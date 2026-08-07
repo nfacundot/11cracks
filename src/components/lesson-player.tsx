@@ -1,0 +1,367 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { submitAnswer, finishLesson } from "@/actions/lesson";
+import { CheckIcon, HeartIcon, XIcon, FlameIcon, BoltIcon, ArrowLeftIcon } from "@/components/icons";
+
+export type PlayerQuestion = {
+  id: string;
+  type: string;
+  prompt: string;
+  explanation?: string | null;
+  timeSeconds?: number | null;
+  options: { id: string; text: string }[];
+};
+
+export type PlayerLesson = {
+  id: string;
+  title: string;
+  emoji: string;
+  xpReward: number;
+};
+
+const MAX_HEARTS = 3;
+
+export function LessonPlayer({
+  lesson,
+  questions,
+}: {
+  lesson: PlayerLesson;
+  questions: PlayerQuestion[];
+}) {
+  const [phase, setPhase] = useState<"intro" | "question" | "feedback" | "results">("intro");
+  const [qIndex, setQIndex] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ correct: boolean; explanation?: string | null } | null>(null);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [hearts, setHearts] = useState(MAX_HEARTS);
+  const [result, setResult] = useState<{ earnedXp: number; perfect: boolean; streak: number } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+
+  const question = questions[qIndex];
+  const total = questions.length;
+  const isLast = qIndex === total - 1;
+  const isPerfect = correctCount === total;
+
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return clearTimer;
+  }, [clearTimer]);
+
+  useEffect(() => {
+    if (phase !== "question" || !question?.timeSeconds) return;
+    timerRef.current = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s === null || s <= 1) return 0;
+        return s - 1;
+      });
+    }, 1000);
+    return clearTimer;
+  }, [phase, question, clearTimer]);
+
+  const timeout = secondsLeft === 0 && phase === "question" && !!question?.timeSeconds;
+
+  useEffect(() => {
+    if (!timeout || busy) return;
+    const t = setTimeout(() => {
+      clearTimer();
+      setSelectedId(null);
+      setFeedback({ correct: false, explanation: "¡Se acabó el tiempo!" });
+      setHearts((h) => h - 1);
+      setPhase("feedback");
+    }, 0);
+    return () => clearTimeout(t);
+  }, [timeout, busy, clearTimer]);
+
+  const pickOption = async (optionId: string) => {
+    if (busy || phase !== "question" || !question) return;
+    setBusy(true);
+    setSelectedId(optionId);
+    clearTimer();
+
+    const res = await submitAnswer({
+      lessonId: lesson.id,
+      questionId: question.id,
+      optionId,
+    });
+
+    if (res.ok) {
+      setFeedback({ correct: res.correct, explanation: res.explanation });
+      if (res.correct) {
+        setCorrectCount((c) => c + 1);
+      } else {
+        setHearts((h) => h - 1);
+      }
+    }
+    setBusy(false);
+    setPhase("feedback");
+  };
+
+  const continueToNext = useCallback(async () => {
+    clearTimer();
+    setSelectedId(null);
+    setFeedback(null);
+    setSecondsLeft(null);
+
+    if (isLast) {
+      setBusy(true);
+      const res = await finishLesson({
+        lessonId: lesson.id,
+        correctCount,
+        totalCount: total,
+      });
+      if (res.ok) {
+        setResult({ earnedXp: res.earnedXp, perfect: res.perfect, streak: res.streak });
+      }
+      setBusy(false);
+      setPhase("results");
+      return;
+    }
+
+    setSecondsLeft(questions[qIndex + 1]?.timeSeconds ?? null);
+    setQIndex((i) => i + 1);
+    setPhase("question");
+  }, [clearTimer, isLast, lesson.id, correctCount, total, questions, qIndex]);
+
+  const resetQuiz = useCallback(() => {
+    clearTimer();
+    setQIndex(0);
+    setSelectedId(null);
+    setFeedback(null);
+    setCorrectCount(0);
+    setHearts(MAX_HEARTS);
+    setResult(null);
+    setSecondsLeft(null);
+    setPhase("intro");
+  }, [clearTimer]);
+
+  const progressPct = Math.round((qIndex / total) * 100);
+
+  if (phase === "intro") {
+    return (
+      <div className="flex flex-col items-center gap-6 pt-8 text-center">
+        <div className="animate-pop rounded-full bg-white p-8 text-7xl shadow-lg shadow-green-100">
+          {lesson.emoji}
+        </div>
+        <div>
+          <h1 className="text-2xl font-black">{lesson.title}</h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            {total} preguntas · {lesson.xpReward} XP · 3 corazones
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            setSecondsLeft(question?.timeSeconds ?? null);
+            setPhase("question");
+          }}
+          className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
+        >
+          Comenzar
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "results") {
+    const colors = ["#fbbf24", "#34d399", "#60a5fa", "#f472b6", "#a78bfa"];
+    return (
+      <div className="relative flex flex-col items-center gap-6 overflow-hidden pt-6 text-center">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-full">
+          {Array.from({ length: 24 }).map((_, i) => (
+            <span
+              key={i}
+              className="confetti-piece"
+              style={{
+                left: `${(i * 100) / 24}%`,
+                backgroundColor: colors[i % colors.length],
+                animationDuration: `${2 + (i % 4) * 0.6}s`,
+                animationDelay: `${i * 0.1}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="animate-pop mt-8 text-6xl">{isPerfect ? "🏆" : hearts === 0 ? "💪" : "⚽"}</div>
+        <div>
+          <h1 className="text-2xl font-black">
+            {hearts === 0 && !isPerfect ? "¡Lo intentaste de nuevo!" : "¡Lección completada!"}
+          </h1>
+          <p className="mt-2 text-sm text-zinc-500">
+            Acertaste {correctCount} de {total} preguntas
+          </p>
+        </div>
+
+        {result && (
+          <div className="flex w-full gap-3">
+            <div className="flex flex-1 flex-col items-center rounded-2xl bg-orange-50 p-4">
+              <div className="flex items-center gap-1 text-orange-500">
+                <FlameIcon className="h-5 w-5" />
+                <span className="text-2xl font-black">{result.streak}</span>
+              </div>
+              <span className="text-xs font-bold text-zinc-500">Racha</span>
+            </div>
+            <div className="flex flex-1 flex-col items-center rounded-2xl bg-green-50 p-4">
+              <div className="flex items-center gap-1 text-green-600">
+                <BoltIcon className="h-5 w-5" />
+                <span className="text-2xl font-black">+{result.earnedXp}</span>
+              </div>
+              <span className="text-xs font-bold text-zinc-500">XP ganado</span>
+            </div>
+          </div>
+        )}
+
+        <div className="flex w-full flex-col gap-3">
+          {hearts === 0 && !isPerfect ? (
+            <button
+              onClick={resetQuiz}
+              className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
+            >
+              Intentar de nuevo
+            </button>
+          ) : (
+            <Link
+              href="/learn"
+              className="w-full rounded-2xl bg-green-500 py-4 text-center text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
+            >
+              Continuar
+            </Link>
+          )}
+          <Link
+            href="/learn"
+            className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50"
+          >
+            Volver al camino
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!question) return null;
+
+  const isFeedback = phase === "feedback";
+  const showCorrect = feedback?.correct;
+  const failed = hearts === 0;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <Link
+          href="/learn"
+          className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600"
+          aria-label="Salir"
+        >
+          <ArrowLeftIcon className="h-5 w-5" />
+        </Link>
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-200">
+          <div
+            className="h-full rounded-full bg-green-500 transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <div className="flex gap-0.5">
+          {Array.from({ length: MAX_HEARTS }).map((_, i) => (
+            <HeartIcon
+              key={i}
+              className={`h-5 w-5 ${i < hearts ? "text-red-500" : "text-zinc-200"}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {question.timeSeconds && (
+        <div className="flex items-center justify-between text-xs font-bold text-zinc-500">
+          <span>Tiempo</span>
+          <div className="flex items-center gap-1">
+            <BoltIcon className="h-4 w-4 text-amber-500" />
+            {secondsLeft}s
+          </div>
+        </div>
+      )}
+
+      <div key={qIndex} className="animate-pop flex flex-col gap-5 pt-2">
+        <h2 className="text-xl font-black leading-snug">{question.prompt}</h2>
+
+        {isFeedback && (
+          <div
+            className={`rounded-2xl p-4 text-sm font-semibold animate-pop ${
+              showCorrect ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
+            }`}
+          >
+            {showCorrect ? "¡Correcto!" : "¡Incorrecto!"}
+            {feedback?.explanation ? (
+              <p className="mt-1 font-normal text-zinc-600">{feedback.explanation}</p>
+            ) : null}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3">
+          {question.options.map((option, i) => {
+            let style = "bg-white text-zinc-700 hover:bg-green-50 hover:border-green-300";
+            if (isFeedback && showCorrect && option.id === selectedId) {
+              style = "bg-green-500 text-white border-green-500";
+            } else if (isFeedback && !showCorrect && option.id === selectedId) {
+              style = "bg-red-500 text-white border-red-500 animate-shake";
+            } else if (isFeedback) {
+              style = "bg-white/50 text-zinc-400 border-zinc-200";
+            }
+
+            return (
+              <button
+                key={option.id}
+                disabled={isFeedback}
+                onClick={() => pickOption(option.id)}
+                className={`flex items-center gap-3 rounded-2xl border-2 border-zinc-200 px-4 py-3.5 text-left font-semibold transition active:scale-95 ${style}`}
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500">
+                  {["A", "B", "C", "D"][i] ?? i + 1}
+                </span>
+                <span className="flex-1">{option.text}</span>
+                {isFeedback && showCorrect && option.id === selectedId && (
+                  <CheckIcon className="h-5 w-5" />
+                )}
+                {isFeedback && !showCorrect && option.id === selectedId && (
+                  <XIcon className="h-5 w-5" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {failed && (
+        <div className="flex flex-col gap-3">
+          <p className="text-center text-sm font-bold text-red-500">
+            Te quedaste sin corazones
+          </p>
+          <button
+            onClick={resetQuiz}
+            className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
+          >
+            Volver a empezar
+          </button>
+        </div>
+      )}
+
+      {isFeedback && !failed && (
+        <button
+          onClick={continueToNext}
+          disabled={busy}
+          className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
+        >
+          {busy ? "..." : isLast ? "Ver resultados" : "Continuar"}
+        </button>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,245 @@
+// 11Cracks - Esquema de datos
+// Plataforma de aprendizaje de fútbol estilo Duolingo
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum TeamRole {
+  OWNER
+  COACH
+  PLAYER
+}
+
+enum LessonType {
+  LESSON
+  QUIZ
+  GAME
+  TRAINING
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  MATCH
+  ORDER
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum NotificationType {
+  STREAK
+  XP
+  LESSON
+  GAME
+  TEAM
+  SYSTEM
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  password     String
+  name         String
+  username     String   @unique
+  avatarUrl    String?
+  bio          String?
+  position     String?
+  favoriteTeam String?
+  country      String?
+  role         Role     @default(USER)
+
+  xp           Int      @default(0)
+  currentStreak Int     @default(0)
+  bestStreak   Int      @default(0)
+  lastActiveAt DateTime?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  teamMembers      TeamMember[]
+  lessonsCompleted LessonProgress[]
+  answers          AnswerRecord[]
+  gameSessions     GameSession[]
+  notifications    Notification[]
+  pushSubscriptions PushSubscription[]
+  streakDays       StreakDay[]
+
+  @@index([xp])
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  description String?
+  logoUrl     String?
+  totalXp     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  members TeamMember[]
+
+  @@index([totalXp])
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     TeamRole @default(PLAYER)
+  joinedAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+}
+
+model StreakDay {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date    DateTime @db.Date
+
+  @@unique([userId, date])
+}
+
+model Stage {
+  id    String   @id @default(cuid())
+  title String
+  emoji String   @default("⭐")
+  color String   @default("#16a34a")
+  order Int      @default(0)
+  xpReward Int   @default(0)
+
+  lessons Lesson[]
+
+  @@index([order])
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  stageId     String?
+  stage       Stage?     @relation(fields: [stageId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  emoji       String     @default("⚽")
+  color       String     @default("#16a34a")
+  type        LessonType @default(LESSON)
+  order       Int        @default(0)
+  xpReward    Int        @default(10)
+  createdAt   DateTime   @default(now())
+
+  questions Question[]
+  progress  LessonProgress[]
+
+  @@index([type, order])
+  @@index([stageId, order])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  lessonId    String
+  lesson      Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  type        QuestionType @default(MULTIPLE_CHOICE)
+  prompt      String
+  imageUrl    String?
+  explanation String?
+  order       Int          @default(0)
+  timeSeconds Int?
+
+  options QuestionOption[]
+  answers AnswerRecord[]
+
+  @@index([lessonId, order])
+}
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean  @default(false)
+  order      Int      @default(0)
+
+  @@index([questionId])
+}
+
+model LessonProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status      ProgressStatus @default(NOT_STARTED)
+  bestScore   Int            @default(0)
+  attempts    Int            @default(0)
+  completed   Boolean        @default(false)
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+  @@index([userId, completed])
+}
+
+model AnswerRecord {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  correct    Boolean
+  answeredAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([questionId])
+}
+
+model GameSession {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType String
+  score    Int      @default(0)
+  playedAt DateTime @default(now())
+
+  @@index([userId, gameType])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType @default(SYSTEM)
+  title     String
+  body      String
+  icon      String?
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  keys      Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f4fbf5;
   --foreground: #171717;
 }
 
@@ -12,15 +12,82 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Prevenir el zoom automático de iOS al enfocar inputs */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Soportar áreas seguras (muescas de Android/iOS) */
+@supports (padding: max(0px)) {
+  .safe-bottom {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  .safe-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-pop {
+  animation: pop 0.3s ease-out both;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out both;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+  animation: confetti-fall linear both;
 }
