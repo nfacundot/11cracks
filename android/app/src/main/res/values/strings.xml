@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">11Cracks</string>
+    <string name="title_activity_main">11Cracks</string>
+    <string name="package_name">com.elevencracks.mobile</string>
+    <string name="custom_url_scheme">com.elevencracks.mobile</string>
+</resources>

@@ -6,9 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "android": "powershell -ExecutionPolicy Bypass -File scripts/celular.ps1",
+    "android:apk": "powershell -ExecutionPolicy Bypass -File scripts/build-apk.ps1",
+    "ios": "echo 'iOS requiere macOS con Xcode. Ve la documentacion.'"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "bcryptjs": "^3.0.3",
