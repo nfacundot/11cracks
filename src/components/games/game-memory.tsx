@@ -73,10 +73,10 @@ export function GameMemory({ pairs = MEMORY_PAIRS }: { pairs?: typeof MEMORY_PAI
   if (showIntro) {
     return (
       <div className="flex flex-col items-center gap-6 pt-8 text-center">
-        <div className="animate-pop rounded-full bg-white p-8 text-7xl shadow-lg shadow-green-100">🧠</div>
+        <div className="animate-pop rounded-full bg-white p-8 text-7xl shadow-lg shadow-green-100 dark:bg-emerald-900 dark:shadow-green-950">🧠</div>
         <div>
           <h1 className="text-2xl font-black">Memoria Táctica</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             Encuentra las {pairs.length} parejas de fútbol · 25 XP por pareja
           </p>
         </div>
@@ -96,18 +96,18 @@ export function GameMemory({ pairs = MEMORY_PAIRS }: { pairs?: typeof MEMORY_PAI
         <div className="animate-pop text-7xl">🎉</div>
         <div>
           <h1 className="text-2xl font-black">¡Memoria completada!</h1>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             {pairs.length} parejas en {tries} intentos
           </p>
         </div>
         <div className="flex w-full gap-3">
-          <div className="flex flex-1 flex-col items-center rounded-2xl bg-green-50 p-4">
-            <span className="text-3xl font-black text-green-600">{pairsFound}✕25</span>
-            <span className="text-xs font-bold text-zinc-500">Puntos</span>
+          <div className="flex flex-1 flex-col items-center rounded-2xl bg-green-50 p-4 dark:bg-green-950/40">
+            <span className="text-3xl font-black text-green-600 dark:text-green-400">{pairsFound}✕25</span>
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Puntos</span>
           </div>
-          <div className="flex flex-1 flex-col items-center rounded-2xl bg-orange-50 p-4">
+          <div className="flex flex-1 flex-col items-center rounded-2xl bg-orange-50 p-4 dark:bg-orange-950/40">
             <span className="text-3xl font-black text-orange-500">+{resultXp}</span>
-            <span className="text-xs font-bold text-zinc-500">XP</span>
+            <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">XP</span>
           </div>
         </div>
         <Link
@@ -122,7 +122,7 @@ export function GameMemory({ pairs = MEMORY_PAIRS }: { pairs?: typeof MEMORY_PAI
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between text-xs font-bold text-zinc-500">
+      <div className="flex items-center justify-between text-xs font-bold text-zinc-500 dark:text-zinc-400">
         <span>
           Parejas: {pairsFound}/{pairs.length}
         </span>
@@ -138,7 +138,7 @@ export function GameMemory({ pairs = MEMORY_PAIRS }: { pairs?: typeof MEMORY_PAI
               onClick={() => clickCard(index)}
               className={`flex aspect-square items-center justify-center rounded-2xl border-2 text-2xl transition-all duration-300 active:scale-95 ${
                 isFlipped
-                  ? "border-green-300 bg-white"
+                  ? "border-green-300 bg-white dark:border-green-600 dark:bg-emerald-900"
                   : "border-emerald-800 bg-emerald-600 hover:bg-emerald-500"
               }`}
             >
@@ -148,7 +148,7 @@ export function GameMemory({ pairs = MEMORY_PAIRS }: { pairs?: typeof MEMORY_PAI
         })}
       </div>
 
-      <p className="text-center text-xs font-bold text-zinc-400">
+      <p className="text-center text-xs font-bold text-zinc-400 dark:text-zinc-500">
         Encuentra las parejas del fútbol
       </p>
     </div>

@@ -66,12 +66,15 @@ export async function getSessionUser() {
       name: true,
       username: true,
       avatarUrl: true,
+      avatarConfig: true,
       role: true,
       bio: true,
       position: true,
       favoriteTeam: true,
       country: true,
       xp: true,
+      coins: true,
+      trophies: true,
       currentStreak: true,
       bestStreak: true,
       createdAt: true,
@@ -85,6 +88,17 @@ export async function requireUser(): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) {
     redirect("/login");
+  }
+  return user;
+}
+
+export async function requireAdmin(): Promise<SessionUser> {
+  const user = await getSessionUser();
+  if (!user) {
+    redirect("/login");
+  }
+  if (user.role !== "ADMIN") {
+    redirect("/learn");
   }
   return user;
 }

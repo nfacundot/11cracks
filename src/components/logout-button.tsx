@@ -12,7 +12,7 @@ export function LogoutButton() {
       <button
         type="submit"
         disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-100 py-3 font-bold text-red-500 transition hover:bg-red-50 active:scale-95 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-red-100 py-3 font-bold text-red-500 transition hover:bg-red-50 active:scale-95 disabled:opacity-60 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/40"
       >
         <LogOutIcon className="h-4 w-4" />
         {pending ? "Saliendo..." : "Cerrar sesión"}

@@ -1,13 +1,17 @@
 import Image from "next/image";
+import { AvatarSvg } from "@/components/avatar-svg";
+import type { AvatarConfig } from "@/lib/avatar";
 
 export function Avatar({
   name,
   src,
+  config,
   size = 40,
   className = "",
 }: {
   name: string;
   src?: string | null;
+  config?: AvatarConfig | null;
   size?: number;
   className?: string;
 }) {
@@ -23,7 +27,9 @@ export function Avatar({
       className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-green-600 font-bold text-white ${className}`}
       style={{ width: size, height: size, fontSize: size * 0.38 }}
     >
-      {src ? (
+      {config ? (
+        <AvatarSvg config={config} size={size} />
+      ) : src ? (
         <Image
           src={src}
           alt={name}

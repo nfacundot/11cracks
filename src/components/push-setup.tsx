@@ -66,7 +66,7 @@ export function PushSetup() {
 
   if (state === "unsupported") {
     return (
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-zinc-400 dark:text-zinc-500">
         Tu navegador no soporta notificaciones push.
       </p>
     );
@@ -75,14 +75,14 @@ export function PushSetup() {
   return (
     <div className="flex flex-col gap-2">
       {state === "enabled" ? (
-        <p className="flex items-center gap-2 text-sm font-bold text-green-600">
+        <p className="flex items-center gap-2 text-sm font-bold text-green-600 dark:text-green-400">
           <BellIcon className="h-4 w-4" /> Notificaciones activadas
         </p>
       ) : (
         <button
           onClick={enable}
           disabled={state === "loading"}
-          className="flex items-center justify-center gap-2 rounded-xl bg-emerald-950 py-3 text-sm font-black text-white transition hover:bg-emerald-900 active:scale-95 disabled:opacity-50"
+          className="flex items-center justify-center gap-2 rounded-xl bg-green-500 py-3 text-sm font-black text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
         >
           <BellIcon className="h-4 w-4" />
           {state === "loading" ? "Activando..." : "Activar notificaciones"}

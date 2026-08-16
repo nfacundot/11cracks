@@ -5,14 +5,14 @@ import { ChevronRightIcon } from "@/components/icons";
 
 export const metadata = { title: "Juegos" };
 
-const games = [
+const classicGames = [
   {
     slug: "penalty",
     emoji: "🥅",
     title: "Tanda de Penales",
     desc: "8 segundos por disparo. Responde rápido y anota goles.",
     color: "#16a34a",
-    bg: "bg-green-50",
+    bg: "bg-green-50 dark:bg-green-950",
   },
   {
     slug: "memory",
@@ -20,7 +20,7 @@ const games = [
     title: "Memoria Táctica",
     desc: "Encuentra las parejas de fútbol en el menor tiempo posible.",
     color: "#2563eb",
-    bg: "bg-blue-50",
+    bg: "bg-blue-50 dark:bg-blue-950",
   },
   {
     slug: "sprint",
@@ -28,12 +28,51 @@ const games = [
     title: "Sprint Express",
     desc: "Verdadero o falso con solo 5 segundos por afirmación.",
     color: "#d97706",
-    bg: "bg-amber-50",
+    bg: "bg-amber-50 dark:bg-amber-950",
+  },
+  {
+    slug: "word",
+    emoji: "🔤",
+    title: "Palabra a Gol",
+    desc: "Escuchá, ordená las letras y anotá goles. Tenés 3 vidas.",
+    color: "#7c3aed",
+    bg: "bg-violet-50 dark:bg-violet-950",
+  },
+  {
+    slug: "infograma",
+    emoji: "🖼️",
+    title: "Infograma",
+    desc: "Elegí la respuesta correcta entre 4 imágenes. 20 segundos por pregunta.",
+    color: "#0891b2",
+    bg: "bg-cyan-50 dark:bg-cyan-950",
   },
 ];
 
+const GAME_MODE_META: Record<string, { label: string; emoji: string }> = {
+  PENALTY: { label: "Tanda de Penales", emoji: "🥅" },
+  MEMORY: { label: "Memoria Táctica", emoji: "🧠" },
+  QUIZ: { label: "Cuestionario", emoji: "📝" },
+  SPRINT: { label: "Sprint Express", emoji: "⚡" },
+  SETBACKS: { label: "Contratiempos", emoji: "⚠️" },
+  INFOGRAMA: { label: "Infograma", emoji: "🖼️" },
+};
+
 export default async function GamesPage() {
   const user = await requireUser();
+
+  const adminGames = await prisma.lesson.findMany({
+    where: {
+      type: "GAME",
+      gameMode: { notIn: ["INFOGRAMA", "ANAGRAM", "MEMORY"] },
+      questions: { some: {} },
+    },
+    orderBy: { createdAt: "asc" },
+    include: {
+      questions: { select: { id: true } },
+      progress: { where: { userId: user.id } },
+      materia: { select: { name: true, emoji: true } },
+    },
+  });
 
   const sessions = await prisma.gameSession.groupBy({
     by: ["gameType"],
@@ -51,18 +90,64 @@ export default async function GamesPage() {
     PENALTY_SHOOTOUT: "penalty",
     MEMORY_MATCH: "memory",
     QUIZ_SPRINT: "sprint",
+    WORD_GOAL: "word",
+    INFOGRAMA: "infograma",
   };
 
   return (
     <div className="flex flex-col gap-4">
       <header>
         <h1 className="text-2xl font-black">Juegos interactivos</h1>
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Entrena tu mente futbolera y gana XP
         </p>
       </header>
 
-      {games.map((game) => {
+      {adminGames.map((game) => {
+        const progress = game.progress[0];
+        const mode = game.gameMode ? GAME_MODE_META[game.gameMode] : null;
+        return (
+          <Link
+            key={game.id}
+            href={`/lesson/${game.id}`}
+            className="group flex items-center gap-4 rounded-3xl bg-purple-50 p-5 ring-1 ring-black/5 transition hover:shadow-md dark:bg-purple-950 dark:ring-white/10"
+          >
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-4xl shadow-sm dark:bg-emerald-900">
+              {game.emoji}
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-purple-500">
+                {mode ? `${mode.emoji} ${mode.label}` : "Juego del administrador"}
+                {game.materia ? ` · ${game.materia.emoji} ${game.materia.name}` : ""}
+              </p>
+              <h2 className="text-lg font-black">{game.title}</h2>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                {game.questions.length} preguntas · {game.xpReward} XP
+              </p>
+              {progress?.completed ? (
+                <p className="mt-1 text-xs font-black text-purple-500">
+                  Completado · {progress.bestScore}/{game.questions.length}
+                </p>
+              ) : progress ? (
+                <p className="mt-1 text-xs font-black text-orange-500">En curso</p>
+              ) : (
+                <p className="mt-1 text-xs font-bold text-zinc-400 dark:text-zinc-500">
+                  Sin jugar todavía
+                </p>
+              )}
+            </div>
+            <ChevronRightIcon className="h-5 w-5 text-zinc-300 transition group-hover:translate-x-1 dark:text-zinc-600" />
+          </Link>
+        );
+      })}
+
+      {adminGames.length > 0 && <div className="my-1" />}
+
+      <p className="text-center text-[11px] font-black uppercase tracking-widest text-zinc-400">
+        Juegos clásicos
+      </p>
+
+      {classicGames.map((game) => {
         const best = Object.entries(bestByType).find(
           ([type]) => typeToSlug[type] === game.slug
         );
@@ -71,27 +156,27 @@ export default async function GamesPage() {
           <Link
             key={game.slug}
             href={`/game/${game.slug}`}
-            className={`group flex items-center gap-4 rounded-3xl ${game.bg} p-5 ring-1 ring-black/5 transition hover:shadow-md`}
+            className={`group flex items-center gap-4 rounded-3xl ${game.bg} p-5 ring-1 ring-black/5 transition hover:shadow-md dark:ring-white/10`}
           >
             <div
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-4xl shadow-sm"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-4xl shadow-sm dark:bg-emerald-900"
             >
               {game.emoji}
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-black">{game.title}</h2>
-              <p className="text-sm text-zinc-500">{game.desc}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">{game.desc}</p>
               {record ? (
                 <p className="mt-1 text-xs font-black" style={{ color: game.color }}>
                   Récord: {record.max} pts · {record.count} jugados
                 </p>
               ) : (
-                <p className="mt-1 text-xs font-bold text-zinc-400">
+                <p className="mt-1 text-xs font-bold text-zinc-400 dark:text-zinc-500">
                   Sin jugar todavía
                 </p>
               )}
             </div>
-            <ChevronRightIcon className="h-5 w-5 text-zinc-300 transition group-hover:translate-x-1" />
+            <ChevronRightIcon className="h-5 w-5 text-zinc-300 transition group-hover:translate-x-1 dark:text-zinc-600" />
           </Link>
         );
       })}

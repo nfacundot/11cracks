@@ -48,7 +48,7 @@ export function AvatarUpload({ name, src }: { name: string; src?: string | null 
         className="group relative rounded-full transition active:scale-95"
         aria-label="Cambiar foto de perfil"
       >
-        <Avatar name={name} src={src} size={88} className="ring-4 ring-white shadow-lg" />
+        <Avatar name={name} src={src} size={88} className="ring-4 ring-white shadow-lg dark:ring-emerald-800" />
         <span className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-green-500 text-white shadow-md transition group-hover:bg-green-600">
           <CameraIcon className="h-4 w-4" />
         </span>
@@ -64,9 +64,9 @@ export function AvatarUpload({ name, src }: { name: string; src?: string | null 
           e.target.value = "";
         }}
       />
-      {uploading && <p className="text-xs font-bold text-zinc-500">Subiendo...</p>}
+      {uploading && <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Subiendo...</p>}
       {error && <p className="text-xs text-red-500">{error}</p>}
-      <p className="text-xs text-zinc-400">Toca para cambiar tu foto</p>
+      <p className="text-xs text-zinc-400 dark:text-zinc-500">Toca para cambiar tu foto</p>
     </div>
   );
 }

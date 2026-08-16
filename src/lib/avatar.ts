@@ -1,0 +1,207 @@
+export type PoseId = "standing" | "celebrate" | "jump" | "kick" | "dribble";
+
+export type AvatarConfig = {
+  skin: string;
+  hair: string;
+  hairColor: string;
+  eyes: string;
+  mouth: string;
+  pose: PoseId;
+  jersey: string;
+  shorts: string;
+  socks: string;
+  boots: string;
+  number: number;
+  shield: string;
+  shieldUrl: string | null;
+  accessory: string;
+  background: string;
+};
+
+export const SKIN_TONES = [
+  "#ffe0bd",
+  "#f1c27d",
+  "#e0ac69",
+  "#c68642",
+  "#8d5524",
+  "#5a3a22",
+  "#3b2f2f",
+] as const;
+
+export const HAIR_STYLES = [
+  { id: "none", label: "Sin pelo" },
+  { id: "short", label: "Corto" },
+  { id: "fringe", label: "Flequillo" },
+  { id: "spiky", label: "Espigado" },
+  { id: "side", label: "Lateral" },
+  { id: "afro", label: "Afro" },
+  { id: "curly", label: "Rizado" },
+  { id: "long", label: "Largo" },
+  { id: "bun", label: "Moño" },
+  { id: "ponytail", label: "Coleta" },
+] as const;
+
+export const HAIR_COLORS = [
+  "#0c0a09",
+  "#3b2f2f",
+  "#7c4a1e",
+  "#b45309",
+  "#eab308",
+  "#f59e0b",
+  "#ef4444",
+  "#94a3b8",
+  "#f8fafc",
+] as const;
+
+export const EYE_STYLES = [
+  { id: "normal", label: "Normales" },
+  { id: "round", label: "Grandes" },
+  { id: "closed", label: "Cerrados" },
+] as const;
+
+export const MOUTH_STYLES = [
+  { id: "smile", label: "Sonrisa" },
+  { id: "smirk", label: "Picara" },
+  { id: "laugh", label: "Risa" },
+  { id: "grin", label: "Dientes" },
+  { id: "shy", label: "Timida" },
+  { id: "neutral", label: "Serio" },
+] as const;
+
+export const POSE_STYLES = [
+  { id: "standing", label: "De pie" },
+  { id: "celebrate", label: "Celebrando" },
+  { id: "jump", label: "Saltando" },
+  { id: "kick", label: "Disparando" },
+  { id: "dribble", label: "Regateando" },
+] as const;
+
+export const KIT_COLORS = [
+  "#16a34a",
+  "#2563eb",
+  "#dc2626",
+  "#ea580c",
+  "#7c3aed",
+  "#0ea5e9",
+  "#facc15",
+  "#111827",
+  "#f8fafc",
+  "#ec4899",
+  "#64748b",
+  "#84cc16",
+] as const;
+
+export const UNIFORM_PRESETS = [
+  { id: "clasico", label: "Clásico", jersey: "#16a34a", shorts: "#f8fafc", socks: "#16a34a" },
+  { id: "local", label: "Local", jersey: "#2563eb", shorts: "#f8fafc", socks: "#f8fafc" },
+  { id: "visitante", label: "Visitante", jersey: "#f8fafc", shorts: "#111827", socks: "#111827" },
+  { id: "rojo", label: "Rojo", jersey: "#dc2626", shorts: "#dc2626", socks: "#dc2626" },
+  { id: "negro", label: "Negro", jersey: "#111827", shorts: "#111827", socks: "#111827" },
+  { id: "dorado", label: "Dorado", jersey: "#facc15", shorts: "#111827", socks: "#facc15" },
+] as const;
+
+export const SHIELDS = [
+  { id: "none", emoji: "—", label: "Sin escudo" },
+  { id: "star", emoji: "⭐", label: "Estrella" },
+  { id: "ball", emoji: "⚽", label: "Balón" },
+  { id: "bolt", emoji: "⚡", label: "Rayo" },
+  { id: "crown", emoji: "👑", label: "Corona" },
+  { id: "flame", emoji: "🔥", label: "Fuego" },
+  { id: "heart", emoji: "💚", label: "Corazón" },
+  { id: "custom", emoji: "🖼️", label: "Mi escudo" },
+] as const;
+
+export const ACCESSORIES = [
+  { id: "none", label: "Ninguno" },
+  { id: "headband", label: "Cinta" },
+  { id: "cap", label: "Gorra" },
+] as const;
+
+export const BACKGROUNDS = [
+  "#111827",
+  "#14532d",
+  "#1e3a8a",
+  "#7f1d1d",
+  "#4c1d95",
+  "#0f766e",
+  "#eab308",
+  "#f8fafc",
+] as const;
+
+export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
+  skin: "#f1c27d",
+  hair: "short",
+  hairColor: "#3b2f2f",
+  eyes: "normal",
+  mouth: "smile",
+  pose: "standing",
+  jersey: "#16a34a",
+  shorts: "#f8fafc",
+  socks: "#16a34a",
+  boots: "#111827",
+  number: 10,
+  shield: "none",
+  shieldUrl: null,
+  accessory: "none",
+  background: "#111827",
+};
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+
+const SKIN_SET = new Set<string>(SKIN_TONES);
+const HAIR_COLOR_SET = new Set<string>(HAIR_COLORS);
+const KIT_SET = new Set<string>(KIT_COLORS);
+const BG_SET = new Set<string>(BACKGROUNDS);
+
+const HAIR_ID_SET = new Set(HAIR_STYLES.map((s) => s.id));
+const EYE_ID_SET = new Set(EYE_STYLES.map((s) => s.id));
+const MOUTH_ID_SET = new Set(MOUTH_STYLES.map((s) => s.id));
+const POSE_ID_SET = new Set(POSE_STYLES.map((s) => s.id));
+const SHIELD_ID_SET = new Set(SHIELDS.map((s) => s.id));
+const ACC_ID_SET = new Set(ACCESSORIES.map((s) => s.id));
+
+function inSet(value: unknown, set: Set<string>, fallback: string): string {
+  const s = String(value ?? "");
+  return set.has(s) && HEX_RE.test(s) ? s : fallback;
+}
+
+function inIds(value: unknown, ids: Set<string>, fallback: string): string {
+  const s = String(value ?? "");
+  return ids.has(s) ? s : fallback;
+}
+
+export function parseAvatarConfig(value: unknown): AvatarConfig | null {
+  const config = validateAvatarConfig(value);
+  return config ?? null;
+}
+
+export function validateAvatarConfig(value: unknown): AvatarConfig | null {
+  if (typeof value !== "object" || value === null) return null;
+
+  const c = value as Record<string, unknown>;
+  const num = Number(c.number);
+  const d = DEFAULT_AVATAR_CONFIG;
+  const shieldUrl =
+    typeof c.shieldUrl === "string" && c.shieldUrl.startsWith("/uploads/")
+      ? c.shieldUrl
+      : null;
+
+  return {
+    skin: inSet(c.skin, SKIN_SET, d.skin),
+    hair: inIds(c.hair, HAIR_ID_SET, d.hair),
+    hairColor: inSet(c.hairColor, HAIR_COLOR_SET, d.hairColor),
+    eyes: inIds(c.eyes, EYE_ID_SET, d.eyes),
+    mouth: inIds(c.mouth, MOUTH_ID_SET, d.mouth),
+    pose: inIds(c.pose, POSE_ID_SET, d.pose) as PoseId,
+    jersey: inSet(c.jersey, KIT_SET, d.jersey),
+    shorts: inSet(c.shorts, KIT_SET, d.shorts),
+    socks: inSet(c.socks, KIT_SET, d.socks),
+    boots: inSet(c.boots, KIT_SET, d.boots),
+    number:
+      Number.isInteger(num) && num >= 1 && num <= 99 ? num : d.number,
+    shield: inIds(c.shield, SHIELD_ID_SET, d.shield),
+    shieldUrl,
+    accessory: inIds(c.accessory, ACC_ID_SET, d.accessory),
+    background: inSet(c.background, BG_SET, d.background),
+  };
+}

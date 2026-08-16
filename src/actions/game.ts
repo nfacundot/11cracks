@@ -9,6 +9,14 @@ export type GameResult =
   | { ok: true; xpGained: number; bestScore: boolean }
   | { ok: false; error: string };
 
+const GAME_NAMES: Record<string, string> = {
+  PENALTY_SHOOTOUT: "Tanda de Penales",
+  MEMORY_MATCH: "Memoria Táctica",
+  QUIZ_SPRINT: "Sprint Express",
+  WORD_GOAL: "Palabra a Gol",
+  INFOGRAMA: "Infograma",
+};
+
 export async function recordGameScore(gameType: string, score: number): Promise<GameResult> {
   const user = await requireUser();
 
@@ -33,7 +41,7 @@ export async function recordGameScore(gameType: string, score: number): Promise<
     user.id,
     "GAME",
     "¡Partido jugado! ⚽",
-    `Terminaste ${gameType} con ${safeScore} puntos. Ganaste ${xpGained} XP.`,
+    `Terminaste ${GAME_NAMES[gameType] ?? gameType} con ${safeScore} puntos. Ganaste ${xpGained} XP.`,
     { icon: "🎮", link: "/games" }
   );
 

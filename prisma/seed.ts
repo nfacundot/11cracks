@@ -19,6 +19,7 @@ type LessonSeed = {
   emoji: string;
   color: string;
   type: "LESSON" | "QUIZ" | "GAME" | "TRAINING";
+  gameMode?: "ANAGRAM" | null;
   xpReward: number;
   questions: QuestionSeed[];
 };
@@ -612,40 +613,128 @@ const lessons: LessonSeed[] = [
       },
     ],
   },
+  {
+    title: "Palabras en juego",
+    description: "Ordena las letras para formar la palabra en inglés. A menor tiempo, más goles.",
+    emoji: "🔤",
+    color: "#0891b2",
+    type: "GAME",
+    gameMode: "ANAGRAM",
+    xpReward: 20,
+    questions: [
+      { type: "MULTIPLE_CHOICE", prompt: "GOAL", explanation: "Gol", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "PENALTY", explanation: "Penal", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "MATCH", explanation: "Partido", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "TEAM", explanation: "Equipo", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "COACH", explanation: "Entrenador", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "STADIUM", explanation: "Estadio", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "PLAYER", explanation: "Jugador", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "DEFENSE", explanation: "Defensa", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "FORWARD", explanation: "Delantero", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "CHAMPION", explanation: "Campeón", options: [] },
+    ],
+  },
 ];
 
-const stages: { title: string; emoji: string; color: string; xpReward: number }[] = [
-  { title: "Los fundamentos", emoji: "⚽", color: "#16a34a", xpReward: 60 },
-  { title: "Reglas del juego", emoji: "🟨", color: "#dc2626", xpReward: 60 },
-  { title: "Torneos y táctica", emoji: "🏆", color: "#9333ea", xpReward: 60 },
-  { title: "Retos técnicos", emoji: "👟", color: "#2563eb", xpReward: 60 },
+const materias: { name: string; emoji: string; color: string; xpReward: number }[] = [
+  { name: "Training sport", emoji: "💪", color: "#16a34a", xpReward: 60 },
+  { name: "Gastronomía sport", emoji: "🍽️", color: "#d97706", xpReward: 60 },
+  { name: "Día de Hotel", emoji: "🏨", color: "#2563eb", xpReward: 60 },
+  { name: "Descansar", emoji: "😴", color: "#0891b2", xpReward: 60 },
+  { name: "Día de juego", emoji: "🏟️", color: "#9333ea", xpReward: 60 },
 ];
 
-const STAGE_SIZE = 3;
+const etapas: {
+  id: string;
+  name: string;
+  description: string;
+  emoji: string;
+  color: string;
+  order: number;
+}[] = [
+  {
+    id: "subject-futbol",
+    name: "Fundamentos del Fútbol",
+    description: "Reglas, posiciones y técnica básica del deporte rey.",
+    emoji: "⚽",
+    color: "#16a34a",
+    order: 0,
+  },
+  {
+    id: "subject-cultura",
+    name: "Cultura Futbolera",
+    description: "Historia, torneos y curiosidades del mundo del fútbol.",
+    emoji: "🏆",
+    color: "#9333ea",
+    order: 1,
+  },
+];
+
+const MATERIA_ETAPAS: Record<string, string> = {
+  "stage-1": "subject-futbol",
+  "stage-2": "subject-cultura",
+  "stage-3": "subject-futbol",
+  "stage-4": "subject-cultura",
+  "stage-5": "subject-futbol",
+};
+
+const STAGE_SIZES = [3, 3, 2, 2, 2];
 
 async function main() {
   const existing = await prisma.lesson.count();
 
+  for (const etapa of etapas) {
+    await prisma.etapa.upsert({
+      where: { id: etapa.id },
+      update: {
+        name: etapa.name,
+        description: etapa.description,
+        emoji: etapa.emoji,
+        color: etapa.color,
+        order: etapa.order,
+      },
+      create: {
+        id: etapa.id,
+        name: etapa.name,
+        description: etapa.description,
+        emoji: etapa.emoji,
+        color: etapa.color,
+        order: etapa.order,
+      },
+    });
+  }
+
   const stageRows = await Promise.all(
-    stages.map((s, i) =>
-      prisma.stage.upsert({
+    materias.map((s, i) =>
+      prisma.materia.upsert({
         where: { id: `stage-${i + 1}` },
-        update: {},
+        update: {
+          name: s.name,
+          emoji: s.emoji,
+          color: s.color,
+          xpReward: s.xpReward,
+          etapaId: MATERIA_ETAPAS[`stage-${i + 1}`],
+        },
         create: {
           id: `stage-${i + 1}`,
-          title: s.title,
+          name: s.name,
           emoji: s.emoji,
           color: s.color,
           order: i,
           xpReward: s.xpReward,
+          etapaId: MATERIA_ETAPAS[`stage-${i + 1}`],
         },
       })
     )
   );
 
-  const stageIdFor = (lessonIndex: number) => {
-    const stageIndex = Math.floor(lessonIndex / STAGE_SIZE);
-    return stageRows[Math.min(stageIndex, stageRows.length - 1)]?.id ?? null;
+  const materiaIdFor = (lessonIndex: number) => {
+    let acc = 0;
+    for (let i = 0; i < STAGE_SIZES.length; i++) {
+      acc += STAGE_SIZES[i];
+      if (lessonIndex < acc) return stageRows[i]?.id ?? null;
+    }
+    return stageRows[stageRows.length - 1]?.id ?? null;
   };
 
   const admin = await prisma.user.upsert({
@@ -671,13 +760,13 @@ async function main() {
     const dbLessons = await prisma.lesson.findMany({ orderBy: { order: "asc" } });
     let assigned = 0;
     for (const [i, lesson] of dbLessons.entries()) {
-      const stageId = stageIdFor(i);
-      if (lesson.stageId !== stageId) {
-        await prisma.lesson.update({ where: { id: lesson.id }, data: { stageId } });
+      const materiaId = materiaIdFor(i);
+      if (lesson.materiaId !== materiaId) {
+        await prisma.lesson.update({ where: { id: lesson.id }, data: { materiaId } });
         assigned += 1;
       }
     }
-    console.log(`Ya hay ${existing} lecciones. Etapas asignadas: ${assigned}. Seed omitido.`);
+    console.log(`Ya hay ${existing} lecciones. Materias asignadas: ${assigned}. Seed omitido.`);
     return;
   }
 
@@ -690,9 +779,10 @@ async function main() {
         emoji: lesson.emoji,
         color: lesson.color,
         type: lesson.type,
+        gameMode: lesson.gameMode ?? null,
         xpReward: lesson.xpReward,
         order,
-        stageId: stageIdFor(order),
+        materiaId: materiaIdFor(order),
         questions: {
           create: lesson.questions.map((q, qi) => ({
             type: q.type,

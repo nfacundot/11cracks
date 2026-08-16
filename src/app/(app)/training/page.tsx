@@ -24,7 +24,7 @@ export default async function TrainingPage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black">Entrenamiento</h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Sesiones de práctica para mejorar tu juego
           </p>
         </div>
@@ -59,7 +59,7 @@ export default async function TrainingPage() {
           <Link
             key={training.id}
             href={`/lesson/${training.id}`}
-            className="group flex items-center gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-green-100 transition hover:shadow-md"
+            className="group flex items-center gap-4 rounded-3xl bg-white/60 backdrop-blur-xl p-5 shadow-sm ring-1 ring-green-100 transition hover:shadow-md dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900"
           >
             <div
               className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl"
@@ -69,10 +69,10 @@ export default async function TrainingPage() {
             </div>
             <div className="flex-1">
               <h2 className="font-black">{training.title}</h2>
-              <p className="line-clamp-1 text-sm text-zinc-500">
+              <p className="line-clamp-1 text-sm text-zinc-500 dark:text-zinc-400">
                 {training.description}
               </p>
-              <p className="mt-0.5 flex items-center gap-1 text-xs font-bold text-zinc-400">
+              <p className="mt-0.5 flex items-center gap-1 text-xs font-bold text-zinc-400 dark:text-zinc-500">
                 <TimerIcon className="h-3.5 w-3.5" />
                 {estimated} min aprox · {training.xpReward} XP
               </p>

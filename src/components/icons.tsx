@@ -92,6 +92,17 @@ export function TrophyIcon({ className }: IconProps) {
   );
 }
 
+export function CoinIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M14.8 9.2a3 3 0 0 0-4.2.1c-.9.9-.9 2.1 0 3s2.8.9 3.7 1.8.9 2.1 0 3a3 3 0 0 1-4.2.1" />
+      <path d="M12 6.5v2" />
+      <path d="M12 15.5v2" />
+    </svg>
+  );
+}
+
 export function StarIcon({ className }: IconProps) {
   return (
     <svg {...base(className)}>
@@ -113,6 +124,14 @@ export function CheckIcon({ className }: IconProps) {
   return (
     <svg {...base(className)}>
       <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
@@ -141,6 +160,26 @@ export function UsersIcon({ className }: IconProps) {
       <circle cx="9" cy="7" r="4" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+export function UserPlusIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M19 8v6" />
+      <path d="M22 11h-6" />
+    </svg>
+  );
+}
+
+export function BookIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     </svg>
   );
 }
@@ -212,8 +251,18 @@ export function BallIcon({ className }: IconProps) {
 export function EyeIcon({ className }: IconProps) {
   return (
     <svg {...base(className)}>
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+export function MapIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+      <line x1="9" y1="3" x2="9" y2="18" />
+      <line x1="15" y1="6" x2="15" y2="21" />
     </svg>
   );
 }
@@ -225,6 +274,18 @@ export function EyeOffIcon({ className }: IconProps) {
       <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c6.5 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
       <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3.5 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
       <line x1="2" x2="22" y1="2" y2="22" />
+    </svg>
+  );
+}
+
+export function JoystickIcon({ className }: IconProps) {
+  return (
+    <svg {...base(className)}>
+      <rect x="2" y="6" width="12" height="12" rx="3" />
+      <path d="M6 9v6" />
+      <path d="M9 12H3" />
+      <circle cx="17" cy="10" r="1.6" />
+      <circle cx="20" cy="13" r="1.6" />
     </svg>
   );
 }

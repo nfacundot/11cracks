@@ -12,7 +12,9 @@ datasource db {
 
 enum Role {
   ADMIN
-  USER
+  COACH
+  PARENT
+  STUDENT
 }
 
 enum TeamRole {
@@ -26,6 +28,16 @@ enum LessonType {
   QUIZ
   GAME
   TRAINING
+}
+
+enum GameMode {
+  PENALTY
+  MEMORY
+  QUIZ
+  SPRINT
+  SETBACKS
+  ANAGRAM
+  INFOGRAMA
 }
 
 enum QuestionType {
@@ -57,13 +69,16 @@ model User {
   name         String
   username     String   @unique
   avatarUrl    String?
+  avatarConfig Json?
   bio          String?
   position     String?
   favoriteTeam String?
   country      String?
-  role         Role     @default(USER)
+  role         Role     @default(STUDENT)
 
   xp           Int      @default(0)
+  coins        Int      @default(0)
+  trophies     Int      @default(0)
   currentStreak Int     @default(0)
   bestStreak   Int      @default(0)
   lastActiveAt DateTime?
@@ -117,28 +132,48 @@ model StreakDay {
   @@unique([userId, date])
 }
 
-model Stage {
-  id    String   @id @default(cuid())
-  title String
-  emoji String   @default("⭐")
-  color String   @default("#16a34a")
-  order Int      @default(0)
-  xpReward Int   @default(0)
+model Etapa {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  emoji       String   @default("🗺️")
+  color       String   @default("#16a34a")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
 
-  lessons Lesson[]
+  materias Materia[]
 
   @@index([order])
 }
 
+model Materia {
+  id       String  @id @default(cuid())
+  etapaId  String?
+  etapa    Etapa?  @relation(fields: [etapaId], references: [id], onDelete: SetNull)
+  name     String
+  emoji    String  @default("⭐")
+  color    String  @default("#16a34a")
+  order    Int     @default(0)
+  xpReward Int     @default(0)
+  posX     Float   @default(50)
+  posY     Float   @default(50)
+
+  lessons Lesson[]
+
+  @@index([order])
+  @@index([etapaId, order])
+}
+
 model Lesson {
-  id          String     @id @default(cuid())
-  stageId     String?
-  stage       Stage?     @relation(fields: [stageId], references: [id], onDelete: SetNull)
-  title       String
+  id        String     @id @default(cuid())
+  materiaId String?
+  materia   Materia?   @relation(fields: [materiaId], references: [id], onDelete: SetNull)
+  title     String
   description String?
   emoji       String     @default("⚽")
   color       String     @default("#16a34a")
   type        LessonType @default(LESSON)
+  gameMode    GameMode?
   order       Int        @default(0)
   xpReward    Int        @default(10)
   createdAt   DateTime   @default(now())
@@ -147,7 +182,7 @@ model Lesson {
   progress  LessonProgress[]
 
   @@index([type, order])
-  @@index([stageId, order])
+  @@index([materiaId, order])
 }
 
 model Question {
@@ -172,6 +207,7 @@ model QuestionOption {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   text       String
+  imageUrl   String?
   isCorrect  Boolean  @default(false)
   order      Int      @default(0)
 

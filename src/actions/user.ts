@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
+import { validateAvatarConfig, type AvatarConfig } from "@/lib/avatar";
 
 export type ProfileState = { error?: string; success?: string } | undefined;
 
@@ -48,6 +49,26 @@ export async function setAvatar(avatarUrl: string) {
   return { success: true };
 }
 
+export async function setAvatarConfig(config: AvatarConfig) {
+  const user = await requireUser();
+
+  const valid = validateAvatarConfig(config);
+  if (!valid) {
+    return { error: "Configuración de avatar no válida" };
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { avatarConfig: valid },
+  });
+
+  revalidatePath("/profile");
+  revalidatePath("/ranking");
+  revalidatePath("/teams");
+  revalidatePath("/notifications");
+  return { success: true };
+}
+
 export async function markAllNotificationsRead() {
   const user = await requireUser();
   await prisma.notification.updateMany({
@@ -71,6 +92,6 @@ export async function markNotificationRead(id: string) {
 export async function claimDailyStreak() {
   const user = await requireUser();
   const result = await touchStreak(user.id);
-  revalidatePath("/dashboard");
+  revalidatePath("/profile");
   return { ok: true, ...result };
 }

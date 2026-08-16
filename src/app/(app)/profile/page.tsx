@@ -2,9 +2,11 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { xpToLevel, levelProgress } from "@/lib/streak";
-import { AvatarUpload } from "@/components/avatar-upload";
+import { AvatarEditor } from "@/components/avatar-editor";
+import { parseAvatarConfig } from "@/lib/avatar";
 import { ProfileForm } from "@/components/profile-form";
 import { LogoutButton } from "@/components/logout-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   FlameIcon,
   BoltIcon,
@@ -32,12 +34,16 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="flex flex-col items-center gap-3 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-green-100">
-        <AvatarUpload name={user.name} src={user.avatarUrl} />
+      <section className="flex flex-col items-center gap-3 rounded-3xl bg-white/60 backdrop-blur-xl p-6 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
+        <AvatarEditor
+          name={user.name}
+          src={user.avatarUrl}
+          config={parseAvatarConfig(user.avatarConfig)}
+        />
         <div className="text-center">
           <h1 className="text-2xl font-black">{user.name}</h1>
-          <p className="text-sm text-zinc-500">@{user.username}</p>
-          {user.bio && <p className="mt-2 text-sm text-zinc-600">{user.bio}</p>}
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">@{user.username}</p>
+          {user.bio && <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{user.bio}</p>}
         </div>
 
         <div className="mt-2 flex w-full flex-wrap justify-center gap-2">
@@ -80,38 +86,38 @@ export default async function ProfilePage() {
         </p>
       </section>
 
-      <section className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-green-100">
-          <div className="flex items-center gap-2 text-green-600">
-            <BoltIcon className="h-5 w-5" />
-            <span className="text-2xl font-black">{user.xp}</span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-white/60 backdrop-blur-xl p-4 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+              <BoltIcon className="h-5 w-5" />
+              <span className="text-2xl font-black">{user.xp}</span>
+            </div>
+            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500">XP total</p>
           </div>
-          <p className="text-xs font-bold text-zinc-400">XP total</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-green-100">
-          <div className="flex items-center gap-2 text-orange-500">
-            <StarIcon className="h-5 w-5" />
-            <span className="text-2xl font-black">{streakDays}</span>
+          <div className="rounded-2xl bg-white/60 backdrop-blur-xl p-4 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
+            <div className="flex items-center gap-2 text-orange-500">
+              <StarIcon className="h-5 w-5" />
+              <span className="text-2xl font-black">{streakDays}</span>
+            </div>
+            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500">Días activos</p>
           </div>
-          <p className="text-xs font-bold text-zinc-400">Días activos</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-green-100">
-          <div className="flex items-center gap-2 text-emerald-600">
-            <TrophyIcon className="h-5 w-5" />
-            <span className="text-2xl font-black">{lessonsDone}</span>
+          <div className="rounded-2xl bg-white/60 backdrop-blur-xl p-4 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
+            <div className="flex items-center gap-2 text-emerald-600">
+              <TrophyIcon className="h-5 w-5" />
+              <span className="text-2xl font-black">{lessonsDone}</span>
+            </div>
+            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500">Lecciones</p>
           </div>
-          <p className="text-xs font-bold text-zinc-400">Lecciones</p>
-        </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-green-100">
-          <div className="flex items-center gap-2 text-blue-500">
-            <GamepadIcon className="h-5 w-5" />
-            <span className="text-2xl font-black">{gamesPlayed}</span>
+          <div className="rounded-2xl bg-white/60 backdrop-blur-xl p-4 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
+            <div className="flex items-center gap-2 text-blue-500">
+              <GamepadIcon className="h-5 w-5" />
+              <span className="text-2xl font-black">{gamesPlayed}</span>
+            </div>
+            <p className="text-xs font-bold text-zinc-400 dark:text-zinc-500">Juegos</p>
           </div>
-          <p className="text-xs font-bold text-zinc-400">Juegos</p>
         </div>
-      </section>
 
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-green-100">
+      <section className="rounded-3xl bg-white/60 backdrop-blur-xl p-5 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
         <h2 className="mb-3 flex items-center gap-2 font-black">
           <UsersIcon className="h-5 w-5 text-amber-500" />
           Editar perfil
@@ -120,9 +126,10 @@ export default async function ProfilePage() {
       </section>
 
       <div className="flex flex-col gap-2">
+        <ThemeToggle />
         <Link
           href="/teams"
-          className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50"
+          className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950/40"
         >
           Mis equipos ({teamsCount})
         </Link>

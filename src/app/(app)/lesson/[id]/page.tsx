@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { LessonPlayer } from "@/components/lesson-player";
@@ -33,6 +33,16 @@ export default async function LessonPage({
   });
 
   if (!lesson) notFound();
+
+  if (lesson.gameMode === "INFOGRAMA") {
+    redirect("/game/infograma");
+  }
+  if (lesson.gameMode === "ANAGRAM") {
+    redirect("/game/word");
+  }
+  if (lesson.gameMode === "MEMORY") {
+    redirect("/game/memory");
+  }
 
   const questions = lesson.questions.map((q) => ({
     id: q.id,

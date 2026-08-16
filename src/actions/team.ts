@@ -32,13 +32,17 @@ export async function createTeam(prev: TeamState, formData: FormData): Promise<T
   });
 
   await prisma.teamMember.create({
-    data: { teamId: team.id, userId: user.id, role: "OWNER" },
+    data: {
+      teamId: team.id,
+      userId: user.id,
+      role: user.role === "COACH" ? "COACH" : "OWNER",
+    },
   });
 
   await notify(
     user.id,
     "TEAM",
-    "¡Equipo creado! 🛡️",
+    user.role === "COACH" ? "¡Equipo creado! 🛡️" : "¡Equipo creado! 🛡️",
     `"${team.name}" está listo. Comparte el código ${team.code} para invitar jugadores.`,
     { icon: "🛡️", link: `/team/${team.id}` }
   );
@@ -80,6 +84,57 @@ export async function joinTeam(prev: TeamState, formData: FormData): Promise<Tea
   );
 
   redirect(`/team/${team.id}`);
+}
+
+export async function addMember(
+  prev: TeamState,
+  formData: FormData
+): Promise<TeamState> {
+  const user = await requireUser();
+  const teamId = String(formData.get("teamId") || "");
+  const username = String(formData.get("username") || "").trim().replace(/^@/, "");
+
+  if (!username) {
+    return { error: "Escribe el usuario del estudiante" };
+  }
+
+  const myMembership = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId, userId: user.id } },
+  });
+
+  if (!myMembership || myMembership.role === "PLAYER") {
+    return { error: "No tienes permisos" };
+  }
+
+  const student = await prisma.user.findUnique({ where: { username } });
+  if (!student) {
+    return { error: `No existe un usuario llamado @${username}` };
+  }
+
+  if (student.id === user.id) {
+    return { error: "No puedes agregarte a ti mismo" };
+  }
+
+  const already = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId, userId: student.id } },
+  });
+  if (already) {
+    return { error: `${student.name} ya pertenece al equipo` };
+  }
+
+  await prisma.teamMember.create({
+    data: { teamId, userId: student.id, role: "PLAYER" },
+  });
+
+  await notify(
+    student.id,
+    "TEAM",
+    "¡Te agregaron a un equipo! ⚽",
+    `Tu entrenador te agregó al equipo.`,
+    { icon: "⚽", link: `/team/${teamId}` }
+  );
+
+  return { success: `${student.name} se unió al equipo` };
 }
 
 export async function leaveTeam(teamId: string) {

@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { updateProfile, type ProfileState } from "@/actions/user";
 
 const inputCls =
-  "w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-medium text-zinc-800 placeholder-zinc-400 outline-none transition focus:border-green-400";
+  "w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-medium text-zinc-800 placeholder-zinc-400 outline-none transition focus:border-green-400 dark:border-zinc-700 dark:bg-emerald-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-green-500";
 
 export function ProfileForm({
   user,
@@ -31,22 +31,22 @@ export function ProfileForm({
   return (
     <form action={action} className="flex flex-col gap-3">
       {state?.error && (
-        <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
+        <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600 dark:bg-red-950/40 dark:text-red-400">
           {state.error}
         </p>
       )}
       {state?.success && (
-        <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600">
+        <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600 dark:bg-green-950/40 dark:text-green-400">
           {state.success}
         </p>
       )}
 
-      <label className="text-xs font-bold text-zinc-500">
+      <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
         Nombre
         <input name="name" defaultValue={user.name} required minLength={2} className={`${inputCls} mt-1`} />
       </label>
 
-      <label className="text-xs font-bold text-zinc-500">
+      <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
         Posición
         <input
           name="position"
@@ -56,7 +56,7 @@ export function ProfileForm({
         />
       </label>
 
-      <label className="text-xs font-bold text-zinc-500">
+      <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
         Equipo favorito
         <input
           name="favoriteTeam"
@@ -66,7 +66,7 @@ export function ProfileForm({
         />
       </label>
 
-      <label className="text-xs font-bold text-zinc-500">
+      <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
         País
         <input
           name="country"
@@ -76,7 +76,7 @@ export function ProfileForm({
         />
       </label>
 
-      <label className="text-xs font-bold text-zinc-500">
+      <label className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
         Biografía
         <textarea
           name="bio"

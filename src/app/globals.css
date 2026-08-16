@@ -1,23 +1,61 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f4fbf5;
+  --background: #000000;
+  --foreground: #ecfdf5;
+  --btn: #83b713;
+  --btn-hover: #6f9c10;
+}
+
+:root.light {
+  --background: #f2f4f6;
   --foreground: #171717;
+  --btn: #22c55e;
+  --btn-hover: #16a34a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-green-500: var(--btn);
+  --color-green-600: var(--btn-hover);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-emerald-950: #0d0d10;
+  --color-emerald-900: #141418;
+  --color-emerald-800: #25252c;
+  --color-green-900: #25252c;
+  --color-green-800: #1b1b20;
+  --color-zinc-800: #1a1a1f;
+}
+
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 640px at 50% -12%, rgba(34, 197, 94, 0.12), transparent 62%),
+    radial-gradient(900px 500px at 100% 110%, rgba(131, 183, 19, 0.08), transparent 60%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+}
+
+/* Paneles de vidrio (glassmorphism) */
+.glass {
+  background-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+.glass-dark {
+  background-color: rgba(13, 13, 16, 0.55);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 
 /* Prevenir el zoom automático de iOS al enfocar inputs */
@@ -75,12 +113,126 @@ textarea {
   }
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px) scale(1.04);
+  }
+  60% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
+  }
+}
+
 .animate-pop {
   animation: pop 0.3s ease-out both;
 }
 
 .animate-shake {
   animation: shake 0.4s ease-in-out both;
+}
+
+.animate-float {
+  animation: float 2.4s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.6s ease-in-out infinite;
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 1.4s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes kick-ball {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(0, -60px) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--kick-x, 0), -130px) scale(0.7);
+    opacity: 0.95;
+  }
+}
+
+@keyframes keeper-dive {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate(var(--dive-x, 70px), 0) rotate(-25deg);
+  }
+}
+
+@keyframes net-shake {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.03, 1.06);
+  }
+}
+
+.animate-kick-ball {
+  animation: kick-ball 0.6s ease-out forwards;
+}
+
+.animate-keeper-dive {
+  animation: keeper-dive 0.5s ease-in forwards;
+}
+
+.animate-net-shake {
+  animation: net-shake 0.6s ease-out;
 }
 
 .confetti-piece {
@@ -90,4 +242,30 @@ textarea {
   height: 16px;
   border-radius: 2px;
   animation: confetti-fall linear both;
+}
+
+@keyframes sheet-up {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out both;
 }

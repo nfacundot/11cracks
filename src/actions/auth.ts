@@ -62,7 +62,7 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
   await setSessionCookie(signToken({ id: user.id }));
   await touchStreak(user.id);
 
-  redirect("/dashboard");
+  redirect("/learn");
 }
 
 const loginSchema = z.object({
@@ -91,7 +91,10 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   await setSessionCookie(signToken({ id: user.id }));
   await touchStreak(user.id);
 
-  redirect("/dashboard");
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  }
+  redirect("/learn");
 }
 
 export async function logout() {

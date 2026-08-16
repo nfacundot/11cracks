@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { leaveTeam, removeMember } from "@/actions/team";
 import { CheckIcon, LogOutIcon, XIcon } from "@/components/icons";
+import { useConfirmDialog } from "@/components/confirm-dialog";
 
 export function TeamActions({
   teamId,
@@ -25,6 +26,7 @@ export function TeamActions({
   const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
+  const { confirm, node } = useConfirmDialog();
 
   const copy = async () => {
     if (!copyCode) return;
@@ -38,7 +40,7 @@ export function TeamActions({
   };
 
   const doLeave = async () => {
-    if (!confirm("¿Seguro que quieres salir de este equipo?")) return;
+    if (!(await confirm("¿Seguro que quieres salir de este equipo?"))) return;
     setBusy(true);
     await leaveTeam(teamId);
     router.refresh();
@@ -46,7 +48,7 @@ export function TeamActions({
 
   const doRemove = async () => {
     if (!memberUserId || !memberName) return;
-    if (!confirm(`¿Eliminar a ${memberName} del equipo?`)) return;
+    if (!(await confirm(`¿Eliminar a ${memberName} del equipo?`))) return;
     setBusy(true);
     await removeMember(teamId, memberUserId);
     router.refresh();
@@ -67,6 +69,7 @@ export function TeamActions({
           {copied ? <CheckIcon className="h-3.5 w-3.5" /> : null}
           {copied ? "¡Copiado!" : "Copiar"}
         </button>
+        {node}
       </div>
     );
   }
@@ -98,6 +101,7 @@ export function TeamActions({
           {roleLabel}
         </span>
       )}
+      {node}
     </div>
   );
 }

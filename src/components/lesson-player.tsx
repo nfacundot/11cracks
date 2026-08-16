@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { submitAnswer, finishLesson } from "@/actions/lesson";
 import { CheckIcon, HeartIcon, XIcon, FlameIcon, BoltIcon, ArrowLeftIcon } from "@/components/icons";
+import { EmoteMascot } from "@/components/emote-mascot";
 
 export type PlayerQuestion = {
   id: string;
@@ -34,6 +35,7 @@ export function LessonPlayer({
   const [qIndex, setQIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ correct: boolean; explanation?: string | null } | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [hearts, setHearts] = useState(MAX_HEARTS);
   const [result, setResult] = useState<{ earnedXp: number; perfect: boolean; streak: number } | null>(null);
@@ -76,6 +78,7 @@ export function LessonPlayer({
     const t = setTimeout(() => {
       clearTimer();
       setSelectedId(null);
+      setTimedOut(true);
       setFeedback({ correct: false, explanation: "¡Se acabó el tiempo!" });
       setHearts((h) => h - 1);
       setPhase("feedback");
@@ -96,6 +99,7 @@ export function LessonPlayer({
     });
 
     if (res.ok) {
+      setTimedOut(false);
       setFeedback({ correct: res.correct, explanation: res.explanation });
       if (res.correct) {
         setCorrectCount((c) => c + 1);
@@ -110,6 +114,7 @@ export function LessonPlayer({
   const continueToNext = useCallback(async () => {
     clearTimer();
     setSelectedId(null);
+    setTimedOut(false);
     setFeedback(null);
     setSecondsLeft(null);
 
@@ -137,6 +142,7 @@ export function LessonPlayer({
     clearTimer();
     setQIndex(0);
     setSelectedId(null);
+    setTimedOut(false);
     setFeedback(null);
     setCorrectCount(0);
     setHearts(MAX_HEARTS);
@@ -150,12 +156,12 @@ export function LessonPlayer({
   if (phase === "intro") {
     return (
       <div className="flex flex-col items-center gap-6 pt-8 text-center">
-        <div className="animate-pop rounded-full bg-white p-8 text-7xl shadow-lg shadow-green-100">
+        <div className="animate-pop rounded-full bg-white p-8 text-7xl shadow-lg shadow-green-100 dark:bg-emerald-900 dark:shadow-green-950">
           {lesson.emoji}
         </div>
         <div>
           <h1 className="text-2xl font-black">{lesson.title}</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {total} preguntas · {lesson.xpReward} XP · 3 corazones
           </p>
         </div>
@@ -196,26 +202,26 @@ export function LessonPlayer({
           <h1 className="text-2xl font-black">
             {hearts === 0 && !isPerfect ? "¡Lo intentaste de nuevo!" : "¡Lección completada!"}
           </h1>
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             Acertaste {correctCount} de {total} preguntas
           </p>
         </div>
 
         {result && (
           <div className="flex w-full gap-3">
-            <div className="flex flex-1 flex-col items-center rounded-2xl bg-orange-50 p-4">
+            <div className="flex flex-1 flex-col items-center rounded-2xl bg-orange-50 p-4 dark:bg-orange-950/40">
               <div className="flex items-center gap-1 text-orange-500">
                 <FlameIcon className="h-5 w-5" />
                 <span className="text-2xl font-black">{result.streak}</span>
               </div>
-              <span className="text-xs font-bold text-zinc-500">Racha</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">Racha</span>
             </div>
-            <div className="flex flex-1 flex-col items-center rounded-2xl bg-green-50 p-4">
-              <div className="flex items-center gap-1 text-green-600">
+            <div className="flex flex-1 flex-col items-center rounded-2xl bg-green-50 p-4 dark:bg-green-950/40">
+              <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
                 <BoltIcon className="h-5 w-5" />
                 <span className="text-2xl font-black">+{result.earnedXp}</span>
               </div>
-              <span className="text-xs font-bold text-zinc-500">XP ganado</span>
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">XP ganado</span>
             </div>
           </div>
         )}
@@ -238,7 +244,7 @@ export function LessonPlayer({
           )}
           <Link
             href="/learn"
-            className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50"
+            className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950/40"
           >
             Volver al camino
           </Link>
@@ -258,12 +264,12 @@ export function LessonPlayer({
       <div className="flex items-center gap-3">
         <Link
           href="/learn"
-          className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600"
+          className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
           aria-label="Salir"
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
-        <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-200">
+        <div className="h-3 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
           <div
             className="h-full rounded-full bg-green-500 transition-all duration-500"
             style={{ width: `${progressPct}%` }}
@@ -273,14 +279,14 @@ export function LessonPlayer({
           {Array.from({ length: MAX_HEARTS }).map((_, i) => (
             <HeartIcon
               key={i}
-              className={`h-5 w-5 ${i < hearts ? "text-red-500" : "text-zinc-200"}`}
+              className={`h-5 w-5 ${i < hearts ? "text-red-500" : "text-zinc-200 dark:text-zinc-700"}`}
             />
           ))}
         </div>
       </div>
 
       {question.timeSeconds && (
-        <div className="flex items-center justify-between text-xs font-bold text-zinc-500">
+        <div className="flex items-center justify-between text-xs font-bold text-zinc-500 dark:text-zinc-400">
           <span>Tiempo</span>
           <div className="flex items-center gap-1">
             <BoltIcon className="h-4 w-4 text-amber-500" />
@@ -289,54 +295,54 @@ export function LessonPlayer({
         </div>
       )}
 
-      <div key={qIndex} className="animate-pop flex flex-col gap-5 pt-2">
-        <h2 className="text-xl font-black leading-snug">{question.prompt}</h2>
-
-        {isFeedback && (
-          <div
-            className={`rounded-2xl p-4 text-sm font-semibold animate-pop ${
-              showCorrect ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-            }`}
-          >
-            {showCorrect ? "¡Correcto!" : "¡Incorrecto!"}
-            {feedback?.explanation ? (
-              <p className="mt-1 font-normal text-zinc-600">{feedback.explanation}</p>
-            ) : null}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-3">
+      <div key={qIndex} className="animate-pop flex flex-col gap-4">
+        <EmoteMascot
+          state={!isFeedback ? "question" : timedOut ? "timeout" : showCorrect ? "correct" : "wrong"}
+          text={
+            !isFeedback ? (
+              question.prompt
+            ) : timedOut ? (
+              "¡Se acabó el tiempo! ⏱️"
+            ) : showCorrect ? (
+              "¡Correcto! ✅"
+            ) : (
+              "¡Incorrecto! ❌"
+            )
+          }
+          explanation={isFeedback ? feedback?.explanation : undefined}
+        >
           {question.options.map((option, i) => {
-            let style = "bg-white text-zinc-700 hover:bg-green-50 hover:border-green-300";
-            if (isFeedback && showCorrect && option.id === selectedId) {
-              style = "bg-green-500 text-white border-green-500";
-            } else if (isFeedback && !showCorrect && option.id === selectedId) {
-              style = "bg-red-500 text-white border-red-500 animate-shake";
-            } else if (isFeedback) {
-              style = "bg-white/50 text-zinc-400 border-zinc-200";
-            }
+              let style =
+                "bg-white text-zinc-700 hover:bg-green-50 hover:border-green-300 dark:bg-emerald-900 dark:text-zinc-100 dark:hover:bg-green-950/50 dark:hover:border-green-600";
+              if (isFeedback && showCorrect && option.id === selectedId) {
+                style = "bg-green-500 text-white border-green-500";
+              } else if (isFeedback && !showCorrect && option.id === selectedId) {
+                style = "bg-red-500 text-white border-red-500 animate-shake";
+              } else if (isFeedback) {
+                style = "bg-white/50 text-zinc-400 border-zinc-200 dark:bg-emerald-900/50 dark:text-zinc-500 dark:border-zinc-700";
+              }
 
-            return (
-              <button
-                key={option.id}
-                disabled={isFeedback}
-                onClick={() => pickOption(option.id)}
-                className={`flex items-center gap-3 rounded-2xl border-2 border-zinc-200 px-4 py-3.5 text-left font-semibold transition active:scale-95 ${style}`}
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500">
-                  {["A", "B", "C", "D"][i] ?? i + 1}
-                </span>
-                <span className="flex-1">{option.text}</span>
-                {isFeedback && showCorrect && option.id === selectedId && (
-                  <CheckIcon className="h-5 w-5" />
-                )}
-                {isFeedback && !showCorrect && option.id === selectedId && (
-                  <XIcon className="h-5 w-5" />
-                )}
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={option.id}
+                  disabled={isFeedback}
+                  onClick={() => pickOption(option.id)}
+                  className={`flex items-center gap-3 rounded-2xl border-2 border-zinc-200 px-4 py-3.5 text-left font-semibold transition active:scale-95 dark:border-zinc-700 ${style}`}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-300">
+                    {["A", "B", "C", "D"][i] ?? i + 1}
+                  </span>
+                  <span className="flex-1">{option.text}</span>
+                  {isFeedback && showCorrect && option.id === selectedId && (
+                    <CheckIcon className="h-5 w-5" />
+                  )}
+                  {isFeedback && !showCorrect && option.id === selectedId && (
+                    <XIcon className="h-5 w-5" />
+                  )}
+                </button>
+              );
+            })}
+        </EmoteMascot>
       </div>
 
       {failed && (

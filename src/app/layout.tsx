@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { SplashScreen } from "@/components/splash-screen";
+import { LessonLoaderGlobal } from "@/components/lesson-loader";
+import { InlineScript } from "@/components/inline-script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +29,9 @@ export const metadata: Metadata = {
     title: "11Cracks",
   },
   icons: {
-    icon: "/icon-192.png",
-    apple: "/icon-192.png",
+    icon: "/img/icons/faviconlit.png",
+    shortcut: "/img/icons/faviconlit.png",
+    apple: "/img/icons/faviconlit.png",
   },
 };
 
@@ -38,7 +41,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#022c22",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -50,10 +53,15 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <InlineScript
+          html={`(function(){try{var t=localStorage.getItem("11cracks-theme");var l=t==="light";document.documentElement.classList.toggle("light",l);document.documentElement.classList.toggle("dark",!l)}catch(e){}})();`}
+        />
         <PwaRegister />
         <SplashScreen />
+        <LessonLoaderGlobal />
         {children}
       </body>
     </html>

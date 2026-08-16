@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { createTeam, joinTeam, type TeamState } from "@/actions/team";
 
 const inputCls =
-  "w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-medium text-zinc-800 placeholder-zinc-400 outline-none transition focus:border-green-400";
+  "w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 font-medium text-zinc-800 placeholder-zinc-400 outline-none transition focus:border-green-400 dark:border-zinc-700 dark:bg-emerald-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-green-500";
 
 export function TeamForm() {
   const [createState, createAction, createPending] = useActionState<TeamState, FormData>(
@@ -18,16 +18,16 @@ export function TeamForm() {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-green-100">
+      <section className="rounded-3xl bg-white/60 backdrop-blur-xl p-5 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
         <h2 className="mb-3 font-black">Crear equipo</h2>
         <form action={createAction} className="flex flex-col gap-3">
           {createState?.error && (
-            <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
+            <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600 dark:bg-red-950/40 dark:text-red-400">
               {createState.error}
             </p>
           )}
           {createState?.success && (
-            <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600">
+            <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600 dark:bg-green-950/40 dark:text-green-400">
               {createState.success}
             </p>
           )}
@@ -43,16 +43,16 @@ export function TeamForm() {
         </form>
       </section>
 
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-green-100">
+      <section className="rounded-3xl bg-white/60 backdrop-blur-xl p-5 shadow-sm ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-green-900">
         <h2 className="mb-3 font-black">Unirse con código</h2>
         <form action={joinAction} className="flex flex-col gap-3">
           {joinState?.error && (
-            <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
+            <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600 dark:bg-red-950/40 dark:text-red-400">
               {joinState.error}
             </p>
           )}
           {joinState?.success && (
-            <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600">
+            <p className="rounded-xl bg-green-50 p-3 text-sm font-semibold text-green-600 dark:bg-green-950/40 dark:text-green-400">
               {joinState.success}
             </p>
           )}
@@ -65,7 +65,7 @@ export function TeamForm() {
           <button
             type="submit"
             disabled={joinPending}
-            className="rounded-2xl bg-emerald-950 py-3 font-black text-white transition hover:bg-emerald-900 active:scale-95 disabled:opacity-60"
+            className="rounded-2xl bg-green-500 py-3 font-black text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-60"
           >
             {joinPending ? "Uniéndote..." : "Unirse"}
           </button>
