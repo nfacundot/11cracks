@@ -2,14 +2,14 @@ import { requireUser } from "@/lib/auth";
 import { TopBar } from "@/components/top-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { SideNav } from "@/components/side-nav";
-import { SplashScreen } from "@/components/splash-screen";
+import { LoadingScreen } from "@/components/loading-screen";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
 
   return (
     <div className="flex min-h-dvh w-full">
-      <SplashScreen />
+      <LoadingScreen />
       <SideNav />
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar user={user} />

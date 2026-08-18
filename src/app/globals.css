@@ -269,3 +269,62 @@ textarea {
 .animate-fade-in {
   animation: fade-in 0.2s ease-out both;
 }
+
+/* Panel de evolución del jugador */
+.player-evolution {
+  --evolution-tone: #8cb62e;
+  --evolution-secondary: #8cb62e;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .player-evolution {
+    --evolution-secondary:
+      color-mix(in oklch, var(--context-neurocracks, var(--evolution-tone)) 62%, var(--brand-gold, #d4a843));
+  }
+  .player-evolution {
+    background:
+      linear-gradient(
+        90deg,
+        lab(38.7497% -6.41793 29.9484 / 72%),
+        lab(8.34503% -0.765175 6.29991 / 18%)
+      ),
+      radial-gradient(
+        circle at 78% 50%,
+        color-mix(in oklch, var(--evolution-tone) 9%, transparent),
+        transparent 42%
+      );
+  }
+}
+
+.dark .player-evolution {
+  --evolution-tone: #6a9e1f;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Card de perfil del jugador */
+.player-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+}
+
+.dark .player-card {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+}

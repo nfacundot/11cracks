@@ -24,12 +24,9 @@ export function SideNav() {
 
   return (
     <nav className="flex w-64 shrink-0 flex-col border-r border-green-100 bg-white/60 backdrop-blur-xl dark:border-green-900 dark:bg-emerald-950/60 max-md:hidden">
-      <div className="flex items-center gap-2 px-5 py-4">
+      <div className="flex items-center justify-center px-5 py-5">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/faviconlit.png" alt="11Cracks" className="h-8 w-8" />
-        <span className="text-lg font-black text-emerald-950 dark:text-white">
-          11Cracks
-        </span>
+        <img src="/img/icons/icontas.png" alt="11Cracks" className="h-17 w-auto object-contain" />
       </div>
       <div className="flex flex-1 flex-col gap-1 px-3">
         {links.map((link) => {
