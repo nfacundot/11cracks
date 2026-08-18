@@ -16,7 +16,7 @@ export default async function AdminEditJuegoPage({
 
   const { id } = await params;
 
-  const [lesson, etapas] = await Promise.all([
+  const [lesson, clases] = await Promise.all([
     prisma.lesson.findUnique({
       where: { id },
       include: {
@@ -26,9 +26,9 @@ export default async function AdminEditJuegoPage({
         },
       },
     }),
-    prisma.etapa.findMany({
+    prisma.clase.findMany({
       orderBy: { order: "asc" },
-      include: { materias: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
+      include: { temas: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
     }),
   ]);
 
@@ -52,7 +52,7 @@ export default async function AdminEditJuegoPage({
         </p>
       </div>
       <LessonEditor
-        etapas={etapas}
+        clases={clases}
         mode="games"
         defaultValues={{
           id: lesson.id,
@@ -64,7 +64,7 @@ export default async function AdminEditJuegoPage({
           gameMode: lesson.gameMode,
           order: lesson.order,
           xpReward: lesson.xpReward,
-          materiaId: lesson.materiaId,
+          temaId: lesson.temaId,
         }}
         questions={lesson.questions
           .filter(

@@ -9,9 +9,9 @@ export const metadata = { title: "Nuevo juego | Admin" };
 export default async function AdminNewJuegoPage() {
   await requireAdmin();
 
-  const etapas = await prisma.etapa.findMany({
+  const clases = await prisma.clase.findMany({
     orderBy: { order: "asc" },
-    include: { materias: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
+    include: { temas: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
   });
 
   return (
@@ -30,7 +30,7 @@ export default async function AdminNewJuegoPage() {
           sube 4 imágenes (A, B, C, D); marca la correcta. Se juega en la app al guardar.
         </p>
       </div>
-      <LessonEditor etapas={etapas} mode="games" />
+      <LessonEditor clases={clases} mode="games" />
     </div>
   );
 }

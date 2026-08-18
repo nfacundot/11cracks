@@ -17,7 +17,7 @@ type SheetLesson = {
   completed: boolean;
 };
 
-type SheetAsignatura = {
+type SheetTema = {
   id: string;
   title: string;
   emoji: string;
@@ -27,19 +27,19 @@ type SheetAsignatura = {
 };
 
 export function LearnAsignaturaSheet({
-  asignatura,
-  etapaName,
-  etapaEmoji,
-  etapaColor,
+  tema,
+  claseName,
+  claseEmoji,
+  claseColor,
   onClose,
 }: {
-  asignatura: SheetAsignatura;
-  etapaName?: string;
-  etapaEmoji?: string;
-  etapaColor?: string;
+  tema: SheetTema;
+  claseName?: string;
+  claseEmoji?: string;
+  claseColor?: string;
   onClose: () => void;
 }) {
-  const lessons = asignatura.lessons;
+  const lessons = tema.lessons;
   const completedCount = lessons.filter((l) => l.completed).length;
   const firstIncompleteIndex = lessons.findIndex((l) => !l.completed);
 
@@ -67,18 +67,18 @@ export function LearnAsignaturaSheet({
         <div className="flex shrink-0 items-start gap-3 border-b border-green-100 px-4 pb-3 pt-3 dark:border-emerald-800">
           <span
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl shadow-inner"
-            style={{ backgroundColor: `${asignatura.color}33` }}
+            style={{ backgroundColor: `${tema.color}33` }}
           >
-            {asignatura.emoji}
+            {tema.emoji}
           </span>
           <div className="min-w-0 flex-1">
-            {etapaName && (
-              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: etapaColor }}>
-                {etapaEmoji} {etapaName}
+            {claseName && (
+              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: claseColor }}>
+                {claseEmoji} {claseName}
               </p>
             )}
             <h3 className="truncate text-base font-black text-emerald-950 dark:text-white">
-              {asignatura.title}
+              {tema.title}
             </h3>
             <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
               {completedCount}/{lessons.length} lecciones completadas
@@ -96,7 +96,7 @@ export function LearnAsignaturaSheet({
         <div className="safe-bottom flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
           {lessons.length === 0 && (
             <div className="rounded-2xl bg-zinc-50 px-4 py-8 text-center text-sm font-bold text-zinc-400 dark:bg-emerald-900">
-              Esta asignatura aún no tiene lecciones.
+              Este tema aún no tiene lecciones.
             </div>
           )}
 

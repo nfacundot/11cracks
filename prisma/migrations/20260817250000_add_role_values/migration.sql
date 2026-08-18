@@ -1,0 +1,6 @@
+-- Add missing Role values
+ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'COACH';
+ALTER TYPE "Role" ADD VALUE IF NOT EXISTS 'PARENT';
+
+-- Add missing TeamRole values
+ALTER TYPE "TeamRole" ADD VALUE IF NOT EXISTS 'OWNER';

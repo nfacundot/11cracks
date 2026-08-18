@@ -162,8 +162,8 @@ export function AvatarEditor({
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Editar avatar" size="xl">
-        <div className="flex flex-col gap-5 md:flex-row md:gap-6">
-          <div className="flex shrink-0 flex-col items-center gap-3 md:w-[300px]">
+        <div className="flex flex-row gap-6 max-md:flex-col max-md:gap-5">
+          <div className="flex shrink-0 flex-col items-center gap-3 w-[300px] max-md:w-full">
             <div className="aspect-square w-full overflow-hidden rounded-2xl ring-4 ring-white shadow-xl dark:ring-emerald-800">
               <AvatarSvg config={draft} />
             </div>
@@ -179,7 +179,7 @@ export function AvatarEditor({
             </div>
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-4 md:max-h-[calc(88vh-9rem)] md:overflow-y-auto md:pr-1">
+          <div className="flex min-w-0 flex-1 flex-col gap-4 max-h-[calc(88vh-9rem)] overflow-y-auto pr-1 max-md:max-h-none max-md:overflow-visible max-md:pr-0">
             <div>
               <SectionTitle>Uniforme</SectionTitle>
               <div className="flex flex-wrap gap-1.5">

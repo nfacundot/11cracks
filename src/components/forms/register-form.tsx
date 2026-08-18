@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useActionState } from "react";
+import { createPortal } from "react-dom";
 import { register, type AuthState } from "@/actions/auth";
-import { EyeIcon, EyeOffIcon } from "@/components/icons";
+import { EyeIcon, EyeOffIcon, ChevronRightIcon, XIcon } from "@/components/icons";
 import { AuthLoading } from "@/components/auth-loading";
 
 const inputCls =
@@ -17,13 +18,32 @@ export function RegisterForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const errorModal =
+    state?.error
+      ? createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div className="relative w-full max-w-xs rounded-3xl border border-white/10 bg-black/70 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+              <p className="mb-4 text-center text-sm font-bold uppercase text-red-400">
+                {state.error}
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-bold uppercase text-white transition hover:bg-white/10"
+              >
+                <XIcon className="h-4 w-4" />
+                Cerrar
+              </button>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
-    <form action={action} className="flex flex-col gap-4">
-      {state?.error && (
-        <p className="rounded-xl bg-red-100 p-3 text-sm font-semibold text-red-600 dark:bg-red-500/20 dark:text-red-200">
-          {state.error}
-        </p>
-      )}
+    <form action={action} className="flex flex-col items-center gap-4">
+      {errorModal}
 
       {pending && <AuthLoading label="Creando cuenta…" />}
 
@@ -33,7 +53,7 @@ export function RegisterForm() {
         required
         minLength={2}
         autoComplete="name"
-        placeholder="Nombre"
+        placeholder="NOMBRE"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className={inputCls}
@@ -44,7 +64,7 @@ export function RegisterForm() {
         required
         minLength={3}
         autoComplete="username"
-        placeholder="Usuario (ej: crack10)"
+        placeholder="USUARIO (EJ: CRACK10)"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         className={inputCls}
@@ -54,19 +74,19 @@ export function RegisterForm() {
         type="email"
         required
         autoComplete="email"
-        placeholder="Email"
+        placeholder="EMAIL"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className={inputCls}
       />
-      <div className="relative">
+      <div className="relative w-full">
         <input
           name="password"
           type={showPassword ? "text" : "password"}
           required
           minLength={6}
           autoComplete="new-password"
-          placeholder="Contraseña (mínimo 6)"
+          placeholder="CONTRASEÑA (MÍNIMO 6)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={`${inputCls} pr-12`}
@@ -88,9 +108,10 @@ export function RegisterForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-900/40 transition hover:bg-green-600 active:scale-95 disabled:opacity-60 dark:shadow-green-900/40"
+        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-500 py-4 text-lg font-black uppercase text-white shadow-lg shadow-green-900/40 transition hover:bg-green-600 active:scale-95 disabled:opacity-60 dark:shadow-green-900/40"
       >
-        {pending ? "Creando..." : "Crear cuenta"}
+        {pending ? "Creando…" : "Crear cuenta"}
+        <ChevronRightIcon className="h-5 w-5" />
       </button>
     </form>
   );

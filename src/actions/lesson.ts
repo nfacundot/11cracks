@@ -34,7 +34,7 @@ export async function submitAnswer(data: {
 
   await prisma.$transaction(async (tx) => {
     await tx.answerRecord.create({
-      data: { userId: user.id, questionId: question.id, correct },
+      data: { userId: user.id, questionId: question.id, isCorrect: correct },
     });
     await tx.lessonProgress.upsert({
       where: { userId_lessonId: { userId: user.id, lessonId: data.lessonId } },

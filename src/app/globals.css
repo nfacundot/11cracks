@@ -21,8 +21,8 @@
   --color-foreground: var(--foreground);
   --color-green-500: var(--btn);
   --color-green-600: var(--btn-hover);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-roboto);
+  --font-mono: var(--font-roboto);
 }
 
 @theme {
@@ -40,7 +40,7 @@ body {
     radial-gradient(900px 500px at 100% 110%, rgba(131, 183, 19, 0.08), transparent 60%),
     var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }

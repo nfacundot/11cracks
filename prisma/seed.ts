@@ -18,7 +18,7 @@ type LessonSeed = {
   description: string;
   emoji: string;
   color: string;
-  type: "LESSON" | "QUIZ" | "GAME" | "TRAINING";
+  type: "LESSON" | "QUIZ" | "GAME";
   gameMode?: "ANAGRAM" | null;
   xpReward: number;
   questions: QuestionSeed[];
@@ -463,7 +463,7 @@ const lessons: LessonSeed[] = [
     description: "Perfecciona la base de todo equipo: pasar el balón.",
     emoji: "👟",
     color: "#16a34a",
-    type: "TRAINING",
+    type: "LESSON",
     xpReward: 15,
     questions: [
       {
@@ -503,7 +503,7 @@ const lessons: LessonSeed[] = [
     description: "Domina el balón al primer toque.",
     emoji: "🎯",
     color: "#2563eb",
-    type: "TRAINING",
+    type: "LESSON",
     xpReward: 15,
     questions: [
       {
@@ -538,7 +538,7 @@ const lessons: LessonSeed[] = [
     description: "Aprende a defender en duelos individuales.",
     emoji: "🛡️",
     color: "#dc2626",
-    type: "TRAINING",
+    type: "LESSON",
     xpReward: 15,
     questions: [
       {
@@ -636,7 +636,7 @@ const lessons: LessonSeed[] = [
   },
 ];
 
-const materias: { name: string; emoji: string; color: string; xpReward: number }[] = [
+const temas: { name: string; emoji: string; color: string; xpReward: number }[] = [
   { name: "Training sport", emoji: "💪", color: "#16a34a", xpReward: 60 },
   { name: "Gastronomía sport", emoji: "🍽️", color: "#d97706", xpReward: 60 },
   { name: "Día de Hotel", emoji: "🏨", color: "#2563eb", xpReward: 60 },
@@ -644,7 +644,7 @@ const materias: { name: string; emoji: string; color: string; xpReward: number }
   { name: "Día de juego", emoji: "🏟️", color: "#9333ea", xpReward: 60 },
 ];
 
-const etapas: {
+const clases: {
   id: string;
   name: string;
   description: string;
@@ -670,7 +670,7 @@ const etapas: {
   },
 ];
 
-const MATERIA_ETAPAS: Record<string, string> = {
+const TEMA_CLASES: Record<string, string> = {
   "stage-1": "subject-futbol",
   "stage-2": "subject-cultura",
   "stage-3": "subject-futbol",
@@ -683,37 +683,37 @@ const STAGE_SIZES = [3, 3, 2, 2, 2];
 async function main() {
   const existing = await prisma.lesson.count();
 
-  for (const etapa of etapas) {
-    await prisma.etapa.upsert({
-      where: { id: etapa.id },
+  for (const clase of clases) {
+    await prisma.clase.upsert({
+      where: { id: clase.id },
       update: {
-        name: etapa.name,
-        description: etapa.description,
-        emoji: etapa.emoji,
-        color: etapa.color,
-        order: etapa.order,
+        name: clase.name,
+        description: clase.description,
+        emoji: clase.emoji,
+        color: clase.color,
+        order: clase.order,
       },
       create: {
-        id: etapa.id,
-        name: etapa.name,
-        description: etapa.description,
-        emoji: etapa.emoji,
-        color: etapa.color,
-        order: etapa.order,
+        id: clase.id,
+        name: clase.name,
+        description: clase.description,
+        emoji: clase.emoji,
+        color: clase.color,
+        order: clase.order,
       },
     });
   }
 
   const stageRows = await Promise.all(
-    materias.map((s, i) =>
-      prisma.materia.upsert({
+    temas.map((s, i) =>
+      prisma.tema.upsert({
         where: { id: `stage-${i + 1}` },
         update: {
           name: s.name,
           emoji: s.emoji,
           color: s.color,
           xpReward: s.xpReward,
-          etapaId: MATERIA_ETAPAS[`stage-${i + 1}`],
+          claseId: TEMA_CLASES[`stage-${i + 1}`],
         },
         create: {
           id: `stage-${i + 1}`,
@@ -722,13 +722,13 @@ async function main() {
           color: s.color,
           order: i,
           xpReward: s.xpReward,
-          etapaId: MATERIA_ETAPAS[`stage-${i + 1}`],
+          claseId: TEMA_CLASES[`stage-${i + 1}`],
         },
       })
     )
   );
 
-  const materiaIdFor = (lessonIndex: number) => {
+  const temaIdFor = (lessonIndex: number) => {
     let acc = 0;
     for (let i = 0; i < STAGE_SIZES.length; i++) {
       acc += STAGE_SIZES[i];
@@ -760,13 +760,13 @@ async function main() {
     const dbLessons = await prisma.lesson.findMany({ orderBy: { order: "asc" } });
     let assigned = 0;
     for (const [i, lesson] of dbLessons.entries()) {
-      const materiaId = materiaIdFor(i);
-      if (lesson.materiaId !== materiaId) {
-        await prisma.lesson.update({ where: { id: lesson.id }, data: { materiaId } });
+      const temaId = temaIdFor(i);
+      if (lesson.temaId !== temaId) {
+        await prisma.lesson.update({ where: { id: lesson.id }, data: { temaId } });
         assigned += 1;
       }
     }
-    console.log(`Ya hay ${existing} lecciones. Materias asignadas: ${assigned}. Seed omitido.`);
+    console.log(`Ya hay ${existing} lecciones. Temas asignados: ${assigned}. Seed omitido.`);
     return;
   }
 
@@ -782,7 +782,7 @@ async function main() {
         gameMode: lesson.gameMode ?? null,
         xpReward: lesson.xpReward,
         order,
-        materiaId: materiaIdFor(order),
+        temaId: temaIdFor(order),
         questions: {
           create: lesson.questions.map((q, qi) => ({
             type: q.type,

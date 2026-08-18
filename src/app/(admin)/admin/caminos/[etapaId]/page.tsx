@@ -5,9 +5,9 @@ import { requireAdmin } from "@/lib/auth";
 import { ArrowLeftIcon, GamepadIcon } from "@/components/icons";
 import { CaminoEditor } from "@/components/admin/camino-editor";
 import {
-  AssignMateriaSelect,
-  UnassignMateriaButton,
-  DeleteMateriaButton,
+  AssignTemaSelect,
+  UnassignTemaButton,
+  DeleteTemaButton,
 } from "@/components/admin/etapa-materia-form";
 
 export const metadata = { title: "Configurar Camino | Admin" };
@@ -20,25 +20,25 @@ export default async function AdminCaminoConfigPage({
   await requireAdmin();
   const { etapaId } = await params;
 
-  const etapa = await prisma.etapa.findUnique({
+  const clase = await prisma.clase.findUnique({
     where: { id: etapaId },
     include: {
-      materias: {
+      temas: {
         orderBy: { order: "asc" },
         include: { _count: { select: { lessons: true } } },
       },
     },
   });
 
-  if (!etapa) notFound();
+  if (!clase) notFound();
 
-  const unassignedMaterias = await prisma.materia.findMany({
-    where: { etapaId: null },
+  const unassignedTemas = await prisma.tema.findMany({
+    where: { claseId: null },
     orderBy: { order: "asc" },
     select: { id: true, name: true, emoji: true, color: true, xpReward: true, _count: { select: { lessons: true } } },
   });
 
-  const editorMaterias = etapa.materias.map((m) => ({
+  const editorTemas = clase.temas.map((m) => ({
     id: m.id,
     name: m.name,
     emoji: m.emoji,
@@ -58,58 +58,58 @@ export default async function AdminCaminoConfigPage({
         </Link>
         <div>
           <h2 className="text-xl font-black text-emerald-950 dark:text-white">
-            {etapa.emoji} {etapa.name}
+            {clase.emoji} {clase.name}
           </h2>
           <p className="text-xs font-bold text-zinc-400">
-            Camino de la etapa. Posiciona las asignaturas con arrastre, sin límite.
+            Camino de la clase. Posiciona los temas con arrastre, sin límite.
           </p>
         </div>
       </div>
 
       <CaminoEditor
-        key={editorMaterias.map((m) => m.id).join("-")}
-        etapaName={etapa.name}
-        materias={editorMaterias}
+        key={editorTemas.map((m) => m.id).join("-")}
+        claseName={clase.name}
+        temas={editorTemas}
       />
 
       <div className="rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-4 dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">
         <h3 className="mb-3 font-black text-emerald-950 dark:text-white">
-          Asignaturas de la etapa ({etapa.materias.length})
+          Temas de la clase ({clase.temas.length})
         </h3>
         <div className="space-y-2">
-          {etapa.materias.length === 0 && (
+          {clase.temas.length === 0 && (
             <p className="rounded-xl bg-zinc-50 px-3 py-2.5 text-center text-xs font-bold text-zinc-400 dark:bg-emerald-900">
-              Esta etapa no tiene asignaturas todavía. Asocia las primeras abajo.
+              Esta clase no tiene temas todavía. Asocia los primeros abajo.
             </p>
           )}
-          {etapa.materias.map((materia) => (
+          {clase.temas.map((tema) => (
             <div
-              key={materia.id}
+              key={tema.id}
               className="flex items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2.5 dark:bg-emerald-900"
             >
-              <span className="text-lg">{materia.emoji}</span>
+              <span className="text-lg">{tema.emoji}</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-black text-emerald-950 dark:text-white">
-                  {materia.name}
+                  {tema.name}
                 </p>
                 <p className="text-[11px] font-bold text-zinc-400">
-                  {materia._count.lessons} lecciones · {materia.xpReward} XP ·{" "}
-                  {Math.round(materia.posX)}%, {Math.round(materia.posY)}%
+                  {tema._count.lessons} lecciones · {tema.xpReward} XP ·{" "}
+                  {Math.round(tema.posX)}%, {Math.round(tema.posY)}%
                 </p>
               </div>
               <Link
-                href={`/admin/lessons?materia=${materia.id}`}
+                href={`/admin/lessons?materia=${tema.id}`}
                 className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-bold text-green-600 transition hover:bg-green-50 dark:text-green-400 dark:hover:bg-emerald-950"
               >
                 <GamepadIcon className="h-3.5 w-3.5" />
                 Contenido
               </Link>
-              <UnassignMateriaButton id={materia.id} />
-              <DeleteMateriaButton id={materia.id} />
+              <UnassignTemaButton id={tema.id} />
+              <DeleteTemaButton id={tema.id} />
             </div>
           ))}
         </div>
-        <AssignMateriaSelect etapaId={etapa.id} unassigned={unassignedMaterias} />
+        <AssignTemaSelect claseId={clase.id} unassigned={unassignedTemas} />
       </div>
     </div>
   );

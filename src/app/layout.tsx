@@ -1,19 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa-register";
-import { SplashScreen } from "@/components/splash-screen";
 import { LessonLoaderGlobal } from "@/components/lesson-loader";
 import { InlineScript } from "@/components/inline-script";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -52,7 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${roboto.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
@@ -60,7 +55,6 @@ export default function RootLayout({
           html={`(function(){try{var t=localStorage.getItem("11cracks-theme");var l=t==="light";document.documentElement.classList.toggle("light",l);document.documentElement.classList.toggle("dark",!l)}catch(e){}})();`}
         />
         <PwaRegister />
-        <SplashScreen />
         <LessonLoaderGlobal />
         {children}
       </body>

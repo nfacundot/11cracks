@@ -7,34 +7,10 @@ export const metadata = { title: "Juegos" };
 
 const classicGames = [
   {
-    slug: "penalty",
-    emoji: "🥅",
-    title: "Tanda de Penales",
-    desc: "8 segundos por disparo. Responde rápido y anota goles.",
-    color: "#16a34a",
-    bg: "bg-green-50 dark:bg-green-950",
-  },
-  {
-    slug: "memory",
-    emoji: "🧠",
-    title: "Memoria Táctica",
-    desc: "Encuentra las parejas de fútbol en el menor tiempo posible.",
-    color: "#2563eb",
-    bg: "bg-blue-50 dark:bg-blue-950",
-  },
-  {
-    slug: "sprint",
-    emoji: "⚡",
-    title: "Sprint Express",
-    desc: "Verdadero o falso con solo 5 segundos por afirmación.",
-    color: "#d97706",
-    bg: "bg-amber-50 dark:bg-amber-950",
-  },
-  {
     slug: "word",
     emoji: "🔤",
     title: "Palabra a Gol",
-    desc: "Escuchá, ordená las letras y anotá goles. Tenés 3 vidas.",
+    desc: "Escucha, ordena las letras y anota goles. Tienes 3 vidas.",
     color: "#7c3aed",
     bg: "bg-violet-50 dark:bg-violet-950",
   },
@@ -42,18 +18,14 @@ const classicGames = [
     slug: "infograma",
     emoji: "🖼️",
     title: "Infograma",
-    desc: "Elegí la respuesta correcta entre 4 imágenes. 20 segundos por pregunta.",
+    desc: "Elige la respuesta correcta entre 4 imágenes. 20 segundos por pregunta.",
     color: "#0891b2",
     bg: "bg-cyan-50 dark:bg-cyan-950",
   },
 ];
 
 const GAME_MODE_META: Record<string, { label: string; emoji: string }> = {
-  PENALTY: { label: "Tanda de Penales", emoji: "🥅" },
-  MEMORY: { label: "Memoria Táctica", emoji: "🧠" },
-  QUIZ: { label: "Cuestionario", emoji: "📝" },
-  SPRINT: { label: "Sprint Express", emoji: "⚡" },
-  SETBACKS: { label: "Contratiempos", emoji: "⚠️" },
+  ANAGRAM: { label: "Palabra a Gol", emoji: "🔤" },
   INFOGRAMA: { label: "Infograma", emoji: "🖼️" },
 };
 
@@ -63,14 +35,14 @@ export default async function GamesPage() {
   const adminGames = await prisma.lesson.findMany({
     where: {
       type: "GAME",
-      gameMode: { notIn: ["INFOGRAMA", "ANAGRAM", "MEMORY"] },
+      gameMode: { notIn: ["INFOGRAMA", "ANAGRAM"] },
       questions: { some: {} },
     },
     orderBy: { createdAt: "asc" },
     include: {
       questions: { select: { id: true } },
       progress: { where: { userId: user.id } },
-      materia: { select: { name: true, emoji: true } },
+      tema: { select: { name: true, emoji: true } },
     },
   });
 
@@ -87,9 +59,6 @@ export default async function GamesPage() {
   }
 
   const typeToSlug: Record<string, string> = {
-    PENALTY_SHOOTOUT: "penalty",
-    MEMORY_MATCH: "memory",
-    QUIZ_SPRINT: "sprint",
     WORD_GOAL: "word",
     INFOGRAMA: "infograma",
   };
@@ -118,7 +87,7 @@ export default async function GamesPage() {
             <div className="flex-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-purple-500">
                 {mode ? `${mode.emoji} ${mode.label}` : "Juego del administrador"}
-                {game.materia ? ` · ${game.materia.emoji} ${game.materia.name}` : ""}
+                {game.tema ? ` · ${game.tema.emoji} ${game.tema.name}` : ""}
               </p>
               <h2 className="text-lg font-black">{game.title}</h2>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">

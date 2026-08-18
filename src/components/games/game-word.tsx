@@ -211,7 +211,7 @@ export function GameWord({ words = DEMO_WORDS }: { words?: WordEntry[] }) {
         <div>
           <h1 className="text-2xl font-black">Palabra a Gol</h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Escuchá cómo se pronuncia y ordená las letras desordenadas para armar la palabra.
+            Escucha cómo se pronuncia y ordena las letras desordenadas para armar la palabra.
           </p>
         </div>
 
@@ -234,7 +234,7 @@ export function GameWord({ words = DEMO_WORDS }: { words?: WordEntry[] }) {
             <span>⚽</span> Cada palabra armada es un gol
           </p>
           <p className="flex items-center gap-2">
-            <span>❌</span> Si fallás, no hay gol y perdés una vida
+            <span>❌</span> Si fallas, no hay gol y pierdes una vida
           </p>
           <p className="flex items-center gap-2">
             <span>🔁</span> Las rondas se repiten hasta quedarte sin vidas

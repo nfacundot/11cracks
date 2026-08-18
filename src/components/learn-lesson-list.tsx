@@ -24,7 +24,7 @@ export function LearnLessonList({
     <div className="mt-4 space-y-3">
       {lessons.length === 0 && (
         <div className="rounded-2xl bg-white/55 backdrop-blur-xl px-4 py-8 text-center text-sm font-bold text-zinc-400 shadow-xl ring-2 ring-white/70 dark:bg-emerald-950/55 dark:ring-emerald-800">
-          Esta asignatura aún no tiene lecciones.
+          Este tema aún no tiene lecciones.
         </div>
       )}
 

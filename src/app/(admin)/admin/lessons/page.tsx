@@ -1,23 +1,19 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
-import { PlusIcon, BookIcon, DumbbellIcon, BoltIcon } from "@/components/icons";
+import { PlusIcon, BookIcon, BoltIcon } from "@/components/icons";
 import { DeleteLessonButton } from "@/components/admin/lesson-editor";
+import { LessonEditorModal } from "@/components/admin/lesson-editor-modal";
 
 export const metadata = { title: "Lecciones | Admin" };
 
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   LESSON: { label: "Lección", icon: <BookIcon className="h-4 w-4" />, color: "bg-blue-500" },
   QUIZ: { label: "Quiz", icon: <BoltIcon className="h-4 w-4" />, color: "bg-purple-500" },
-  TRAINING: { label: "Entrenamiento", icon: <DumbbellIcon className="h-4 w-4" />, color: "bg-green-500" },
 };
 
 const GAME_MODE_META: Record<string, { label: string; emoji: string }> = {
-  PENALTY: { label: "Tanda de Penales", emoji: "🥅" },
-  MEMORY: { label: "Memoria Táctica", emoji: "🧠" },
-  QUIZ: { label: "Cuestionario", emoji: "📝" },
-  SPRINT: { label: "Sprint Express", emoji: "⚡" },
-  SETBACKS: { label: "Contratiempos", emoji: "⚠️" },
+  ANAGRAM: { label: "Palabra a Gol", emoji: "🔤" },
   INFOGRAMA: { label: "Infograma", emoji: "🖼️" },
 };
 
@@ -33,7 +29,14 @@ type LessonCardData = {
   _count: { questions: number };
 };
 
-function LessonCard({ lesson }: { lesson: LessonCardData }) {
+type EditorClase = {
+  id: string;
+  name: string;
+  emoji: string;
+  temas: { id: string; name: string }[];
+};
+
+function LessonCard({ lesson, clases }: { lesson: LessonCardData; clases: EditorClase[] }) {
   const meta = TYPE_META[lesson.type] ?? TYPE_META.LESSON;
   return (
     <div className="flex flex-col rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-4 transition hover:shadow-md dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">
@@ -74,12 +77,14 @@ function LessonCard({ lesson }: { lesson: LessonCardData }) {
       </div>
 
       <div className="mt-4 flex gap-2 border-t border-green-50 pt-3 dark:border-emerald-900">
-        <Link
-          href={`/admin/lessons/${lesson.id}`}
+        <LessonEditorModal
+          clases={clases}
+          mode="lessons"
+          lessonId={lesson.id}
+          label="Editar"
+          title="Editar lección"
           className="flex-1 rounded-xl bg-green-500 py-2 text-center text-xs font-black text-white transition hover:bg-green-600"
-        >
-          Editar
-        </Link>
+        />
         <Link
           href={`/lesson/${lesson.id}`}
           className="rounded-xl border-2 border-green-200 px-3 py-2 text-xs font-black text-green-700 transition hover:bg-green-50 dark:border-emerald-800 dark:text-green-400"
@@ -101,20 +106,20 @@ export default async function AdminLessonsPage({
 
   const { type, materia } = await searchParams;
   const filterType =
-    type && ["LESSON", "QUIZ", "TRAINING"].includes(type) ? type : null;
+    type && ["LESSON", "QUIZ"].includes(type) ? type : null;
 
-  const etapaLessonsWhere = filterType
-    ? { type: filterType as "LESSON" | "QUIZ" | "TRAINING" }
+  const claseLessonsWhere = filterType
+    ? { type: filterType as "LESSON" | "QUIZ" }
     : ({ type: { not: "GAME" } } as const);
 
-  const etapas = await prisma.etapa.findMany({
+  const clases = await prisma.clase.findMany({
     orderBy: { order: "asc" },
     include: {
-      materias: {
+      temas: {
         orderBy: { order: "asc" },
         include: {
           lessons: {
-            where: etapaLessonsWhere,
+            where: claseLessonsWhere,
             orderBy: { order: "asc" },
             include: { _count: { select: { questions: true } } },
           },
@@ -123,12 +128,12 @@ export default async function AdminLessonsPage({
     },
   });
 
-  const unassignedMaterias = await prisma.materia.findMany({
-    where: { etapaId: null },
+  const unassignedTemas = await prisma.tema.findMany({
+    where: { claseId: null },
     orderBy: { order: "asc" },
     include: {
       lessons: {
-        where: etapaLessonsWhere,
+        where: claseLessonsWhere,
         orderBy: { order: "asc" },
         include: { _count: { select: { questions: true } } },
       },
@@ -137,21 +142,21 @@ export default async function AdminLessonsPage({
 
   const orphanLessons = await prisma.lesson.findMany({
     where: {
-      materiaId: null,
+      temaId: null,
       ...(filterType
-        ? { type: filterType as "LESSON" | "QUIZ" | "TRAINING" }
+        ? { type: filterType as "LESSON" | "QUIZ" }
         : ({ type: { not: "GAME" } } as const)),
     },
     orderBy: { order: "asc" },
     include: { _count: { select: { questions: true } } },
   });
 
-  const allMaterias = [
-    ...etapas.flatMap((e) => e.materias),
-    ...unassignedMaterias,
+  const allTemas = [
+    ...clases.flatMap((e) => e.temas),
+    ...unassignedTemas,
   ];
-  const filteredMateria = materia
-    ? allMaterias.find((m) => m.id === materia)
+  const filteredTema = materia
+    ? allTemas.find((m) => m.id === materia)
     : undefined;
 
   const countByType = await prisma.lesson.groupBy({
@@ -169,17 +174,22 @@ export default async function AdminLessonsPage({
             Lecciones
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Lecciones, quizzes y entrenamientos de cada asignatura. Los juegos se gestionan en el
+            Lecciones, quizzes y entrenamientos de cada tema. Los juegos se gestionan en el
             panel <Link href="/admin/juegos" className="font-bold text-orange-500 underline">Juegos</Link>.
           </p>
         </div>
-        <Link
-          href="/admin/lessons/new"
+        <LessonEditorModal
+          clases={clases}
+          mode="lessons"
+          label={
+            <>
+              <PlusIcon className="h-4 w-4" />
+              Nueva lección
+            </>
+          }
+          title="Nueva lección"
           className="flex items-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-black text-white shadow-md shadow-green-200 transition hover:bg-green-600 active:scale-95 dark:shadow-green-950"
-        >
-          <PlusIcon className="h-4 w-4" />
-          Nueva lección
-        </Link>
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -209,9 +219,9 @@ export default async function AdminLessonsPage({
         ))}
       </div>
 
-      {filteredMateria && (
+      {filteredTema && (
         <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
-          Filtrando por asignatura: {filteredMateria.emoji} {filteredMateria.name}
+          Filtrando por tema: {filteredTema.emoji} {filteredTema.name}
           <Link href="/admin/lessons" className="ml-3 underline">
             Limpiar filtro
           </Link>
@@ -219,47 +229,47 @@ export default async function AdminLessonsPage({
       )}
 
       <div className="space-y-8">
-        {etapas.map((etapa) => (
-          <section key={etapa.id} className="space-y-4">
+        {clases.map((clase) => (
+          <section key={clase.id} className="space-y-4">
             <h3 className="flex items-center gap-2 text-lg font-black text-emerald-950 dark:text-white">
               <span
                 className="flex h-9 w-9 items-center justify-center rounded-xl text-xl"
-                style={{ backgroundColor: `${etapa.color}22` }}
+                style={{ backgroundColor: `${clase.color}22` }}
               >
-                {etapa.emoji}
+                {clase.emoji}
               </span>
-              {etapa.name}
+              {clase.name}
             </h3>
-            {etapa.materias.length === 0 ? (
+            {clase.temas.length === 0 ? (
               <p className="text-sm font-bold text-zinc-400">
-                Sin asignaturas en esta etapa.
+                Sin temas en esta clase.
               </p>
             ) : (
               <div className="space-y-4">
-                {etapa.materias.map((materia) => (
-                  <div key={materia.id} className="space-y-3">
+                {clase.temas.map((tema) => (
+                  <div key={tema.id} className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="flex items-center gap-2 text-sm font-black text-emerald-950 dark:text-white">
-                        <span>{materia.emoji}</span> {materia.name}
+                        <span>{tema.emoji}</span> {tema.name}
                         <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                          {materia.lessons.length}
+                          {tema.lessons.length}
                         </span>
                       </h4>
                       <Link
-                        href={`/admin/lessons?materia=${materia.id}`}
+                        href={`/admin/lessons?materia=${tema.id}`}
                         className="text-xs font-bold text-green-600 transition hover:text-green-700 dark:text-green-400"
                       >
-                        Ver solo esta asignatura
+                        Ver solo este tema
                       </Link>
                     </div>
-                    {materia.lessons.length === 0 ? (
+                    {tema.lessons.length === 0 ? (
                       <p className="rounded-xl bg-zinc-50 px-3 py-2.5 text-xs font-bold text-zinc-400 dark:bg-emerald-900">
-                        Esta asignatura aún no tiene lecciones.
+                        Este tema aún no tiene lecciones.
                       </p>
                     ) : (
-                      <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                        {materia.lessons.map((lesson) => (
-                          <LessonCard key={lesson.id} lesson={lesson} />
+                      <div className="grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-lg:grid-cols-1">
+                        {tema.lessons.map((lesson) => (
+                          <LessonCard key={lesson.id} lesson={lesson} clases={clases} />
                         ))}
                       </div>
                     )}
@@ -270,27 +280,27 @@ export default async function AdminLessonsPage({
           </section>
         ))}
 
-        {unassignedMaterias.length > 0 && (
+        {unassignedTemas.length > 0 && (
           <section className="space-y-4">
             <h3 className="flex items-center gap-2 text-lg font-black text-amber-700 dark:text-amber-400">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-xl dark:bg-amber-950">
                 🗺️
               </span>
-              Asignaturas sin etapa
+              Temas sin clase
             </h3>
             <div className="space-y-3">
-              {unassignedMaterias.map((materia) => (
-                <div key={materia.id} className="space-y-3">
+              {unassignedTemas.map((tema) => (
+                <div key={tema.id} className="space-y-3">
                   <h4 className="flex items-center gap-2 text-sm font-black text-emerald-950 dark:text-white">
-                    <span>{materia.emoji}</span> {materia.name}
+                    <span>{tema.emoji}</span> {tema.name}
                     <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                      {materia.lessons.length}
+                      {tema.lessons.length}
                     </span>
                   </h4>
-                  {materia.lessons.length > 0 && (
-                    <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                      {materia.lessons.map((lesson) => (
-                        <LessonCard key={lesson.id} lesson={lesson} />
+                  {tema.lessons.length > 0 && (
+                    <div className="grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-lg:grid-cols-1">
+                      {tema.lessons.map((lesson) => (
+                        <LessonCard key={lesson.id} lesson={lesson} clases={clases} />
                       ))}
                     </div>
                   )}
@@ -306,18 +316,18 @@ export default async function AdminLessonsPage({
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-xl dark:bg-amber-950">
                 ⚡
               </span>
-              Lecciones sin asignatura
+              Lecciones sin tema
             </h3>
-            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-lg:grid-cols-1">
               {orphanLessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} />
+                <LessonCard key={lesson.id} lesson={lesson} clases={clases} />
               ))}
             </div>
           </section>
         )}
       </div>
 
-      {allMaterias.length === 0 && orphanLessons.length === 0 && (
+      {allTemas.length === 0 && orphanLessons.length === 0 && (
         <div className="rounded-2xl border border-dashed border-green-200 p-10 text-center text-sm font-bold text-zinc-400 dark:border-emerald-800">
           No hay lecciones. Crea la primera.
         </div>

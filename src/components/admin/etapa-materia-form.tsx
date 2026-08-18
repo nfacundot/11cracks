@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { saveEtapa, saveMateria, deleteEtapa, deleteMateria, assignMateria, unassignMateria } from "@/actions/admin";
+import { saveClase, saveTema, deleteClase, deleteTema, assignTema, unassignTema } from "@/actions/admin";
 import { Modal } from "@/components/admin/modal";
 import { PlusIcon } from "@/components/icons";
 import { useConfirmDialog } from "@/components/confirm-dialog";
@@ -62,7 +62,7 @@ function ColorField({ value, onChange }: { value: string; onChange: (v: string) 
   );
 }
 
-export function EtapaForm({
+export function ClaseForm({
   defaultValues,
   onSuccess,
 }: {
@@ -71,7 +71,7 @@ export function EtapaForm({
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "🗺️");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [state, formAction, pending] = useActionState(saveEtapa, undefined);
+  const [state, formAction, pending] = useActionState(saveClase, undefined);
 
   useEffect(() => {
     if (state?.success) {
@@ -83,7 +83,7 @@ export function EtapaForm({
     <form action={formAction} className="rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-4 dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">
       <input type="hidden" name="id" value={defaultValues?.id ?? ""} />
       <h4 className="mb-3 font-black text-emerald-950 dark:text-white">
-        {defaultValues ? "Editar etapa" : "Nueva etapa"}
+        {defaultValues ? "Editar clase" : "Nueva clase"}
       </h4>
       <div className="space-y-3">
         <EmojiPicker value={emoji} onChange={setEmoji} />
@@ -91,7 +91,7 @@ export function EtapaForm({
           type="text"
           name="name"
           defaultValue={defaultValues?.name ?? ""}
-          placeholder="Nombre de la etapa (ej. Fundamentos del fútbol)"
+          placeholder="Nombre de la clase (ej. Fundamentos del fútbol)"
           className={inputCls}
           required
         />
@@ -127,13 +127,13 @@ export function EtapaForm({
         disabled={pending}
         className="mt-4 w-full rounded-xl bg-green-500 py-2.5 text-sm font-black text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
       >
-        {defaultValues ? "Guardar cambios" : "Crear etapa"}
+        {defaultValues ? "Guardar cambios" : "Crear clase"}
       </button>
     </form>
   );
 }
 
-export function DeleteEtapaButton({ id, hasMaterias }: { id: string; hasMaterias: boolean }) {
+export function DeleteClaseButton({ id, hasTemas }: { id: string; hasTemas: boolean }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const { confirm, node } = useConfirmDialog();
@@ -144,12 +144,12 @@ export function DeleteEtapaButton({ id, hasMaterias }: { id: string; hasMaterias
         type="button"
         disabled={pending}
         onClick={async () => {
-          const msg = hasMaterias
-            ? "Las asignaturas de esta etapa quedarán sin etapa asignada. ¿Continuar?"
-            : "¿Seguro que quieres eliminar esta etapa?";
+          const msg = hasTemas
+            ? "Los temas de esta clase quedarán sin clase asignada. ¿Continuar?"
+            : "¿Seguro que quieres eliminar esta clase?";
           if (!(await confirm(msg))) return;
           startTransition(() => {
-            void deleteEtapa(id).then(() => router.refresh());
+            void deleteClase(id).then(() => router.refresh());
           });
         }}
         className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-950/40"
@@ -161,21 +161,21 @@ export function DeleteEtapaButton({ id, hasMaterias }: { id: string; hasMaterias
   );
 }
 
-export function MateriaForm({
-  etapas,
-  etapaId,
+export function TemaForm({
+  clases,
+  claseId,
   defaultValues,
   onSuccess,
 }: {
-  etapas: { id: string; name: string; emoji: string }[];
-  etapaId?: string;
+  clases: { id: string; name: string; emoji: string }[];
+  claseId?: string;
   defaultValues?: { id: string; name: string; emoji: string; color: string; order: number; xpReward: number };
   onSuccess?: () => void;
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "⭐");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [selectedEtapa, setSelectedEtapa] = useState(etapaId ?? "");
-  const [state, formAction, pending] = useActionState(saveMateria, undefined);
+  const [selectedClase, setSelectedClase] = useState(claseId ?? "");
+  const [state, formAction, pending] = useActionState(saveTema, undefined);
 
   useEffect(() => {
     if (state?.success) {
@@ -186,9 +186,9 @@ export function MateriaForm({
   return (
     <form action={formAction} className="rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-4 dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">
       <input type="hidden" name="id" value={defaultValues?.id ?? ""} />
-      <input type="hidden" name="etapaId" value={selectedEtapa} />
+      <input type="hidden" name="claseId" value={selectedClase} />
       <h4 className="mb-3 font-black text-emerald-950 dark:text-white">
-        {defaultValues ? "Editar asignatura" : "Nueva asignatura"}
+        {defaultValues ? "Editar tema" : "Nueva tema"}
       </h4>
       <div className="space-y-3">
         <EmojiPicker value={emoji} onChange={setEmoji} />
@@ -196,18 +196,18 @@ export function MateriaForm({
           type="text"
           name="name"
           defaultValue={defaultValues?.name ?? ""}
-          placeholder="Nombre de la asignatura"
+          placeholder="Nombre del tema"
           className={inputCls}
           required
         />
         <select
-          value={selectedEtapa}
-          onChange={(e) => setSelectedEtapa(e.target.value)}
+          value={selectedClase}
+          onChange={(e) => setSelectedClase(e.target.value)}
           className={inputCls}
-          aria-label="Etapa"
+          aria-label="Clase"
         >
-          <option value="">Sin etapa (asígnala después)</option>
-          {etapas.map((s) => (
+          <option value="">Sin clase (asíguala después)</option>
+          {clases.map((s) => (
             <option key={s.id} value={s.id}>
               {s.emoji} {s.name}
             </option>
@@ -233,34 +233,34 @@ export function MateriaForm({
         disabled={pending}
         className="mt-4 w-full rounded-xl bg-green-500 py-2.5 text-sm font-black text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
       >
-        {defaultValues ? "Guardar cambios" : "Crear asignatura"}
+        {defaultValues ? "Guardar cambios" : "Crear tema"}
       </button>
     </form>
   );
 }
 
-export function AssignMateriaSelect({
-  etapaId,
+export function AssignTemaSelect({
+  claseId,
   unassigned,
 }: {
-  etapaId: string;
+  claseId: string;
   unassigned: { id: string; name: string; emoji: string }[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [materiaId, setMateriaId] = useState("");
+  const [temaId, setTemaId] = useState("");
 
   if (unassigned.length === 0) return null;
 
   return (
     <div className="mt-2 flex items-center gap-2">
       <select
-        value={materiaId}
-        onChange={(e) => setMateriaId(e.target.value)}
+        value={temaId}
+        onChange={(e) => setTemaId(e.target.value)}
         className={inputCls}
-        aria-label="Asignatura sin etapa"
+        aria-label="Tema sin clase"
       >
-        <option value="">Asociar asignatura…</option>
+        <option value="">Asociar tema…</option>
         {unassigned.map((s) => (
           <option key={s.id} value={s.id}>
             {s.emoji} {s.name}
@@ -269,11 +269,11 @@ export function AssignMateriaSelect({
       </select>
       <button
         type="button"
-        disabled={pending || !materiaId}
+        disabled={pending || !temaId}
         onClick={() => {
           startTransition(() => {
-            void assignMateria(materiaId, etapaId).then(() => {
-              setMateriaId("");
+            void assignTema(temaId, claseId).then(() => {
+              setTemaId("");
               router.refresh();
             });
           });
@@ -286,7 +286,7 @@ export function AssignMateriaSelect({
   );
 }
 
-export function UnassignMateriaButton({ id }: { id: string }) {
+export function UnassignTemaButton({ id }: { id: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -296,7 +296,7 @@ export function UnassignMateriaButton({ id }: { id: string }) {
       disabled={pending}
       onClick={() => {
         startTransition(() => {
-          void unassignMateria(id).then(() => router.refresh());
+          void unassignTema(id).then(() => router.refresh());
         });
       }}
       className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-amber-600 transition hover:bg-amber-50 disabled:opacity-50 dark:hover:bg-amber-950/40"
@@ -306,7 +306,7 @@ export function UnassignMateriaButton({ id }: { id: string }) {
   );
 }
 
-export function DeleteMateriaButton({ id }: { id: string }) {
+export function DeleteTemaButton({ id }: { id: string }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const { confirm, node } = useConfirmDialog();
@@ -319,12 +319,12 @@ export function DeleteMateriaButton({ id }: { id: string }) {
         onClick={async () => {
           if (
             !(await confirm(
-              "¿Seguro que quieres eliminar esta asignatura? Sus lecciones se quedarán sin asignatura."
+              "¿Seguro que quieres eliminar este tema? Sus lecciones se quedarán sin tema."
             ))
           )
             return;
           startTransition(() => {
-            void deleteMateria(id).then(() => router.refresh());
+            void deleteTema(id).then(() => router.refresh());
           });
         }}
         className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 disabled:opacity-50 dark:hover:bg-red-950/40"
@@ -336,7 +336,7 @@ export function DeleteMateriaButton({ id }: { id: string }) {
   );
 }
 
-export function NewEtapaModal({ children }: { children?: React.ReactNode }) {
+export function NewClaseModal({ children }: { children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -346,20 +346,20 @@ export function NewEtapaModal({ children }: { children?: React.ReactNode }) {
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-green-600"
       >
         <PlusIcon className="h-4 w-4" />
-        Nueva etapa
+        Nueva clase
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Nueva etapa">
-        {children ?? <EtapaForm onSuccess={() => setOpen(false)} />}
+      <Modal open={open} onClose={() => setOpen(false)} title="Nueva clase">
+        {children ?? <ClaseForm onSuccess={() => setOpen(false)} />}
       </Modal>
     </>
   );
 }
 
-export function NewMateriaModal({
-  etapas,
+export function NewTemaModal({
+  clases,
   children,
 }: {
-  etapas: { id: string; name: string; emoji: string }[];
+  clases: { id: string; name: string; emoji: string }[];
   children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -371,29 +371,29 @@ export function NewMateriaModal({
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-green-600"
       >
         <PlusIcon className="h-4 w-4" />
-        Nueva asignatura
+        Nueva tema
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Nueva asignatura">
-        {children ?? <MateriaForm etapas={etapas} onSuccess={() => setOpen(false)} />}
+      <Modal open={open} onClose={() => setOpen(false)} title="Nueva tema">
+        {children ?? <TemaForm clases={clases} onSuccess={() => setOpen(false)} />}
       </Modal>
     </>
   );
 }
 
-export function EditMateriaModal({
-  materia,
-  etapas,
+export function EditTemaModal({
+  tema,
+  clases,
 }: {
-  materia: {
+  tema: {
     id: string;
     name: string;
     emoji: string;
     color: string;
     order: number;
     xpReward: number;
-    etapaId: string | null;
+    claseId: string | null;
   };
-  etapas: { id: string; name: string; emoji: string }[];
+  clases: { id: string; name: string; emoji: string }[];
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -405,17 +405,17 @@ export function EditMateriaModal({
       >
         Editar
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title={`Editar ${materia.name}`}>
-        <MateriaForm
-          etapas={etapas}
-          etapaId={materia.etapaId ?? ""}
+      <Modal open={open} onClose={() => setOpen(false)} title={`Editar ${tema.name}`}>
+        <TemaForm
+          clases={clases}
+          claseId={tema.claseId ?? ""}
           defaultValues={{
-            id: materia.id,
-            name: materia.name,
-            emoji: materia.emoji,
-            color: materia.color,
-            order: materia.order,
-            xpReward: materia.xpReward,
+            id: tema.id,
+            name: tema.name,
+            emoji: tema.emoji,
+            color: tema.color,
+            order: tema.order,
+            xpReward: tema.xpReward,
           }}
           onSuccess={() => setOpen(false)}
         />

@@ -11,17 +11,16 @@ import {
   ShieldIcon,
   BookIcon,
   StarIcon,
-  MapIcon,
   JoystickIcon,
   LogOutIcon,
 } from "@/components/icons";
 
 const links: { href: string; label: string; icon: ReactNode }[] = [
   { href: "/admin", label: "Dashboard", icon: <HomeIcon className="h-5 w-5" /> },
+  { href: "/admin/indicators", label: "Indicadores", icon: <StarIcon className="h-5 w-5" /> },
   { href: "/admin/users", label: "Usuarios", icon: <UsersIcon className="h-5 w-5" /> },
-  { href: "/admin/etapas", label: "Etapas", icon: <BookIcon className="h-5 w-5" /> },
-  { href: "/admin/asignaturas", label: "Asignaturas", icon: <StarIcon className="h-5 w-5" /> },
-  { href: "/admin/caminos", label: "Caminos", icon: <MapIcon className="h-5 w-5" /> },
+  { href: "/admin/clases", label: "Clases", icon: <BookIcon className="h-5 w-5" /> },
+  { href: "/admin/temas", label: "Temas", icon: <StarIcon className="h-5 w-5" /> },
   { href: "/admin/lessons", label: "Lecciones", icon: <GamepadIcon className="h-5 w-5" /> },
   { href: "/admin/juegos", label: "Juegos", icon: <JoystickIcon className="h-5 w-5" /> },
   { href: "/admin/teams", label: "Equipos", icon: <ShieldIcon className="h-5 w-5" /> },

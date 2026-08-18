@@ -39,7 +39,7 @@ export default async function RankingPage() {
       </header>
 
       <p className="text-sm text-zinc-500 dark:text-zinc-400">
-        Los cracks con más XP de la plataforma. ¡Sumá puntos y subí de posición!
+        Los cracks con más XP de la plataforma. ¡Suma puntos y sube de posición!
       </p>
 
       <div className="grid grid-cols-3 gap-2">

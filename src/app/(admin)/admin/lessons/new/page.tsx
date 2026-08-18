@@ -9,9 +9,9 @@ export const metadata = { title: "Nueva lección | Admin" };
 export default async function AdminNewLessonPage() {
   await requireAdmin();
 
-  const etapas = await prisma.etapa.findMany({
+  const clases = await prisma.clase.findMany({
     orderBy: { order: "asc" },
-    include: { materias: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
+    include: { temas: { orderBy: { order: "asc" }, select: { id: true, name: true } } },
   });
 
   return (
@@ -26,10 +26,10 @@ export default async function AdminNewLessonPage() {
       <div>
         <h2 className="text-2xl font-black text-emerald-950 dark:text-white">Nueva lección</h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Crea una lección, quiz, juego o entrenamiento con sus preguntas y asígnala a una asignatura. Se proyecta en la app al guardar.
+          Crea una lección, quiz o juego con sus preguntas y asíguala a un tema. Se proyecta en la app al guardar.
         </p>
       </div>
-      <LessonEditor etapas={etapas} />
+      <LessonEditor clases={clases} />
     </div>
   );
 }

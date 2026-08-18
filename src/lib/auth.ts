@@ -87,7 +87,7 @@ export async function getSessionUser() {
 export async function requireUser(): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/login");
+    redirect("/");
   }
   return user;
 }
@@ -95,7 +95,7 @@ export async function requireUser(): Promise<SessionUser> {
 export async function requireAdmin(): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/login");
+    redirect("/");
   }
   if (user.role !== "ADMIN") {
     redirect("/learn");

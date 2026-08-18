@@ -3,10 +3,10 @@
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { saveMateriaPosition } from "@/actions/admin";
+import { saveTemaPosition } from "@/actions/admin";
 import { CheckIcon } from "@/components/icons";
 
-export type CaminoMateria = {
+export type CaminoTema = {
   id: string;
   name: string;
   emoji: string;
@@ -19,13 +19,13 @@ const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
 
 export function CaminoEditor({
-  etapaName,
-  materias,
+  claseName,
+  temas,
 }: {
-  etapaName: string;
-  materias: CaminoMateria[];
+  claseName: string;
+  temas: CaminoTema[];
 }) {
-  const [items, setItems] = useState(materias);
+  const [items, setItems] = useState(temas);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,7 +84,7 @@ export function CaminoEditor({
     dragRef.current = null;
     setDraggingId(null);
     startTransition(() => {
-      void saveMateriaPosition(drag.id, drag.posX, drag.posY).then((res) => {
+      void saveTemaPosition(drag.id, drag.posX, drag.posY).then((res) => {
         if (res?.success) {
           setSavedId(drag.id);
           setTimeout(() => setSavedId((cur) => (cur === drag.id ? null : cur)), 1400);
@@ -144,7 +144,7 @@ export function CaminoEditor({
         })}
       </div>
       <p className="text-[11px] font-bold text-zinc-400">
-        {etapaName} · {items.length} asignaturas · arrastra para posicionar
+        {claseName} · {items.length} temas · arrastra para posicionar
       </p>
     </div>
   );

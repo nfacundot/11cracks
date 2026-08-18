@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import {
-  DumbbellIcon,
   GamepadIcon,
   HomeIcon,
   ShieldIcon,
@@ -15,8 +14,7 @@ import {
 const links: { href: string; label: string; icon: ReactNode }[] = [
   { href: "/learn", label: "Aprender", icon: <HomeIcon className="h-6 w-6" /> },
   { href: "/games", label: "Juegos", icon: <GamepadIcon className="h-6 w-6" /> },
-  { href: "/training", label: "Entreno", icon: <DumbbellIcon className="h-6 w-6" /> },
-  { href: "/ranking", label: "Ranking", icon: <TrophyIcon className="h-6 w-6" /> },
+{ href: "/ranking", label: "Ranking", icon: <TrophyIcon className="h-6 w-6" /> },
   { href: "/teams", label: "Equipos", icon: <ShieldIcon className="h-6 w-6" /> },
   { href: "/profile", label: "Perfil", icon: <UserIcon className="h-6 w-6" /> },
 ];
@@ -25,7 +23,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-green-100 bg-white/55 backdrop-blur-xl dark:border-green-900 dark:bg-emerald-950/55">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-green-100 bg-white/55 backdrop-blur-xl dark:border-green-900 dark:bg-emerald-950/55 md:hidden">
       <div className="safe-bottom mx-auto flex w-full max-w-md items-stretch justify-between">
         {links.map((link) => {
           const active =

@@ -40,9 +40,6 @@ export default async function LessonPage({
   if (lesson.gameMode === "ANAGRAM") {
     redirect("/game/word");
   }
-  if (lesson.gameMode === "MEMORY") {
-    redirect("/game/memory");
-  }
 
   const questions = lesson.questions.map((q) => ({
     id: q.id,

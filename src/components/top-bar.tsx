@@ -10,7 +10,7 @@ export async function TopBar({ user }: { user: SessionUser }) {
 
   return (
     <header className="sticky top-0 z-20">
-      <div className="mx-auto flex w-full max-w-md items-center justify-between gap-2 px-4 py-3">
+      <div className="mx-auto flex w-full items-center justify-between gap-2 px-4 py-3 max-md:px-4">
         <div className="flex flex-1 items-center justify-between gap-1">
           <span className="flex min-w-0 items-center gap-1 rounded-full bg-emerald-950/60 px-2 py-1.5 backdrop-blur">
             <BoltIcon className="h-4 w-4 shrink-0 text-amber-300" />

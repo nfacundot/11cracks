@@ -33,7 +33,7 @@ export default async function AdminTeamsPage() {
         </p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-2 gap-5 max-lg:grid-cols-1">
         {teams.map((team) => {
           const captain = team.members.find((m) => m.role === "OWNER")?.user;
           const coaches = team.members.filter((m) => m.role === "COACH").map((m) => m.user);

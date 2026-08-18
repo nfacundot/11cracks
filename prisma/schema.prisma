@@ -1,8 +1,5 @@
-// 11Cracks - Esquema de datos
-// Plataforma de aprendizaje de fútbol estilo Duolingo
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -10,32 +7,13 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  COACH
-  PARENT
-  STUDENT
-}
-
-enum TeamRole {
-  OWNER
-  COACH
-  PLAYER
-}
-
 enum LessonType {
   LESSON
   QUIZ
   GAME
-  TRAINING
 }
 
 enum GameMode {
-  PENALTY
-  MEMORY
-  QUIZ
-  SPRINT
-  SETBACKS
   ANAGRAM
   INFOGRAMA
 }
@@ -60,6 +38,20 @@ enum NotificationType {
   GAME
   TEAM
   SYSTEM
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+  COACH
+  PARENT
+}
+
+enum TeamRole {
+  PLAYER
+  CAPTAIN
+  COACH
+  OWNER
 }
 
 model User {
@@ -93,6 +85,7 @@ model User {
   notifications    Notification[]
   pushSubscriptions PushSubscription[]
   streakDays       StreakDay[]
+  indicators       Indicator[]
 
   @@index([xp])
 }
@@ -132,7 +125,7 @@ model StreakDay {
   @@unique([userId, date])
 }
 
-model Etapa {
+model Clase {
   id          String   @id @default(cuid())
   name        String
   description String?
@@ -141,15 +134,15 @@ model Etapa {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
 
-  materias Materia[]
+  temas Tema[]
 
   @@index([order])
 }
 
-model Materia {
+model Tema {
   id       String  @id @default(cuid())
-  etapaId  String?
-  etapa    Etapa?  @relation(fields: [etapaId], references: [id], onDelete: SetNull)
+  claseId  String?
+  clase    Clase?  @relation(fields: [claseId], references: [id], onDelete: SetNull)
   name     String
   emoji    String  @default("⭐")
   color    String  @default("#16a34a")
@@ -161,13 +154,13 @@ model Materia {
   lessons Lesson[]
 
   @@index([order])
-  @@index([etapaId, order])
+  @@index([claseId, order])
 }
 
 model Lesson {
   id        String     @id @default(cuid())
-  materiaId String?
-  materia   Materia?   @relation(fields: [materiaId], references: [id], onDelete: SetNull)
+  temaId    String?
+  tema      Tema?      @relation(fields: [temaId], references: [id], onDelete: SetNull)
   title     String
   description String?
   emoji       String     @default("⚽")
@@ -182,7 +175,7 @@ model Lesson {
   progress  LessonProgress[]
 
   @@index([type, order])
-  @@index([materiaId, order])
+  @@index([temaId, order])
 }
 
 model Question {
@@ -227,7 +220,6 @@ model LessonProgress {
   completedAt DateTime?
 
   @@unique([userId, lessonId])
-  @@index([userId, completed])
 }
 
 model AnswerRecord {
@@ -236,20 +228,21 @@ model AnswerRecord {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  correct    Boolean
+  optionId   String?
+  isCorrect  Boolean
   answeredAt DateTime @default(now())
 
   @@index([userId])
-  @@index([questionId])
 }
 
 model GameSession {
-  id       String   @id @default(cuid())
-  userId   String
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  gameType String
-  score    Int      @default(0)
-  playedAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameType  String
+  score     Int
+  details   Json?
+  createdAt DateTime @default(now())
 
   @@index([userId, gameType])
 }
@@ -258,7 +251,7 @@ model Notification {
   id        String           @id @default(cuid())
   userId    String
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type      NotificationType @default(SYSTEM)
+  type      NotificationType
   title     String
   body      String
   icon      String?
@@ -276,6 +269,18 @@ model PushSubscription {
   endpoint  String   @unique
   keys      Json
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Indicator {
+  id         String    @id @default(cuid())
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  percentage Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@index([userId])
 }

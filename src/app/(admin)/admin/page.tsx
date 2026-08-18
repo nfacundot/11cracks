@@ -71,7 +71,7 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-4 gap-4 max-lg:grid-cols-2">
         {stats.map((stat) => (
           <Link
             key={stat.label}
@@ -89,7 +89,7 @@ export default async function AdminDashboard() {
 
       <div className="rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-5 dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">
         <h3 className="font-black text-emerald-950 dark:text-white">Usuarios por rol</h3>
-        <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-4 gap-4 max-lg:grid-cols-2">
           {roles.map((role) => (
             <div
               key={role.key}
@@ -105,19 +105,19 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1">
         <Link
-          href="/admin/etapas"
+          href="/admin/clases"
           className="rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-5 transition hover:shadow-md dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl"
         >
           <h3 className="flex items-center gap-2 font-black text-emerald-950 dark:text-white">
-            <BookIcon className="h-5 w-5 text-green-500" /> Etapas y asignaturas
+            <BookIcon className="h-5 w-5 text-green-500" /> Clases y temas
           </h3>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Organiza las etapas y sus asignaturas visibles en el mapa de aprendizaje.
+            Organiza las clases y sus temas visibles en el mapa de aprendizaje.
           </p>
           <p className="mt-3 text-sm font-black text-green-600 dark:text-green-400">
-            Gestionar etapas →
+            Gestionar clases →
           </p>
         </Link>
         <Link

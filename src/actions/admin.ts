@@ -6,6 +6,73 @@ import { requireAdmin } from "@/lib/auth";
 
 export type AdminState = { error?: string; success?: string } | undefined;
 
+export type EditableLessonData = {
+  defaultValues: {
+    id: string;
+    title: string;
+    description: string;
+    emoji: string;
+    color: string;
+    type: "LESSON" | "QUIZ" | "GAME";
+    gameMode?: "ANAGRAM" | "INFOGRAMA" | null;
+    order: number;
+    xpReward: number;
+    temaId?: string | null;
+  };
+  questions: {
+    id: string;
+    type: "MULTIPLE_CHOICE" | "TRUE_FALSE";
+    prompt: string;
+    explanation: string | null;
+    timeSeconds: number | null;
+    options: { id: string; text: string; imageUrl?: string | null; isCorrect: boolean }[];
+  }[];
+};
+
+export async function getEditableLesson(lessonId: string): Promise<EditableLessonData | null> {
+  await requireAdmin();
+
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+    include: {
+      questions: {
+        orderBy: { order: "asc" },
+        include: { options: { orderBy: { order: "asc" } } },
+      },
+    },
+  });
+
+  if (!lesson) return null;
+
+  return {
+    defaultValues: {
+      id: lesson.id,
+      title: lesson.title,
+      description: lesson.description ?? "",
+      emoji: lesson.emoji,
+      color: lesson.color,
+      type: lesson.type as EditableLessonData["defaultValues"]["type"],
+      gameMode: lesson.gameMode as EditableLessonData["defaultValues"]["gameMode"],
+      order: lesson.order,
+      xpReward: lesson.xpReward,
+      temaId: lesson.temaId,
+    },
+    questions: lesson.questions.map((q) => ({
+      id: q.id,
+      type: q.type as EditableLessonData["questions"][number]["type"],
+      prompt: q.prompt,
+      explanation: q.explanation,
+      timeSeconds: q.timeSeconds,
+      options: q.options.map((o) => ({
+        id: o.id,
+        text: o.text,
+        imageUrl: o.imageUrl ?? undefined,
+        isCorrect: o.isCorrect,
+      })),
+    })),
+  };
+}
+
 const ROLE_LABELS = {
   ADMIN: "Administrador",
   COACH: "Entrenador",
@@ -43,7 +110,7 @@ export async function deleteUser(userId: string) {
   return { success: "Usuario eliminado" };
 }
 
-export async function saveEtapa(prev: AdminState, formData: FormData): Promise<AdminState> {
+export async function saveClase(prev: AdminState, formData: FormData): Promise<AdminState> {
   await requireAdmin();
 
   const id = String(formData.get("id") || "").trim();
@@ -53,89 +120,89 @@ export async function saveEtapa(prev: AdminState, formData: FormData): Promise<A
   const color = String(formData.get("color") || "#16a34a").trim();
   const order = Math.max(0, Math.round(Number(formData.get("order")) || 0));
 
-  if (!name) return { error: "Escribe el nombre de la etapa" };
+  if (!name) return { error: "Escribe el nombre de la clase" };
   if (name.length > 60) return { error: "El nombre es demasiado largo" };
 
   if (id) {
-    await prisma.etapa.update({
+    await prisma.clase.update({
       where: { id },
       data: { name, description: description || null, emoji, color, order },
     });
   } else {
-    await prisma.etapa.create({
+    await prisma.clase.create({
       data: { name, description: description || null, emoji, color, order },
     });
   }
 
-  revalidatePath("/admin/etapas");
+  revalidatePath("/admin/clases");
   revalidatePath("/admin/caminos");
   revalidatePath("/admin");
   revalidatePath("/learn");
-  return { success: id ? "Etapa actualizada" : "Etapa creada" };
+  return { success: id ? "Clase actualizada" : "Clase creada" };
 }
 
-export async function deleteEtapa(etapaId: string) {
+export async function deleteClase(claseId: string) {
   await requireAdmin();
 
-  const materias = await prisma.materia.findMany({
-    where: { etapaId },
+  const temas = await prisma.tema.findMany({
+    where: { claseId },
     select: { id: true },
   });
-  if (materias.length > 0) {
-    await prisma.materia.updateMany({
-      where: { etapaId },
-      data: { etapaId: null },
+  if (temas.length > 0) {
+    await prisma.tema.updateMany({
+      where: { claseId },
+      data: { claseId: null },
     });
   }
 
-  await prisma.etapa.delete({ where: { id: etapaId } });
+  await prisma.clase.delete({ where: { id: claseId } });
 
-  revalidatePath("/admin/etapas");
+  revalidatePath("/admin/clases");
   revalidatePath("/admin");
   revalidatePath("/learn");
-  return { success: "Etapa eliminada" };
+  return { success: "Clase eliminada" };
 }
 
-export async function saveMateria(prev: AdminState, formData: FormData): Promise<AdminState> {
+export async function saveTema(prev: AdminState, formData: FormData): Promise<AdminState> {
   await requireAdmin();
 
   const id = String(formData.get("id") || "").trim();
-  const etapaId = String(formData.get("etapaId") || "").trim() || null;
+  const claseId = String(formData.get("claseId") || "").trim() || null;
   const name = String(formData.get("name") || "").trim();
   const emoji = String(formData.get("emoji") || "⭐").trim().slice(0, 4);
   const color = String(formData.get("color") || "#16a34a").trim();
   const order = Math.max(0, Math.round(Number(formData.get("order")) || 0));
   const xpReward = Math.max(0, Math.round(Number(formData.get("xpReward")) || 0));
 
-  if (!name) return { error: "Escribe el nombre de la asignatura" };
+  if (!name) return { error: "Escribe el nombre del tema" };
 
   if (id) {
-    await prisma.materia.update({
+    await prisma.tema.update({
       where: { id },
-      data: { etapaId, name, emoji, color, order, xpReward },
+      data: { claseId, name, emoji, color, order, xpReward },
     });
   } else {
-    await prisma.materia.create({
-      data: { etapaId, name, emoji, color, order, xpReward },
+    await prisma.tema.create({
+      data: { claseId, name, emoji, color, order, xpReward },
     });
   }
 
-  revalidatePath("/admin/etapas");
-  revalidatePath("/admin/caminos");
+  revalidatePath("/admin/clases");
+  revalidatePath("/admin/temas");
   revalidatePath("/learn");
-  return { success: id ? "Asignatura actualizada" : "Asignatura creada" };
+  return { success: id ? "Tema actualizado" : "Tema creado" };
 }
 
-export async function deleteMateria(materiaId: string) {
+export async function deleteTema(temaId: string) {
   await requireAdmin();
 
-  await prisma.materia.delete({ where: { id: materiaId } });
+  await prisma.tema.delete({ where: { id: temaId } });
 
-  revalidatePath("/admin/etapas");
-  revalidatePath("/admin/caminos");
+  revalidatePath("/admin/clases");
+  revalidatePath("/admin/temas");
   revalidatePath("/admin/lessons");
   revalidatePath("/learn");
-  return { success: "Asignatura eliminada. Sus lecciones quedaron sin asignatura." };
+  return { success: "Tema eliminado. Sus lecciones quedaron sin tema." };
 }
 
 const defaultPositionFor = (index: number) => {
@@ -145,55 +212,55 @@ const defaultPositionFor = (index: number) => {
   return { posX: xs[col], posY: 10 + row * 24 };
 };
 
-export async function assignMateria(materiaId: string, etapaId: string) {
+export async function assignTema(temaId: string, claseId: string) {
   await requireAdmin();
 
-  if (!etapaId) return { error: "Selecciona una etapa" };
+  if (!claseId) return { error: "Selecciona una clase" };
 
-  const etapa = await prisma.etapa.findUnique({ where: { id: etapaId } });
-  if (!etapa) return { error: "La etapa no existe" };
+  const clase = await prisma.clase.findUnique({ where: { id: claseId } });
+  if (!clase) return { error: "La clase no existe" };
 
-  const count = await prisma.materia.count({ where: { etapaId } });
-  await prisma.materia.update({
-    where: { id: materiaId },
-    data: { etapaId, ...defaultPositionFor(count) },
+  const count = await prisma.tema.count({ where: { claseId } });
+  await prisma.tema.update({
+    where: { id: temaId },
+    data: { claseId, ...defaultPositionFor(count) },
   });
 
-  revalidatePath("/admin/etapas");
-  revalidatePath("/admin/caminos");
+  revalidatePath("/admin/clases");
+  revalidatePath("/admin/temas");
   revalidatePath("/learn");
-  return { success: "Asignatura asociada a la etapa" };
+  return { success: "Tema asociado a la clase" };
 }
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-export async function saveMateriaPosition(materiaId: string, posX: number, posY: number) {
+export async function saveTemaPosition(temaId: string, posX: number, posY: number) {
   await requireAdmin();
 
   if (!Number.isFinite(posX) || !Number.isFinite(posY)) {
     return { error: "Posición inválida" };
   }
 
-  await prisma.materia.update({
-    where: { id: materiaId },
+  await prisma.tema.update({
+    where: { id: temaId },
     data: { posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
   });
 
   revalidatePath("/learn");
-  revalidatePath("/admin/caminos");
+  revalidatePath("/admin/temas");
   return { success: "Posición guardada" };
 }
 
-export async function unassignMateria(materiaId: string) {
+export async function unassignTema(temaId: string) {
   await requireAdmin();
 
-  await prisma.materia.update({ where: { id: materiaId }, data: { etapaId: null } });
+  await prisma.tema.update({ where: { id: temaId }, data: { claseId: null } });
 
-  revalidatePath("/admin/etapas");
-  revalidatePath("/admin/caminos");
+  revalidatePath("/admin/clases");
+  revalidatePath("/admin/temas");
   revalidatePath("/learn");
-  return { success: "Asignatura separada de la etapa" };
+  return { success: "Tema separado de la clase" };
 }
 
 type QuestionInput = {
@@ -239,7 +306,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   await requireAdmin();
 
   const id = String(formData.get("id") || "").trim();
-  const materiaId = String(formData.get("materiaId") || "").trim() || null;
+  const temaId = String(formData.get("temaId") || "").trim() || null;
   const title = String(formData.get("title") || "").trim();
   const description = String(formData.get("description") || "").trim();
   const emoji = String(formData.get("emoji") || "⚽").trim().slice(0, 4);
@@ -247,22 +314,16 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   const type = String(formData.get("type") || "LESSON") as
     | "LESSON"
     | "QUIZ"
-    | "GAME"
-    | "TRAINING";
+    | "GAME";
   const gameMode = String(formData.get("gameMode") || "") as
     | ""
-    | "PENALTY"
-    | "MEMORY"
-    | "QUIZ"
-    | "SPRINT"
-    | "SETBACKS"
     | "ANAGRAM"
     | "INFOGRAMA";
   const order = Math.max(0, Math.round(Number(formData.get("order")) || 0));
   const xpReward = Math.max(0, Math.round(Number(formData.get("xpReward")) || 10));
   const questions = parseQuestions(String(formData.get("questions") || "[]"));
 
-  if (!["LESSON", "QUIZ", "GAME", "TRAINING"].includes(type)) {
+  if (!["LESSON", "QUIZ", "GAME"].includes(type)) {
     return { error: "Tipo de lección inválido" };
   }
   if (!title) return { error: "Escribe el título" };
@@ -273,7 +334,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   if (questions.some((q) => !q.prompt)) {
     return { error: "Todas las preguntas necesitan enunciado" };
   }
-  const needsOptions = gameMode !== "ANAGRAM" && gameMode !== "MEMORY";
+  const needsOptions = gameMode !== "ANAGRAM";
   if (
     needsOptions &&
     questions.some(
@@ -295,7 +356,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   }
 
   const lessonData = {
-    materiaId,
+    temaId,
     title,
     description: description || null,
     emoji,
@@ -392,7 +453,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
 
   revalidatePath("/admin/lessons");
   revalidatePath("/admin/juegos");
-  revalidatePath("/admin/etapas");
+  revalidatePath("/admin/clases");
   revalidatePath("/learn");
   revalidatePath("/games");
   return { success: id ? "Lección actualizada" : "Lección creada" };
@@ -417,4 +478,37 @@ export async function deleteTeam(teamId: string) {
 
   revalidatePath("/admin/teams");
   return { success: "Equipo eliminado" };
+}
+
+export async function upsertIndicator(
+  _prev: AdminState,
+  formData: FormData
+): Promise<AdminState> {
+  await requireAdmin();
+
+  const name = (formData.get("name") as string)?.trim();
+  const indicatorId = formData.get("indicatorId") as string | null;
+
+  if (!name) return { error: "Escribí el nombre del indicador" };
+
+  if (indicatorId) {
+    await prisma.indicator.update({
+      where: { id: indicatorId },
+      data: { name },
+    });
+  } else {
+    await prisma.indicator.create({ data: { name, userId: null } });
+  }
+
+  revalidatePath("/admin/indicators");
+  revalidatePath("/learn");
+  return { success: indicatorId ? "Indicador actualizado" : "Indicador creado" };
+}
+
+export async function deleteIndicator(indicatorId: string) {
+  await requireAdmin();
+  await prisma.indicator.delete({ where: { id: indicatorId } });
+  revalidatePath("/admin/indicators");
+  revalidatePath("/learn");
+  return { success: "Indicador eliminado" };
 }

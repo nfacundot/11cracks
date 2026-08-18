@@ -2,7 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { sendPushNotification } from "@/lib/push";
-import type { NotificationType } from "@/generated/prisma/enums";
+import type { NotificationType } from "@/generated/prisma";
 
 export async function notify(
   userId: string,

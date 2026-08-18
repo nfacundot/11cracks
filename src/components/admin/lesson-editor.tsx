@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useRef, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { saveLesson, deleteLesson } from "@/actions/admin";
 import { PlusIcon, XIcon } from "@/components/icons";
 import { useConfirmDialog } from "@/components/confirm-dialog";
+import { Modal } from "@/components/admin/modal";
 
 const inputCls =
   "w-full rounded-xl border-2 border-green-100 bg-white/60 backdrop-blur-xl px-3 py-2 text-sm font-semibold text-emerald-950 outline-none transition focus:border-green-400 dark:border-emerald-800 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:text-white";
@@ -122,7 +123,7 @@ function OptionImage({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Imagen de la opción (o súbela)"
+        placeholder="Imagen de la opción (o súbelo)"
         className={inputCls}
       />
       {value && (
@@ -140,38 +141,206 @@ function OptionImage({
   );
 }
 
+function EmojiField({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  const options = value && !EMOJIS.includes(value) ? [...EMOJIS, value] : EMOJIS;
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`${inputCls} w-auto`}
+        aria-label="Icono"
+      >
+        <option value="">Sin icono</option>
+        {options.map((e) => (
+          <option key={e} value={e}>
+            {e}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={inputCls}
+      />
+    </div>
+  );
+}
+
+function QuestionFields({
+  value,
+  onChange,
+  isInfograma,
+  isWord,
+  noOptions,
+  radioName,
+}: {
+  value: QuestionDraft;
+  onChange: (patch: Partial<QuestionDraft>) => void;
+  isInfograma: boolean;
+  isWord: boolean;
+  noOptions: boolean;
+  radioName: string;
+}) {
+  const setCorrect = (oi: number) =>
+    onChange({ options: value.options.map((o, j) => ({ ...o, isCorrect: j === oi })) });
+  const updateOpt = (oi: number, patch: Partial<OptionDraft>) =>
+    onChange({
+      options: value.options.map((o, j) => (j === oi ? { ...o, ...patch } : o)),
+    });
+  const addOpt = () => onChange({ options: [...value.options, { text: "", isCorrect: false }] });
+  const removeOpt = (oi: number) =>
+    onChange({ options: value.options.filter((_, j) => j !== oi) });
+
+  return (
+    <>
+      {!isInfograma && !isWord && (
+        <div className="mb-2">
+          <select
+            value={value.type}
+            onChange={(e) => onChange({ type: e.target.value as QuestionDraft["type"] })}
+            className={`${inputCls} w-auto`}
+          >
+            <option value="MULTIPLE_CHOICE">Opción múltiple</option>
+            <option value="TRUE_FALSE">Verdadero / Falso</option>
+          </select>
+        </div>
+      )}
+      <input
+        type="text"
+        value={value.prompt}
+        onChange={(e) => onChange({ prompt: e.target.value })}
+        placeholder={isWord ? "Palabra (ej. FÚTBOL)" : "Enunciado de la pregunta"}
+        className={inputCls}
+      />
+      {isWord ? (
+        <EmojiField
+          value={value.explanation}
+          onChange={(v) => onChange({ explanation: v })}
+          placeholder="o escribe tu propio tema"
+        />
+      ) : (
+        <input
+          type="text"
+          value={value.explanation}
+          onChange={(e) => onChange({ explanation: e.target.value })}
+          placeholder="Explicación (se muestra tras responder)"
+          className={`${inputCls} mt-2`}
+        />
+      )}
+      {!noOptions && (
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs font-bold text-zinc-500">Tiempo (seg)</span>
+          <input
+            type="number"
+            value={value.timeSeconds}
+            onChange={(e) => onChange({ timeSeconds: Math.max(0, Number(e.target.value)) })}
+            className={`${inputCls} w-20`}
+          />
+        </div>
+      )}
+      {!noOptions && (
+        <div className="mt-3 space-y-2">
+          {value.options.map((opt, oi) => (
+            <div key={oi} className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={radioName}
+                checked={opt.isCorrect}
+                onChange={() => setCorrect(oi)}
+                className="h-4 w-4 accent-green-500"
+                title="Marcar como correcta"
+              />
+              <input
+                type="text"
+                value={opt.text}
+                onChange={(e) => updateOpt(oi, { text: e.target.value })}
+                placeholder={`Opción ${oi + 1}`}
+                className={`${inputCls} ${opt.isCorrect ? "border-green-400 ring-1 ring-green-200" : ""}`}
+              />
+              {opt.isCorrect && (
+                <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black text-green-700 dark:bg-green-950 dark:text-green-400">
+                  Correcta
+                </span>
+              )}
+              {!isInfograma && value.options.length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => removeOpt(oi)}
+                  className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40"
+                  aria-label="Eliminar opción"
+                >
+                  <XIcon className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))}
+          {!isInfograma && (
+            <button
+              type="button"
+              onClick={addOpt}
+              className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-green-600 transition hover:bg-green-50 dark:text-green-400 dark:hover:bg-emerald-900"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+              Agregar opción
+            </button>
+          )}
+        </div>
+      )}
+      {isInfograma && (
+        <div className="mt-3 space-y-2 border-t border-green-50 pt-3 dark:border-emerald-900">
+          {value.options.map((opt, oi) => (
+            <OptionImage
+              key={oi}
+              value={opt.imageUrl ?? ""}
+              onChange={(url) => updateOpt(oi, { imageUrl: url })}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 export function LessonEditor({
-  etapas,
+  clases,
   defaultValues,
   questions,
   mode = "lessons",
+  onSaved,
 }: {
-  etapas: {
+  clases: {
     id: string;
     name: string;
     emoji: string;
-    materias: { id: string; name: string }[];
+    temas: { id: string; name: string }[];
   }[];
   mode?: "lessons" | "games";
+  onSaved?: () => void;
   defaultValues?: {
     id: string;
     title: string;
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME" | "TRAINING";
+    type: "LESSON" | "QUIZ" | "GAME";
     gameMode?:
-      | "PENALTY"
-      | "MEMORY"
-      | "QUIZ"
-      | "SPRINT"
-      | "SETBACKS"
       | "ANAGRAM"
       | "INFOGRAMA"
       | null;
     order: number;
     xpReward: number;
-    materiaId?: string | null;
+    temaId?: string | null;
   };
   questions?: {
     id: string;
@@ -184,21 +353,21 @@ export function LessonEditor({
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "⚽");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "TRAINING">(
+  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME">(
     defaultValues?.type ?? (mode === "games" ? "GAME" : "LESSON")
   );
   const [gameMode, setGameMode] = useState<
-    "PENALTY" | "MEMORY" | "QUIZ" | "SPRINT" | "SETBACKS" | "ANAGRAM" | "INFOGRAMA"
-  >(defaultValues?.gameMode ?? (mode === "games" ? "INFOGRAMA" : "QUIZ"));
-  const [materiaId, setMateriaId] = useState(defaultValues?.materiaId ?? "");
+    "ANAGRAM" | "INFOGRAMA"
+  >(defaultValues?.gameMode ?? (mode === "games" ? "INFOGRAMA" : "ANAGRAM"));
+  const [temaId, setTemaId] = useState(defaultValues?.temaId ?? "");
   const [title, setTitle] = useState(defaultValues?.title ?? "");
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [order, setOrder] = useState(defaultValues?.order ?? 0);
   const [xpReward, setXpReward] = useState(defaultValues?.xpReward ?? 10);
   const initialGameMode =
-    defaultValues?.gameMode ?? (mode === "games" ? "INFOGRAMA" : "QUIZ");
+    defaultValues?.gameMode ?? (mode === "games" ? "INFOGRAMA" : "ANAGRAM");
   const initialNoOptions =
-    mode === "games" && (initialGameMode === "ANAGRAM" || initialGameMode === "MEMORY");
+    mode === "games" && initialGameMode === "ANAGRAM";
   const [qs, setQs] = useState<QuestionDraft[]>(
     questions?.map((q) => ({
       id: q.id,
@@ -218,14 +387,20 @@ export function LessonEditor({
   );
   const [state, formAction, pending] = useActionState(saveLesson, undefined);
 
+  const prevSuccessRef = useRef(false);
+  useEffect(() => {
+    if (state?.success && !prevSuccessRef.current) onSaved?.();
+    prevSuccessRef.current = Boolean(state?.success);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.success]);
+
   const isInfograma = mode === "games" && gameMode === "INFOGRAMA";
   const isWord = mode === "games" && gameMode === "ANAGRAM";
-  const isMemory = mode === "games" && gameMode === "MEMORY";
-  const noOptions = isWord || isMemory;
+  const noOptions = isWord;
 
   const changeGameMode = (next: typeof gameMode) => {
     setGameMode(next);
-    if (next === "ANAGRAM" || next === "MEMORY") {
+    if (next === "ANAGRAM") {
       setQs((prev) => prev.map((q) => ({ ...q, options: [] })));
     } else if (next === "INFOGRAMA") {
       setQs((prev) => prev.map((q) => ({ ...q, options: padOptionsTo4(q.options) })));
@@ -235,43 +410,27 @@ export function LessonEditor({
   const updateQ = (qi: number, patch: Partial<QuestionDraft>) => {
     setQs((prev) => prev.map((q, i) => (i === qi ? { ...q, ...patch } : q)));
   };
-  const updateOpt = (qi: number, oi: number, patch: Partial<OptionDraft>) => {
-    setQs((prev) =>
-      prev.map((q, i) =>
-        i === qi ? { ...q, options: q.options.map((o, j) => (j === oi ? { ...o, ...patch } : o)) } : q
-      )
-    );
+  const [creating, setCreating] = useState(false);
+  const [draft, setDraft] = useState<QuestionDraft>(() => (noOptions ? emptyQuestion() : newQuestion()));
+  const openCreateModal = () => {
+    setDraft(noOptions ? emptyQuestion() : newQuestion());
+    setCreating(true);
   };
-  const setCorrect = (qi: number, oi: number) => {
-    setQs((prev) =>
-      prev.map((q, i) =>
-        i === qi ? { ...q, options: q.options.map((o, j) => ({ ...o, isCorrect: j === oi })) } : q
-      )
-    );
+  const submitDraft = () => {
+    setQs((prev) => [...prev, draft]);
+    setCreating(false);
   };
-  const addQ = () =>
-    setQs((prev) => [...prev, noOptions ? emptyQuestion() : newQuestion()]);
   const removeQ = (qi: number) => setQs((prev) => prev.filter((_, i) => i !== qi));
-  const addOpt = (qi: number) =>
-    setQs((prev) =>
-      prev.map((q, i) => (i === qi ? { ...q, options: [...q.options, { text: "", isCorrect: false }] } : q))
-    );
-  const removeOpt = (qi: number, oi: number) => {
-    setQs((prev) =>
-      prev.map((q, i) =>
-        i === qi ? { ...q, options: q.options.filter((_, j) => j !== oi) } : q
-      )
-    );
-  };
 
   return (
+    <>
     <form action={formAction} className="space-y-5">
       {defaultValues?.id && <input type="hidden" name="id" value={defaultValues.id} />}
       <input type="hidden" name="emoji" value={emoji} />
       <input type="hidden" name="color" value={color} />
       <input type="hidden" name="type" value={mode === "games" ? "GAME" : type} />
       <input type="hidden" name="gameMode" value={type === "GAME" ? gameMode : ""} />
-      <input type="hidden" name="materiaId" value={materiaId} />
+      <input type="hidden" name="temaId" value={temaId} />
       <input type="hidden" name="title" value={title} />
       <input type="hidden" name="description" value={description} />
       <input type="hidden" name="order" value={order} />
@@ -351,7 +510,6 @@ export function LessonEditor({
                   <option value="LESSON">Lección</option>
                   <option value="QUIZ">Quiz</option>
                   <option value="GAME">Juego</option>
-                  <option value="TRAINING">Entrenamiento</option>
                 </select>
               )}
             </label>
@@ -365,22 +523,17 @@ export function LessonEditor({
                   style={{ width: "auto" }}
                 >
                   <option value="INFOGRAMA">Infograma (4 imágenes A-D)</option>
-                  <option value="PENALTY">Tanda de Penales</option>
-                  <option value="MEMORY">Memoria Táctica (parejas)</option>
-                  <option value="QUIZ">Cuestionario</option>
-                  <option value="SPRINT">Sprint Express</option>
-                  <option value="SETBACKS">Contratiempos</option>
                   <option value="ANAGRAM">Palabra a Gol (palabras)</option>
                 </select>
               </label>
             )}
             <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
-              Asignatura
-              <select value={materiaId} onChange={(e) => setMateriaId(e.target.value)} className={inputCls} style={{ width: "auto" }}>
-                <option value="">Sin asignatura</option>
-                {etapas.map((e) => (
+              Tema
+              <select value={temaId} onChange={(e) => setTemaId(e.target.value)} className={inputCls} style={{ width: "auto" }}>
+                <option value="">Sin tema</option>
+                {clases.map((e) => (
                   <optgroup key={e.id} label={`${e.emoji} ${e.name}`}>
-                    {e.materias.map((m) => (
+                    {e.temas.map((m) => (
                       <option key={m.id} value={m.id}>
                         {m.name}
                       </option>
@@ -428,7 +581,7 @@ export function LessonEditor({
           </h3>
           <button
             type="button"
-            onClick={addQ}
+            onClick={openCreateModal}
             className="flex items-center gap-1.5 rounded-xl bg-green-500 px-3 py-2 text-xs font-black text-white transition hover:bg-green-600"
           >
             <PlusIcon className="h-4 w-4" />
@@ -453,20 +606,7 @@ export function LessonEditor({
                 <span className="rounded-full bg-violet-500 px-2.5 py-1 text-[10px] font-black text-white">
                   Palabra a Gol · sin opciones
                 </span>
-              ) : isMemory ? (
-                <span className="rounded-full bg-blue-500 px-2.5 py-1 text-[10px] font-black text-white">
-                  Memoria Táctica · pareja
-                </span>
-              ) : (
-                <select
-                  value={q.type}
-                  onChange={(e) => updateQ(qi, { type: e.target.value as QuestionDraft["type"] })}
-                  className={`${inputCls} w-auto`}
-                >
-                  <option value="MULTIPLE_CHOICE">Opción múltiple</option>
-                  <option value="TRUE_FALSE">Verdadero / Falso</option>
-                </select>
-              )}
+              ) : null}
               <div className="flex-1" />
               {qs.length > 1 && (
                 <button
@@ -480,104 +620,14 @@ export function LessonEditor({
               )}
             </div>
 
-            <input
-              type="text"
-              value={q.prompt}
-              onChange={(e) => updateQ(qi, { prompt: e.target.value })}
-              placeholder={
-                isWord
-                  ? "Palabra (ej. FÚTBOL)"
-                  : isMemory
-                    ? "Emoji de la pareja (ej. ⚽)"
-                    : "Enunciado de la pregunta"
-              }
-              className={inputCls}
+            <QuestionFields
+              value={q}
+              onChange={(patch) => updateQ(qi, patch)}
+              isInfograma={isInfograma}
+              isWord={isWord}
+              noOptions={noOptions}
+              radioName={`correct-${qi}`}
             />
-            <input
-              type="text"
-              value={q.explanation}
-              onChange={(e) => updateQ(qi, { explanation: e.target.value })}
-              placeholder={
-                isWord
-                  ? "Tema o pista (ej. Deporte de 11 jugadores)"
-                  : isMemory
-                    ? "Etiqueta (ej. Balón)"
-                    : "Explicación (se muestra tras responder)"
-              }
-              className={`${inputCls} mt-2`}
-            />
-            {!noOptions && (
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs font-bold text-zinc-500">Tiempo (seg)</span>
-                <input
-                  type="number"
-                  value={q.timeSeconds}
-                  onChange={(e) => updateQ(qi, { timeSeconds: Math.max(0, Number(e.target.value)) })}
-                  className={`${inputCls} w-20`}
-                />
-              </div>
-            )}
-
-            {!noOptions && (
-              <div className="mt-3 space-y-2">
-                {q.options.map((opt, oi) => (
-                  <div key={oi} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`correct-${qi}`}
-                      checked={opt.isCorrect}
-                      onChange={() => setCorrect(qi, oi)}
-                      className="h-4 w-4 accent-green-500"
-                      title="Marcar como correcta"
-                    />
-                    <input
-                      type="text"
-                      value={opt.text}
-                      onChange={(e) => updateOpt(qi, oi, { text: e.target.value })}
-                      placeholder={`Opción ${oi + 1}`}
-                      className={`${inputCls} ${opt.isCorrect ? "border-green-400 ring-1 ring-green-200" : ""}`}
-                    />
-                    {opt.isCorrect && (
-                      <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black text-green-700 dark:bg-green-950 dark:text-green-400">
-                        Correcta
-                      </span>
-                    )}
-                    {!isInfograma && q.options.length > 2 && (
-                      <button
-                        type="button"
-                        onClick={() => removeOpt(qi, oi)}
-                        className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40"
-                        aria-label="Eliminar opción"
-                      >
-                        <XIcon className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                {!isInfograma && (
-                  <button
-                    type="button"
-                    onClick={() => addOpt(qi)}
-                    className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold text-green-600 transition hover:bg-green-50 dark:text-green-400 dark:hover:bg-emerald-900"
-                  >
-                    <PlusIcon className="h-3.5 w-3.5" />
-                    Agregar opción
-                  </button>
-                )}
-              </div>
-            )}
-
-            {isInfograma && (
-              <div className="mt-3 space-y-2 border-t border-green-50 pt-3 dark:border-emerald-900">
-                {q.options.map((opt, oi) => (
-                  <OptionImage
-                    key={oi}
-                    value={opt.imageUrl ?? ""}
-                    onChange={(url) => updateOpt(qi, oi, { imageUrl: url })}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         ))}
       </div>
@@ -607,6 +657,43 @@ export function LessonEditor({
             : "Crear lección"}
       </button>
     </form>
+
+      {creating && (
+        <Modal
+          open={creating}
+          onClose={() => setCreating(false)}
+          title="Nueva pregunta"
+          size="lg"
+        >
+          <div className="space-y-3">
+            <QuestionFields
+              value={draft}
+              onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))}
+              isInfograma={isInfograma}
+              isWord={isWord}
+              noOptions={noOptions}
+              radioName="draft-correct"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setCreating(false)}
+                className="flex-1 rounded-2xl border-2 border-green-200 py-3 text-sm font-black text-green-700 transition hover:bg-green-50 dark:border-emerald-800 dark:text-green-400 dark:hover:bg-emerald-950/40"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={submitDraft}
+                className="flex-1 rounded-2xl bg-green-500 py-3 text-sm font-black text-white transition hover:bg-green-600 active:scale-95"
+              >
+                Añadir pregunta
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
 

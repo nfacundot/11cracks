@@ -6,7 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { ArrowLeftIcon } from "@/components/icons";
 import { LearnLessonList } from "@/components/learn-lesson-list";
 
-export const metadata = { title: "Asignatura" };
+export const metadata = { title: "Tema" };
 
 export default async function LearnAsignaturaPage({
   params,
@@ -16,10 +16,10 @@ export default async function LearnAsignaturaPage({
   const user = await requireUser();
   const { asignaturaId } = await params;
 
-  const asignatura = await prisma.materia.findUnique({
+  const tema = await prisma.tema.findUnique({
     where: { id: asignaturaId },
     include: {
-      etapa: { select: { id: true, name: true, emoji: true, color: true } },
+      clase: { select: { id: true, name: true, emoji: true, color: true } },
       lessons: {
         orderBy: { order: "asc" },
         include: {
@@ -30,9 +30,9 @@ export default async function LearnAsignaturaPage({
     },
   });
 
-  if (!asignatura) notFound();
+  if (!tema) notFound();
 
-  const lessons = asignatura.lessons;
+  const lessons = tema.lessons;
   const completedCount = lessons.filter((l) => l.progress[0]?.completed).length;
   const firstIncompleteIndex = lessons.findIndex((l) => !l.progress[0]?.completed);
 
@@ -57,13 +57,13 @@ export default async function LearnAsignaturaPage({
         </Link>
 
         <div className="rounded-2xl bg-white/55 backdrop-blur-xl px-4 py-3 shadow-xl ring-2 ring-white/70 dark:bg-emerald-950/55 dark:ring-emerald-800">
-          {asignatura.etapa && (
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: asignatura.etapa.color }}>
-              {asignatura.etapa.emoji} {asignatura.etapa.name}
+          {tema.clase && (
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: tema.clase.color }}>
+              {tema.clase.emoji} {tema.clase.name}
             </p>
           )}
           <p className="text-sm font-black text-emerald-950 dark:text-white">
-            {asignatura.emoji} {asignatura.name}
+            {tema.emoji} {tema.name}
           </p>
           <p className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
             {completedCount}/{lessons.length} lecciones completadas

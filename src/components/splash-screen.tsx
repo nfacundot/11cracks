@@ -16,7 +16,7 @@ export function SplashScreen() {
   return (
     <div className="fixed inset-0 z-[100] bg-emerald-950">
       <div
-        className="mx-auto h-full max-w-md bg-cover bg-center bg-no-repeat"
+        className="h-full bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url(/img/back/splasher1.png)" }}
       >
         <div className="flex h-full flex-col items-end justify-end p-8">
