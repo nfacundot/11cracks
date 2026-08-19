@@ -60,15 +60,7 @@ const S = {
 
 function DashboardHero() {
   return (
-    <div
-      className="relative overflow-hidden"
-      style={{
-        borderRadius: 16,
-        border: `1px solid ${S.border}`,
-        background: S.surface,
-      }}
-    >
-      <div className="relative z-10 px-6 pt-8 pb-6 md:px-10 md:pt-10 md:pb-6">
+    <div className="px-6 pt-8 pb-2 md:px-10 md:pt-10 md:pb-2">
         <h2
           style={{
             fontFamily: S.barlow,
@@ -320,79 +312,74 @@ function DashboardHero() {
             );
           })}
         </div>
+
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-2.5">
+          {D.nav.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="group flex items-center gap-3 px-4"
+                style={{
+                  height: 48,
+                  flex: 1,
+                  background: S.surface,
+                  border: `1px solid ${S.borderSubtle}`,
+                  borderBottom: `2px solid ${item.color}`,
+                  borderRadius: 12,
+                  transition: "all 180ms ease",
+                  outline: "none",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.outline = `1px solid ${item.color}`;
+                  e.currentTarget.style.outlineOffset = "2px";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.outline = "none";
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.background = S.surfaceAlt;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.background = S.surface;
+                }}
+              >
+                <Icon size={17} style={{ color: item.color }} />
+                <span
+                  className="flex-1 uppercase"
+                  style={{
+                    fontFamily: S.barlow,
+                    fontWeight: 700,
+                    fontSize: 13,
+                    letterSpacing: "0.06em",
+                    color: S.textPrimary,
+                  }}
+                >
+                  {item.label}
+                </span>
+                <ArrowRight
+                  size={15}
+                  style={{
+                    color: item.color,
+                    transition: "transform 180ms ease",
+                  }}
+                />
+              </Link>
+            );
+          })}
+        </div>
       </div>
-    </div>
   );
 }
 
-function QuickNav() {
-  return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:gap-2.5">
-      {D.nav.map((item) => {
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="group flex items-center gap-3 px-4"
-            style={{
-              height: 48,
-              flex: 1,
-              background: S.surface,
-              border: `1px solid ${S.borderSubtle}`,
-              borderBottom: `2px solid ${item.color}`,
-              borderRadius: 12,
-              transition: "all 180ms ease",
-              outline: "none",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.outline = `1px solid ${item.color}`;
-              e.currentTarget.style.outlineOffset = "2px";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.outline = "none";
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.background = S.surfaceAlt;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.background = S.surface;
-            }}
-          >
-            <Icon size={17} style={{ color: item.color }} />
-            <span
-              className="flex-1 uppercase"
-              style={{
-                fontFamily: S.barlow,
-                fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: "0.06em",
-                color: S.textPrimary,
-              }}
-            >
-              {item.label}
-            </span>
-            <ArrowRight
-              size={15}
-              style={{
-                color: item.color,
-                transition: "transform 180ms ease",
-              }}
-            />
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
 
 export function DashboardClient() {
   return (
     <section className="flex flex-col" style={{ gap: 16, marginTop: 20 }}>
       <DashboardHero />
-      <QuickNav />
     </section>
   );
 }
