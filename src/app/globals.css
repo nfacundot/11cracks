@@ -3,17 +3,32 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #000000;
-  --foreground: #ecfdf5;
-  --btn: #83b713;
-  --btn-hover: #6f9c10;
+  --background: #050606;
+  --foreground: #F2F0E9;
+  --btn: #C9A24A;
+  --btn-hover: #E0BB61;
+
+  --db-bg: #050505;
+  --db-surface: #0A0B09;
+  --db-surface-elevated: #10110E;
+  --db-border: #292B24;
+  --db-border-subtle: #20221D;
+  --db-text-primary: #F3F0E8;
+  --db-text-secondary: #AAA69C;
+  --db-text-muted: #77746D;
+  --db-accent: #B7E600;
+  --db-accent-hover: #C4F000;
+  --db-accent-dark: #A9D800;
+  --db-gold: #C89B32;
+  --db-cyan: #00CFE8;
+  --db-purple: #B35CFF;
 }
 
 :root.light {
   --background: #f2f4f6;
   --foreground: #171717;
-  --btn: #22c55e;
-  --btn-hover: #16a34a;
+  --btn: #C9A24A;
+  --btn-hover: #806322;
 }
 
 @theme inline {
@@ -21,51 +36,91 @@
   --color-foreground: var(--foreground);
   --color-green-500: var(--btn);
   --color-green-600: var(--btn-hover);
-  --font-sans: var(--font-roboto);
-  --font-mono: var(--font-roboto);
+  --font-sans: var(--font-barlow);
+  --font-mono: var(--font-barlow);
 }
 
 @theme {
-  --color-emerald-950: #0d0d10;
-  --color-emerald-900: #141418;
-  --color-emerald-800: #25252c;
-  --color-green-900: #25252c;
-  --color-green-800: #1b1b20;
+  --color-emerald-950: #050606;
+  --color-emerald-900: #080909;
+  --color-emerald-800: #0B0D0D;
+  --color-green-900: #0E1111;
+  --color-green-800: #12110D;
   --color-zinc-800: #1a1a1f;
 }
 
 body {
-  background:
-    radial-gradient(1200px 640px at 50% -12%, rgba(34, 197, 94, 0.12), transparent 62%),
-    radial-gradient(900px 500px at 100% 110%, rgba(131, 183, 19, 0.08), transparent 60%),
-    var(--background);
-  color: var(--foreground);
-  font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+  background: #050606;
+  color: #F2F0E9;
+  font-family: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
-/* Paneles de vidrio (glassmorphism) */
-.glass {
-  background-color: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+/* ─── Section labels: uppercase condensed ─── */
+.section-label {
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #686862;
 }
 
-.glass-dark {
-  background-color: rgba(13, 13, 16, 0.55);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+/* ─── Nav items: condensed uppercase ─── */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 54px;
+  padding: 0 0.875rem;
+  border-radius: 4px;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #A5A39C;
+  transition: all 0.15s ease;
+  cursor: pointer;
 }
 
-/* Prevenir el zoom automático de iOS al enfocar inputs */
+.nav-item:hover {
+  background: #0E1111;
+  color: #F2F0E9;
+}
+
+.nav-item.active {
+  background: #0E1111;
+  border-left: 2px solid #C9A24A;
+  color: #F2F0E9;
+}
+
+.nav-item.active svg {
+  color: #C9A24A;
+}
+
+/* ─── Color utilities ─── */
+.gold { color: #C9A24A; }
+.gold-bg { background-color: #C9A24A; }
+.gold-border { border-color: #C9A24A; }
+.gold-highlight { color: #E0BB61; }
+.gold-dark { color: #806322; }
+
+.cyan { color: #00C8F5; }
+.cyan-bg { background-color: #00C8F5; }
+.cyan-border { border-color: #00C8F5; }
+.cyan-highlight { color: #12D9FF; }
+.cyan-surface { background-color: rgba(0, 200, 245, 0.12); }
+
+/* ─── Prevenir zoom iOS ─── */
 input,
 select,
 textarea {
   font-size: 16px;
 }
 
-/* Soportar áreas seguras (muescas de Android/iOS) */
+/* ─── Safe areas ─── */
 @supports (padding: max(0px)) {
   .safe-bottom {
     padding-bottom: max(0px, env(safe-area-inset-bottom));
@@ -75,165 +130,71 @@ textarea {
   }
 }
 
+/* ─── Animations ─── */
 @keyframes pop {
-  0% {
-    transform: scale(0.85);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-8px);
-  }
-  75% {
-    transform: translateX(8px);
-  }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
 }
 
 @keyframes confetti-fall {
-  0% {
-    transform: translateY(-10vh) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes wiggle {
-  0%,
-  100% {
-    transform: rotate(-6deg);
-  }
-  50% {
-    transform: rotate(6deg);
-  }
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
 }
 
 @keyframes bounce-soft {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-10px) scale(1.04);
-  }
-  60% {
-    transform: translateY(0);
-  }
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-10px) scale(1.04); }
+  60% { transform: translateY(0); }
 }
 
 @keyframes glow-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 0 14px rgba(34, 197, 94, 0);
-  }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201, 162, 74, 0.5); }
+  50% { box-shadow: 0 0 0 12px rgba(201, 162, 74, 0); }
 }
 
-@keyframes marquee {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 40px 0;
-  }
-}
-
-.animate-pop {
-  animation: pop 0.3s ease-out both;
-}
-
-.animate-shake {
-  animation: shake 0.4s ease-in-out both;
-}
-
-.animate-float {
-  animation: float 2.4s ease-in-out infinite;
-}
-
-.animate-wiggle {
-  animation: wiggle 0.6s ease-in-out infinite;
-}
-
-.animate-bounce-soft {
-  animation: bounce-soft 1.4s ease-in-out infinite;
-}
-
-.animate-glow {
-  animation: glow-pulse 1.8s ease-in-out infinite;
-}
+.animate-pop { animation: pop 0.3s ease-out both; }
+.animate-shake { animation: shake 0.4s ease-in-out both; }
+.animate-float { animation: float 2.4s ease-in-out infinite; }
+.animate-wiggle { animation: wiggle 0.6s ease-in-out infinite; }
+.animate-bounce-soft { animation: bounce-soft 1.4s ease-in-out infinite; }
+.animate-glow { animation: glow-pulse 1.8s ease-in-out infinite; }
 
 @keyframes kick-ball {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  40% {
-    transform: translate(0, -60px) scale(0.9);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--kick-x, 0), -130px) scale(0.7);
-    opacity: 0.95;
-  }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  40% { transform: translate(0, -60px) scale(0.9); opacity: 1; }
+  100% { transform: translate(var(--kick-x, 0), -130px) scale(0.7); opacity: 0.95; }
 }
 
 @keyframes keeper-dive {
-  0% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  100% {
-    transform: translate(var(--dive-x, 70px), 0) rotate(-25deg);
-  }
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(var(--dive-x, 70px), 0) rotate(-25deg); }
 }
 
 @keyframes net-shake {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.03, 1.06);
-  }
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.03, 1.06); }
 }
 
-.animate-kick-ball {
-  animation: kick-ball 0.6s ease-out forwards;
-}
-
-.animate-keeper-dive {
-  animation: keeper-dive 0.5s ease-in forwards;
-}
-
-.animate-net-shake {
-  animation: net-shake 0.6s ease-out;
-}
+.animate-kick-ball { animation: kick-ball 0.6s ease-out forwards; }
+.animate-keeper-dive { animation: keeper-dive 0.5s ease-in forwards; }
+.animate-net-shake { animation: net-shake 0.6s ease-out; }
 
 .confetti-piece {
   position: absolute;
@@ -245,86 +206,69 @@ textarea {
 }
 
 @keyframes sheet-up {
-  0% {
-    transform: translateY(100%);
-  }
-  100% {
-    transform: translateY(0);
-  }
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
 }
 
 @keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-.animate-sheet-up {
-  animation: sheet-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+.animate-sheet-up { animation: sheet-up 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in { animation: fade-in 0.2s ease-out both; }
 
-.animate-fade-in {
-  animation: fade-in 0.2s ease-out both;
-}
-
-/* Panel de evolución del jugador */
+/* ─── Player evolution panel (cyan data) ─── */
 .player-evolution {
-  --evolution-tone: #8cb62e;
-  --evolution-secondary: #8cb62e;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(0, 200, 245, 0.15);
+  background: rgba(10, 13, 14, 0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 245, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-@supports (color: color-mix(in lab, red, red)) {
-  .player-evolution {
-    --evolution-secondary:
-      color-mix(in oklch, var(--context-neurocracks, var(--evolution-tone)) 62%, var(--brand-gold, #d4a843));
-  }
-  .player-evolution {
-    background:
-      linear-gradient(
-        90deg,
-        lab(38.7497% -6.41793 29.9484 / 72%),
-        lab(8.34503% -0.765175 6.29991 / 18%)
-      ),
-      radial-gradient(
-        circle at 78% 50%,
-        color-mix(in oklch, var(--evolution-tone) 9%, transparent),
-        transparent 42%
-      );
-  }
-}
-
-.dark .player-evolution {
-  --evolution-tone: #6a9e1f;
-  border-color: rgba(255, 255, 255, 0.06);
-}
-
-/* Card de perfil del jugador */
+/* ─── Player card ─── */
 .player-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.03) 100%
-  );
+  border: 1px solid rgba(201, 162, 74, 0.12);
+  background: #0E1111;
 }
 
-.dark .player-card {
-  border-color: rgba(255, 255, 255, 0.06);
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
+/* ─── Hero section ─── */
+.hero-stadium {
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+}
+
+.hero-stadium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #050606 25%, transparent 70%);
+  z-index: 1;
+}
+
+.hero-stadium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #050606 0%, transparent 40%);
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .hero-stadium::before {
+    background: linear-gradient(180deg, #050606 10%, transparent 60%);
+  }
+  .hero-stadium::after {
+    background: linear-gradient(0deg, #050606 0%, transparent 50%);
+  }
 }

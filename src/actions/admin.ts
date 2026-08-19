@@ -487,17 +487,22 @@ export async function upsertIndicator(
   await requireAdmin();
 
   const name = (formData.get("name") as string)?.trim();
+  const category = (formData.get("category") as string) || "DEPORTE";
   const indicatorId = formData.get("indicatorId") as string | null;
 
   if (!name) return { error: "Escribí el nombre del indicador" };
 
+  const validCategory = ["DEPORTE", "NEUROCRACKS"].includes(category) ? category : "DEPORTE";
+
   if (indicatorId) {
     await prisma.indicator.update({
       where: { id: indicatorId },
-      data: { name },
+      data: { name, category: validCategory as "DEPORTE" | "NEUROCRACKS" },
     });
   } else {
-    await prisma.indicator.create({ data: { name, userId: null } });
+    await prisma.indicator.create({
+      data: { name, category: validCategory as "DEPORTE" | "NEUROCRACKS", userId: null },
+    });
   }
 
   revalidatePath("/admin/indicators");

@@ -16,7 +16,7 @@ export default async function LearnPage() {
 
   const indicators = await prisma.indicator.findMany({
     orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, percentage: true },
+    select: { id: true, name: true, category: true, percentage: true },
   });
 
   return (

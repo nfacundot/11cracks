@@ -18,6 +18,11 @@ enum GameMode {
   INFOGRAMA
 }
 
+enum IndicatorCategory {
+  DEPORTE
+  NEUROCRACKS
+}
+
 enum QuestionType {
   MULTIPLE_CHOICE
   TRUE_FALSE
@@ -278,9 +283,11 @@ model Indicator {
   userId     String?
   user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name       String
+  category   IndicatorCategory @default(DEPORTE)
   percentage Int       @default(0)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   @@index([userId])
+  @@index([category])
 }

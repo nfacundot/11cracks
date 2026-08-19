@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Roboto } from "next/font/google";
+import { Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { LessonLoaderGlobal } from "@/components/lesson-loader";
 import { InlineScript } from "@/components/inline-script";
 
-const roboto = Roboto({
-  variable: "--font-roboto",
+const barlow = Barlow_Condensed({
+  variable: "--font-barlow",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -47,10 +47,10 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${roboto.variable} h-full antialiased`}
+      className={`${barlow.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col font-[var(--font-barlow)]">
         <InlineScript
           html={`(function(){try{var t=localStorage.getItem("11cracks-theme");var l=t==="light";document.documentElement.classList.toggle("light",l);document.documentElement.classList.toggle("dark",!l)}catch(e){}})();`}
         />

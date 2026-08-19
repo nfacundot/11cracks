@@ -11,6 +11,7 @@ const inputCls =
 type IndicatorData = {
   id: string;
   name: string;
+  category: "DEPORTE" | "NEUROCRACKS";
   percentage: number;
   userId: string | null;
   user: { name: string; username: string } | null;
@@ -86,6 +87,9 @@ export function IndicatorManager({
               className="flex items-center gap-3 rounded-2xl border border-green-100 bg-white/60 backdrop-blur-xl p-4 dark:border-emerald-900 dark:bg-emerald-950/60"
             >
               <p className="flex-1 min-w-0 truncate text-sm font-black text-emerald-950 dark:text-white">{ind.name}</p>
+              <span className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-zinc-500 dark:bg-emerald-800/60 dark:text-zinc-400">
+                {ind.category === "NEUROCRACKS" ? "Neuro" : "Deporte"}
+              </span>
               {ind.user && (
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-20 overflow-hidden rounded-full bg-zinc-200 dark:bg-emerald-800">
@@ -191,6 +195,17 @@ export function IndicatorManager({
                   required
                   autoFocus
                 />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-bold text-zinc-500">CATEGORÍA</span>
+                <select
+                  name="category"
+                  defaultValue={editing?.category ?? "DEPORTE"}
+                  className={inputCls}
+                >
+                  <option value="DEPORTE">Deporte</option>
+                  <option value="NEUROCRACKS">Neurocracks</option>
+                </select>
               </label>
             </div>
 

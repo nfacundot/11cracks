@@ -11,10 +11,10 @@ import {
 } from "@/components/icons";
 
 const ROLE_LABELS: Record<string, string> = {
-  STUDENT: "Jugador",
-  ADMIN: "Administrador",
-  COACH: "Entrenador",
-  PARENT: "Padre / Madre",
+  STUDENT: "JUGADOR",
+  ADMIN: "ADMINISTRADOR",
+  COACH: "ENTRENADOR",
+  PARENT: "PADRE / MADRE",
 };
 
 export function TopBar({
@@ -41,52 +41,76 @@ export function TopBar({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  const initials = user.name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
-    <header className="sticky top-0 z-20 border-b border-white/10 bg-white/10 backdrop-blur-xl dark:bg-emerald-950/30">
-      <div className="flex items-center justify-between gap-3 px-4 py-2.5">
-        <div className="flex flex-col">
-          <span className="text-[11px] font-black leading-tight text-green-600 dark:text-green-400">
+    <header className="sticky top-0 z-20 border-b border-[#C9A24A]/10 bg-[#020303]">
+      <div className="flex h-[90px] items-center justify-between px-5 md:px-8">
+        {/* Left: Role + Page */}
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">
             {ROLE_LABELS[user.role] ?? user.role}
           </span>
-          <span className="text-sm font-black leading-tight text-emerald-950 dark:text-white">
-            {process.env.NEXT_PUBLIC_SITE_NAME || "11Cracks"}
+          <span className="text-[22px] font-bold uppercase leading-none tracking-wide text-[#F2F0E9] md:text-[26px]">
+            Inicio
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/img/icons/favicon.png" alt="" className="h-6 w-6 shrink-0 rounded-full ring-1 ring-white/20" />
-            <div className="flex flex-col">
-              <span className="text-[11px] font-black leading-tight text-emerald-950 dark:text-white">
-                11Cracks FC
-              </span>
-              <span className="text-[10px] font-bold leading-tight text-zinc-400 dark:text-zinc-500">
-                Futbol y aprendizaje
-              </span>
-            </div>
+        {/* Right: Team + Avatar dropdown */}
+        <div className="flex items-center gap-4">
+          {/* Team info - hidden on mobile */}
+          <div className="hidden flex-col items-end gap-0.5 sm:flex">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A5A39C]">
+              Alcance Activo
+            </span>
+            <span className="text-[11px] font-medium text-[#686862]">
+              Forjadores Pro · Rionegro
+            </span>
           </div>
 
+          {/* Club avatar */}
+          <img
+            src="/img/icons/favicon.png"
+            alt=""
+            className="hidden h-8 w-8 shrink-0 rounded-full border border-[#C9A24A]/20 sm:block"
+          />
+
+          {/* Profile dropdown */}
           <div className="relative" ref={ref}>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="flex items-center gap-1 rounded-xl bg-white/10 px-2 py-2 transition hover:bg-white/20"
+              className="flex items-center gap-2 rounded-lg border border-[#C9A24A]/20 bg-[#080909] px-3 py-2 transition hover:border-[#C9A24A]/40 hover:bg-[#0B0D0D]"
             >
-              <UserIcon className="h-5 w-5 shrink-0 text-zinc-500 dark:text-zinc-300" />
+              {user.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  className="h-7 w-7 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#C9A24A]/15 text-[10px] font-bold text-[#C9A24A]">
+                  {initials}
+                </div>
+              )}
               <ChevronDownIcon
-                className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform ${
+                className={`h-3.5 w-3.5 shrink-0 text-[#686862] transition-transform ${
                   open ? "rotate-180" : ""
                 }`}
               />
             </button>
 
             {open && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-white/95 shadow-xl backdrop-blur-xl dark:border-emerald-900 dark:bg-emerald-950/95">
+              <div className="absolute right-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-[12px] border border-[#806322]/30 bg-[#080909] shadow-2xl shadow-black/60">
                 <Link
                   href="/profile"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-zinc-700 transition hover:bg-green-50 dark:text-zinc-200 dark:hover:bg-emerald-900"
+                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >
                   <UserIcon className="h-4 w-4 shrink-0" />
                   Perfil
@@ -94,19 +118,19 @@ export function TopBar({
                 <Link
                   href="/profile"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-zinc-700 transition hover:bg-green-50 dark:text-zinc-200 dark:hover:bg-emerald-900"
+                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >
                   <SettingsIcon className="h-4 w-4 shrink-0" />
                   Configuración
                 </Link>
-                <div className="border-t border-zinc-100 dark:border-emerald-900" />
+                <div className="border-t border-[#C9A24A]/10" />
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                  className="flex w-full items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >
                   <LogOutIcon className="h-4 w-4 shrink-0" />
-                  Cerrar Sesión
+                  Cerrar sesión
                 </button>
               </div>
             )}

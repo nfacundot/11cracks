@@ -8,7 +8,14 @@ export default async function AdminIndicatorsPage() {
   await requireAdmin();
 
   const indicators = await prisma.indicator.findMany({
-    include: { user: { select: { name: true, username: true } } },
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      percentage: true,
+      userId: true,
+      user: { select: { name: true, username: true } },
+    },
     orderBy: { createdAt: "desc" },
   });
 
