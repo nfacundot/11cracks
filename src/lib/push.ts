@@ -26,7 +26,7 @@ export async function sendPushNotification(
     title: payload.title,
     body: payload.body,
     icon: payload.icon ?? "/icon-192.png",
-    url: payload.url ?? "/notifications",
+    url: payload.url ?? "/jugador/notifications",
   });
 
   for (const sub of subscriptions) {

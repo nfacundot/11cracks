@@ -46,10 +46,10 @@ enum NotificationType {
 }
 
 enum Role {
-  STUDENT
+  JUGADOR
+  ENTRENADOR
   ADMIN
-  COACH
-  PARENT
+  SUPERADMIN
 }
 
 enum TeamRole {
@@ -71,7 +71,7 @@ model User {
   position     String?
   favoriteTeam String?
   country      String?
-  role         Role     @default(STUDENT)
+  role         Role     @default(JUGADOR)
 
   xp           Int      @default(0)
   coins        Int      @default(0)
@@ -290,4 +290,13 @@ model Indicator {
 
   @@index([userId])
   @@index([category])
+}
+
+model Characteristic {
+  id         String   @id @default(cuid())
+  name       String
+  percentage Int      @default(0)
+  color      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

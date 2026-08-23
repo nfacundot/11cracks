@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 
 export const SESSION_COOKIE = "11cracks_session";
 
+export const PROTECTED_EMAILS = ["superadmin@gmail.com", "admin@gmail.com"];
+
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
 
 export function signToken(payload: { id: string }): string {
@@ -92,13 +94,50 @@ export async function requireUser(): Promise<SessionUser> {
   return user;
 }
 
-export async function requireAdmin(): Promise<SessionUser> {
+const ROLE_RANK: Record<string, number> = {
+  JUGADOR: 0,
+  ENTRENADOR: 1,
+  ADMIN: 2,
+  SUPERADMIN: 3,
+};
+
+export function homeForRole(role: string): string {
+  switch (role) {
+    case "SUPERADMIN":
+      return "/superadmin";
+    case "ADMIN":
+      return "/admin";
+    case "ENTRENADOR":
+      return "/coach";
+    default:
+      return "/jugador";
+  }
+}
+
+export function hasRole(userRole: string, minRole: string): boolean {
+  return (ROLE_RANK[userRole] ?? -1) >= (ROLE_RANK[minRole] ?? Infinity);
+}
+
+export async function requireSection(
+  minRole: "JUGADOR" | "ENTRENADOR" | "ADMIN" | "SUPERADMIN"
+): Promise<SessionUser> {
   const user = await getSessionUser();
   if (!user) {
     redirect("/");
   }
-  if (user.role !== "ADMIN") {
-    redirect("/learn");
+  if (!hasRole(user.role, minRole)) {
+    redirect(homeForRole(user.role));
+  }
+  return user;
+}
+
+export async function requireStaff(): Promise<SessionUser> {
+  const user = await getSessionUser();
+  if (!user) {
+    redirect("/");
+  }
+  if (!hasRole(user.role, "ADMIN")) {
+    redirect(homeForRole(user.role));
   }
   return user;
 }

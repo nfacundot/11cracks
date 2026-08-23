@@ -9,6 +9,7 @@ import {
   signToken,
   setSessionCookie,
   clearSessionCookie,
+  homeForRole,
 } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
 
@@ -62,7 +63,7 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
   await setSessionCookie(signToken({ id: user.id }));
   await touchStreak(user.id);
 
-  redirect("/learn");
+  redirect("/jugador");
 }
 
 const loginSchema = z.object({
@@ -91,10 +92,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   await setSessionCookie(signToken({ id: user.id }));
   await touchStreak(user.id);
 
-  if (user.role === "ADMIN") {
-    redirect("/admin");
-  }
-  redirect("/learn");
+  redirect(homeForRole(user.role));
 }
 
 export async function logout() {

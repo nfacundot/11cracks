@@ -5,27 +5,32 @@ import { setUserRole, deleteUser } from "@/actions/admin";
 import { useConfirmDialog } from "@/components/confirm-dialog";
 
 const ROLE_OPTIONS = [
-  { value: "ADMIN", label: "Administrador" },
-  { value: "COACH", label: "Entrenador" },
-  { value: "PARENT", label: "Padre" },
-  { value: "STUDENT", label: "Estudiante" },
+  { value: "SUPERADMIN", label: "Superadministrador", staffOnly: true },
+  { value: "ADMIN", label: "Administrador", staffOnly: true },
+  { value: "ENTRENADOR", label: "Entrenador", staffOnly: false },
+  { value: "JUGADOR", label: "Jugador", staffOnly: false },
 ] as const;
 
 export function UserRoleSelect({
   userId,
   currentRole,
   isProtected,
+  viewerIsSuperadmin,
 }: {
   userId: string;
   currentRole: string;
   isProtected: boolean;
+  viewerIsSuperadmin: boolean;
 }) {
   const [pending, startTransition] = useTransition();
+  const targetIsStaff = currentRole === "SUPERADMIN" || currentRole === "ADMIN";
+  const locked = pending || isProtected || (targetIsStaff && !viewerIsSuperadmin);
+  const options = ROLE_OPTIONS.filter((r) => viewerIsSuperadmin || !r.staffOnly);
 
   return (
     <select
       value={currentRole}
-      disabled={pending || isProtected}
+      disabled={locked}
       onChange={(e) => {
         const role = e.target.value as (typeof ROLE_OPTIONS)[number]["value"];
         startTransition(() => {
@@ -38,7 +43,7 @@ export function UserRoleSelect({
           : "border-green-200 bg-white/60 backdrop-blur-xl text-emerald-950 hover:border-green-400 dark:border-emerald-800 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:text-white"
       }`}
     >
-      {ROLE_OPTIONS.map((role) => (
+      {options.map((role) => (
         <option key={role.value} value={role.value}>
           {role.label}
         </option>

@@ -283,7 +283,7 @@ export function GameWord({ words = DEMO_WORDS }: { words?: WordEntry[] }) {
             Jugar de nuevo
           </button>
           <Link
-            href="/games"
+            href="/jugador/games"
             className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950/40"
           >
             Más juegos

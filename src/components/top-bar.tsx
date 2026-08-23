@@ -11,10 +11,10 @@ import {
 } from "@/components/icons";
 
 const ROLE_LABELS: Record<string, string> = {
-  STUDENT: "JUGADOR",
+  SUPERADMIN: "SUPERADMIN",
   ADMIN: "ADMINISTRADOR",
-  COACH: "ENTRENADOR",
-  PARENT: "PADRE / MADRE",
+  ENTRENADOR: "ENTRENADOR",
+  JUGADOR: "JUGADOR",
 };
 
 export function TopBar({
@@ -49,8 +49,8 @@ export function TopBar({
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[#C9A24A]/10 bg-[#020303]">
-      <div className="flex h-[90px] items-center justify-between px-5 md:px-8">
+    <header className="sticky top-0 z-20 border-b border-[#C9A24A]/10 bg-[#020303]/90 backdrop-blur-md">
+      <div className="flex h-[70px] items-center justify-between px-5 md:px-8">
         {/* Left: Role + Page */}
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">
@@ -108,7 +108,7 @@ export function TopBar({
             {open && (
               <div className="absolute right-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-[12px] border border-[#806322]/30 bg-[#080909] shadow-2xl shadow-black/60">
                 <Link
-                  href="/profile"
+                  href="/jugador/profile"
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >
@@ -116,7 +116,7 @@ export function TopBar({
                   Perfil
                 </Link>
                 <Link
-                  href="/profile"
+                  href="/jugador/profile"
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >

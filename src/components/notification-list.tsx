@@ -111,7 +111,7 @@ export function NotificationList({ notifications }: { notifications: Notif[] }) 
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Cuando completes lecciones o juegos, verás tus logros aquí.
           </p>
-          <Link href="/learn" className="mt-4 inline-block rounded-2xl bg-green-500 px-6 py-3 font-black text-white">
+          <Link href="/jugador/learn" className="mt-4 inline-block rounded-2xl bg-green-500 px-6 py-3 font-black text-white">
             Ir a aprender
           </Link>
         </div>

@@ -147,7 +147,7 @@ export function LearnAsignaturaSheet({
             ) : (
               <Link
                 key={lesson.id}
-                href={`/lesson/${lesson.id}`}
+                href={`/jugador/lesson/${lesson.id}`}
                 onClick={onClose}
                 className={`${rowClass} transition active:scale-[0.98]`}
               >

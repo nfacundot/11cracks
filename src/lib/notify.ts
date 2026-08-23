@@ -27,7 +27,7 @@ export async function notify(
       title,
       body,
       icon: opts?.icon,
-      url: opts?.link ?? "/notifications",
+      url: opts?.link ?? "/jugador/notifications",
     });
   }
 

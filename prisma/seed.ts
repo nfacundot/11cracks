@@ -1,4 +1,4 @@
-import { PrismaPg } from "@prisma/adapter-pg";
+﻿import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 
@@ -26,17 +26,17 @@ type LessonSeed = {
 
 const lessons: LessonSeed[] = [
   {
-    title: "Reglas básicas del fútbol",
+    title: "Reglas bÃ¡sicas del fÃºtbol",
     description: "Aprende las reglas fundamentales del deporte rey.",
-    emoji: "⚽",
+    emoji: "âš½",
     color: "#16a34a",
     type: "LESSON",
     xpReward: 20,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuántos jugadores de campo tiene cada equipo durante un partido?",
-        explanation: "Son 11 por equipo, incluido el portero. De ahí el nombre '11Cracks'.",
+        prompt: "Â¿CuÃ¡ntos jugadores de campo tiene cada equipo durante un partido?",
+        explanation: "Son 11 por equipo, incluido el portero. De ahÃ­ el nombre '11Cracks'.",
         options: [
           { text: "10" },
           { text: "11", isCorrect: true },
@@ -46,8 +46,8 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuánto dura un partido de fútbol profesional en tiempo reglamentario?",
-        explanation: "90 minutos divididos en dos tiempos de 45 minutos, más el descuento.",
+        prompt: "Â¿CuÃ¡nto dura un partido de fÃºtbol profesional en tiempo reglamentario?",
+        explanation: "90 minutos divididos en dos tiempos de 45 minutos, mÃ¡s el descuento.",
         options: [
           { text: "80 minutos" },
           { text: "100 minutos" },
@@ -57,29 +57,29 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El único jugador que puede usar las manos en su área es el portero.",
-        explanation: "Correcto. El portero puede usar las manos dentro de su área penal.",
+        prompt: "El Ãºnico jugador que puede usar las manos en su Ã¡rea es el portero.",
+        explanation: "Correcto. El portero puede usar las manos dentro de su Ã¡rea penal.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué sucede si el balón cruza completamente la línea de meta fuera de la portería?",
-        explanation: "Si lo toca por último un atacante es saque de meta; si lo toca un defensor es córner.",
+        prompt: "Â¿QuÃ© sucede si el balÃ³n cruza completamente la lÃ­nea de meta fuera de la porterÃ­a?",
+        explanation: "Si lo toca por Ãºltimo un atacante es saque de meta; si lo toca un defensor es cÃ³rner.",
         options: [
           { text: "Saque de banda" },
-          { text: "Córner o saque de meta, según quién tocó el balón", isCorrect: true },
+          { text: "CÃ³rner o saque de meta, segÃºn quiÃ©n tocÃ³ el balÃ³n", isCorrect: true },
           { text: "Tiro libre" },
           { text: "Penalti" },
         ],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué árbitro adicional revisa las jugadas con video en los partidos grandes?",
-        explanation: "El VAR (Video Assistant Referee) asiste al árbitro principal.",
+        prompt: "Â¿QuÃ© Ã¡rbitro adicional revisa las jugadas con video en los partidos grandes?",
+        explanation: "El VAR (Video Assistant Referee) asiste al Ã¡rbitro principal.",
         options: [
-          { text: "El cuarto árbitro" },
+          { text: "El cuarto Ã¡rbitro" },
           { text: "El VAR", isCorrect: true },
-          { text: "El juez de línea" },
+          { text: "El juez de lÃ­nea" },
           { text: "El delegado" },
         ],
       },
@@ -94,15 +94,15 @@ const lessons: LessonSeed[] = [
   {
     title: "Las posiciones",
     description: "Conoce el rol de cada jugador en el campo.",
-    emoji: "🧤",
+    emoji: "ðŸ§¤",
     color: "#2563eb",
     type: "LESSON",
     xpReward: 20,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué jugador está autorizado a usar las manos dentro del área?",
-        explanation: "El portero o guardameta es el único autorizado dentro de su área.",
+        prompt: "Â¿QuÃ© jugador estÃ¡ autorizado a usar las manos dentro del Ã¡rea?",
+        explanation: "El portero o guardameta es el Ãºnico autorizado dentro de su Ã¡rea.",
         options: [
           { text: "El delantero" },
           { text: "El defensa central" },
@@ -112,7 +112,7 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cómo se llama el jugador que se ubica entre los defensas y los delanteros?",
+        prompt: "Â¿CÃ³mo se llama el jugador que se ubica entre los defensas y los delanteros?",
         explanation: "El mediocampista conecta la defensa con el ataque.",
         options: [
           { text: "Extremo" },
@@ -123,7 +123,7 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué posición juega normalmente en las bandas cerca del área rival?",
+        prompt: "Â¿QuÃ© posiciÃ³n juega normalmente en las bandas cerca del Ã¡rea rival?",
         explanation: "El extremo o volante ofensivo juega pegado a las bandas para desbordar.",
         options: [
           { text: "Extremo", isCorrect: true },
@@ -134,13 +134,13 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El 9 suele ser el delantero centro o 'referente de área'.",
-        explanation: "El dorsal 9 clásico es el delantero centro que define en el área.",
+        prompt: "El 9 suele ser el delantero centro o 'referente de Ã¡rea'.",
+        explanation: "El dorsal 9 clÃ¡sico es el delantero centro que define en el Ã¡rea.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué jugador cubre las bandas en defensa y apoya en ataque?",
+        prompt: "Â¿QuÃ© jugador cubre las bandas en defensa y apoya en ataque?",
         explanation: "El lateral recorre la banda ayudando en defensa y en ataque.",
         options: [
           { text: "Lateral", isCorrect: true },
@@ -153,44 +153,44 @@ const lessons: LessonSeed[] = [
   },
   {
     title: "El fuera de juego",
-    description: "Domina la regla más polémica del fútbol.",
-    emoji: "🚩",
+    description: "Domina la regla mÃ¡s polÃ©mica del fÃºtbol.",
+    emoji: "ðŸš©",
     color: "#d97706",
     type: "LESSON",
     xpReward: 25,
     questions: [
       {
         type: "TRUE_FALSE",
-        prompt: "Estás en fuera de juego si estás más cerca de la portería rival que el balón y el penúltimo defensor.",
-        explanation: "El fuera de juego se marca al estar por delante del balón y del penúltimo rival.",
+        prompt: "EstÃ¡s en fuera de juego si estÃ¡s mÃ¡s cerca de la porterÃ­a rival que el balÃ³n y el penÃºltimo defensor.",
+        explanation: "El fuera de juego se marca al estar por delante del balÃ³n y del penÃºltimo rival.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿En qué momento se sanciona el fuera de juego?",
+        prompt: "Â¿En quÃ© momento se sanciona el fuera de juego?",
         explanation: "Solo se sanciona cuando el jugador participa de la jugada: recibe, toca o interfiere.",
         options: [
           { text: "En cualquier momento" },
-          { text: "Solo al recibir el balón de un rival" },
+          { text: "Solo al recibir el balÃ³n de un rival" },
           { text: "Cuando participa en la jugada recibiendo o interfiriendo", isCorrect: true },
           { text: "Nunca se sanciona" },
         ],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Se puede estar en fuera de juego en un saque de esquina?",
-        explanation: "No. En córner, saque de banda y saque de meta no hay fuera de juego.",
+        prompt: "Â¿Se puede estar en fuera de juego en un saque de esquina?",
+        explanation: "No. En cÃ³rner, saque de banda y saque de meta no hay fuera de juego.",
         options: [
-          { text: "Sí, siempre" },
-          { text: "No, en el córner no existe fuera de juego", isCorrect: true },
+          { text: "SÃ­, siempre" },
+          { text: "No, en el cÃ³rner no existe fuera de juego", isCorrect: true },
           { text: "Solo en la primera jugada" },
-          { text: "Depende del árbitro" },
+          { text: "Depende del Ã¡rbitro" },
         ],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "Si un jugador está en posición adelantada pero no toca el balón, puede seguir la jugada.",
-        explanation: "Si no participa, no hay infracción, aunque los árbitros pueden marcar si interfiere con el rival.",
+        prompt: "Si un jugador estÃ¡ en posiciÃ³n adelantada pero no toca el balÃ³n, puede seguir la jugada.",
+        explanation: "Si no participa, no hay infracciÃ³n, aunque los Ã¡rbitros pueden marcar si interfiere con el rival.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
     ],
@@ -198,46 +198,46 @@ const lessons: LessonSeed[] = [
   {
     title: "Faltas y tarjetas",
     description: "Aprende a distinguir faltas, tarjetas y sanciones.",
-    emoji: "🟨",
+    emoji: "ðŸŸ¨",
     color: "#dc2626",
     type: "LESSON",
     xpReward: 20,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué significan dos tarjetas amarillas para el mismo jugador?",
-        explanation: "Dos amarillas en un partido equivalen a expulsión (tarjeta roja).",
+        prompt: "Â¿QuÃ© significan dos tarjetas amarillas para el mismo jugador?",
+        explanation: "Dos amarillas en un partido equivalen a expulsiÃ³n (tarjeta roja).",
         options: [
           { text: "Nada" },
-          { text: "Amonestación y sanción económica" },
-          { text: "Expulsión", isCorrect: true },
-          { text: "Cambio de posición" },
+          { text: "AmonestaciÃ³n y sanciÃ³n econÃ³mica" },
+          { text: "ExpulsiÃ³n", isCorrect: true },
+          { text: "Cambio de posiciÃ³n" },
         ],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuándo se sanciona un penalti?",
-        explanation: "Cuando se comete una falta sancionable con tiro libre dentro del área penal.",
+        prompt: "Â¿CuÃ¡ndo se sanciona un penalti?",
+        explanation: "Cuando se comete una falta sancionable con tiro libre dentro del Ã¡rea penal.",
         options: [
-          { text: "Cuando la falta es dentro del área penal", isCorrect: true },
+          { text: "Cuando la falta es dentro del Ã¡rea penal", isCorrect: true },
           { text: "En cualquier falta del partido" },
-          { text: "Solo en el último minuto" },
-          { text: "Cuando el portero sale del área" },
+          { text: "Solo en el Ãºltimo minuto" },
+          { text: "Cuando el portero sale del Ã¡rea" },
         ],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El árbitro puede mostrar una tarjeta roja directa por una falta violenta.",
-        explanation: "Las faltas violentas o el juego peligroso grave se castigan con expulsión directa.",
+        prompt: "El Ã¡rbitro puede mostrar una tarjeta roja directa por una falta violenta.",
+        explanation: "Las faltas violentas o el juego peligroso grave se castigan con expulsiÃ³n directa.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué es una 'falta táctica'?",
+        prompt: "Â¿QuÃ© es una 'falta tÃ¡ctica'?",
         explanation: "Es cortar un ataque rival de forma deliberada, generalmente se castiga con amarilla.",
         options: [
-          { text: "Cortar un contraataque rival a propósito", isCorrect: true },
-          { text: "Una falta dentro del área" },
+          { text: "Cortar un contraataque rival a propÃ³sito", isCorrect: true },
+          { text: "Una falta dentro del Ã¡rea" },
           { text: "Un pase largo" },
           { text: "Un cambio de jugador" },
         ],
@@ -246,29 +246,29 @@ const lessons: LessonSeed[] = [
   },
   {
     title: "Los grandes torneos",
-    description: "El Mundial, la Champions y más competencias legendarias.",
-    emoji: "🏆",
+    description: "El Mundial, la Champions y mÃ¡s competencias legendarias.",
+    emoji: "ðŸ†",
     color: "#9333ea",
     type: "LESSON",
     xpReward: 25,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cada cuántos años se juega el Mundial de la FIFA?",
-        explanation: "Históricamente cada 4 años. A partir de 2026 cambió a 4 años también (48 selecciones).",
+        prompt: "Â¿Cada cuÃ¡ntos aÃ±os se juega el Mundial de la FIFA?",
+        explanation: "HistÃ³ricamente cada 4 aÃ±os. A partir de 2026 cambiÃ³ a 4 aÃ±os tambiÃ©n (48 selecciones).",
         options: [
-          { text: "Cada 2 años" },
-          { text: "Cada 4 años", isCorrect: true },
-          { text: "Cada 3 años" },
-          { text: "Cada año" },
+          { text: "Cada 2 aÃ±os" },
+          { text: "Cada 4 aÃ±os", isCorrect: true },
+          { text: "Cada 3 aÃ±os" },
+          { text: "Cada aÃ±o" },
         ],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué torneo reúne a los mejores clubes de Europa?",
-        explanation: "La UEFA Champions League es el torneo de clubes más prestigioso de Europa.",
+        prompt: "Â¿QuÃ© torneo reÃºne a los mejores clubes de Europa?",
+        explanation: "La UEFA Champions League es el torneo de clubes mÃ¡s prestigioso de Europa.",
         options: [
-          { text: "La Copa América" },
+          { text: "La Copa AmÃ©rica" },
           { text: "La UEFA Champions League", isCorrect: true },
           { text: "El Mundial de Clubes" },
           { text: "La Liga de Naciones" },
@@ -276,27 +276,27 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué selección ganó el Mundial de Qatar 2022?",
-        explanation: "Argentina venció a Francia en una final legendaria por penales.",
+        prompt: "Â¿QuÃ© selecciÃ³n ganÃ³ el Mundial de Qatar 2022?",
+        explanation: "Argentina venciÃ³ a Francia en una final legendaria por penales.",
         options: [
           { text: "Francia" },
           { text: "Brasil" },
           { text: "Argentina", isCorrect: true },
-          { text: "España" },
+          { text: "EspaÃ±a" },
         ],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El Mundial de 2026 se jugará en Estados Unidos, México y Canadá.",
-        explanation: "Es el primer Mundial organizado por tres países, con 48 selecciones.",
+        prompt: "El Mundial de 2026 se jugarÃ¡ en Estados Unidos, MÃ©xico y CanadÃ¡.",
+        explanation: "Es el primer Mundial organizado por tres paÃ­ses, con 48 selecciones.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cómo se llama el torneo continental más importante de Sudamérica?",
-        explanation: "La Copa América es el torneo de selecciones más antiguo del mundo.",
+        prompt: "Â¿CÃ³mo se llama el torneo continental mÃ¡s importante de SudamÃ©rica?",
+        explanation: "La Copa AmÃ©rica es el torneo de selecciones mÃ¡s antiguo del mundo.",
         options: [
-          { text: "Copa América", isCorrect: true },
+          { text: "Copa AmÃ©rica", isCorrect: true },
           { text: "Copa Libertadores" },
           { text: "Sudamericano" },
           { text: "Mundialito" },
@@ -305,16 +305,16 @@ const lessons: LessonSeed[] = [
     ],
   },
   {
-    title: "Estrategia y táctica",
-    description: "Formaciones, pressing y conceptos tácticos básicos.",
-    emoji: "🧠",
+    title: "Estrategia y tÃ¡ctica",
+    description: "Formaciones, pressing y conceptos tÃ¡cticos bÃ¡sicos.",
+    emoji: "ðŸ§ ",
     color: "#0891b2",
     type: "LESSON",
     xpReward: 25,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "En la formación 4-4-2, ¿cuántos delanteros hay?",
+        prompt: "En la formaciÃ³n 4-4-2, Â¿cuÃ¡ntos delanteros hay?",
         explanation: "4 defensas, 4 mediocampistas y 2 delanteros.",
         options: [
           { text: "1" },
@@ -325,29 +325,29 @@ const lessons: LessonSeed[] = [
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué es el 'pressing alto'?",
-        explanation: "Presionar al rival en su propio campo para recuperar el balón rápido.",
+        prompt: "Â¿QuÃ© es el 'pressing alto'?",
+        explanation: "Presionar al rival en su propio campo para recuperar el balÃ³n rÃ¡pido.",
         options: [
-          { text: "Defender en tu propia área" },
-          { text: "Presionar al rival cerca de su portería", isCorrect: true },
+          { text: "Defender en tu propia Ã¡rea" },
+          { text: "Presionar al rival cerca de su porterÃ­a", isCorrect: true },
           { text: "Jugar con un solo delantero" },
           { text: "Esperar el error rival sin salir" },
         ],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "La 'posesión' mide el tiempo que un equipo mantiene el control del balón.",
-        explanation: "La posesión es el porcentaje del tiempo en que un equipo controla el balón.",
+        prompt: "La 'posesiÃ³n' mide el tiempo que un equipo mantiene el control del balÃ³n.",
+        explanation: "La posesiÃ³n es el porcentaje del tiempo en que un equipo controla el balÃ³n.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué significa 'contraataque'?",
-        explanation: "Es atacar rápido tras recuperar el balón, aprovechando que el rival está descolocado.",
+        prompt: "Â¿QuÃ© significa 'contraataque'?",
+        explanation: "Es atacar rÃ¡pido tras recuperar el balÃ³n, aprovechando que el rival estÃ¡ descolocado.",
         options: [
-          { text: "Atacar rápido tras robar el balón", isCorrect: true },
+          { text: "Atacar rÃ¡pido tras robar el balÃ³n", isCorrect: true },
           { text: "Defender con todos los jugadores" },
-          { text: "Tocar el balón sin avanzar" },
+          { text: "Tocar el balÃ³n sin avanzar" },
           { text: "Un cambio de portero" },
         ],
       },
@@ -355,81 +355,81 @@ const lessons: LessonSeed[] = [
   },
 
   {
-    title: "Quiz relámpago",
-    description: "Preguntas rápidas para calentar tu mente.",
-    emoji: "🎯",
+    title: "Quiz relÃ¡mpago",
+    description: "Preguntas rÃ¡pidas para calentar tu mente.",
+    emoji: "ðŸŽ¯",
     color: "#16a34a",
     type: "GAME",
     xpReward: 10,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué país ganó la Eurocopa 2024?",
-        explanation: "España se coronó campeona de la Euro 2024 en Berlín.",
-        options: [{ text: "España", isCorrect: true }, { text: "Inglaterra" }, { text: "Francia" }, { text: "Italia" }],
+        prompt: "Â¿QuÃ© paÃ­s ganÃ³ la Eurocopa 2024?",
+        explanation: "EspaÃ±a se coronÃ³ campeona de la Euro 2024 en BerlÃ­n.",
+        options: [{ text: "EspaÃ±a", isCorrect: true }, { text: "Inglaterra" }, { text: "Francia" }, { text: "Italia" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Quién ganó el Balón de Oro 2024?",
-        explanation: "Rodri Hernández fue galardonado tras ganar la Euro y la Premier.",
-        options: [{ text: "Vinicius Jr." }, { text: "Rodri", isCorrect: true }, { text: "Bellingham" }, { text: "Mbappé" }],
+        prompt: "Â¿QuiÃ©n ganÃ³ el BalÃ³n de Oro 2024?",
+        explanation: "Rodri HernÃ¡ndez fue galardonado tras ganar la Euro y la Premier.",
+        options: [{ text: "Vinicius Jr." }, { text: "Rodri", isCorrect: true }, { text: "Bellingham" }, { text: "MbappÃ©" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué club juega en el estadio Camp Nou?",
+        prompt: "Â¿QuÃ© club juega en el estadio Camp Nou?",
         explanation: "El Camp Nou (ahora Spotify Camp Nou) es la casa del FC Barcelona.",
-        options: [{ text: "Real Madrid" }, { text: "FC Barcelona", isCorrect: true }, { text: "Atlético de Madrid" }, { text: "Sevilla" }],
+        options: [{ text: "Real Madrid" }, { text: "FC Barcelona", isCorrect: true }, { text: "AtlÃ©tico de Madrid" }, { text: "Sevilla" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué país tiene más Copas del Mundo?",
-        explanation: "Brasil lidera con 5 títulos mundiales.",
+        prompt: "Â¿QuÃ© paÃ­s tiene mÃ¡s Copas del Mundo?",
+        explanation: "Brasil lidera con 5 tÃ­tulos mundiales.",
         options: [{ text: "Alemania" }, { text: "Argentina" }, { text: "Brasil", isCorrect: true }, { text: "Italia" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué jugador es apodado 'La Pulga'?",
+        prompt: "Â¿QuÃ© jugador es apodado 'La Pulga'?",
         explanation: "Lionel Messi es conocido mundialmente como 'La Pulga'.",
-        options: [{ text: "Neymar" }, { text: "Lionel Messi", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "Suárez" }],
+        options: [{ text: "Neymar" }, { text: "Lionel Messi", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "SuÃ¡rez" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cómo se llama el trofeo que levanta el campeón de la Champions League?",
+        prompt: "Â¿CÃ³mo se llama el trofeo que levanta el campeÃ³n de la Champions League?",
         explanation: "La 'Orejona' es el apodo del trofeo de la UEFA Champions League.",
         options: [{ text: "La Orejona", isCorrect: true }, { text: "La Copa" }, { text: "El Dorado" }, { text: "El Oso" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué selección ganó la Copa América 2024?",
-        explanation: "Argentina se consagró bicampeona de América en Miami.",
+        prompt: "Â¿QuÃ© selecciÃ³n ganÃ³ la Copa AmÃ©rica 2024?",
+        explanation: "Argentina se consagrÃ³ bicampeona de AmÃ©rica en Miami.",
         options: [{ text: "Colombia" }, { text: "Uruguay" }, { text: "Argentina", isCorrect: true }, { text: "Brasil" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿En qué país nació Pelé?",
-        explanation: "Pelé nació en Três Corações, Brasil.",
+        prompt: "Â¿En quÃ© paÃ­s naciÃ³ PelÃ©?",
+        explanation: "PelÃ© naciÃ³ en TrÃªs CoraÃ§Ãµes, Brasil.",
         options: [{ text: "Argentina" }, { text: "Brasil", isCorrect: true }, { text: "Uruguay" }, { text: "Portugal" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué equipo inglés tiene más Champions League?",
-        explanation: "El Liverpool es el club inglés con más Copas de Europa (6).",
+        prompt: "Â¿QuÃ© equipo inglÃ©s tiene mÃ¡s Champions League?",
+        explanation: "El Liverpool es el club inglÃ©s con mÃ¡s Copas de Europa (6).",
         options: [{ text: "Manchester City" }, { text: "Chelsea" }, { text: "Liverpool", isCorrect: true }, { text: "Arsenal" }],
         timeSeconds: 8,
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué arquero argentino ganó el Mundial 2022 y fue clave en los penales?",
-        explanation: "Emiliano 'Dibu' Martínez fue figura atajando en la tanda final.",
-        options: [{ text: "Emiliano Martínez", isCorrect: true }, { text: "Romero" }, { text: "Musso" }, { text: "Armani" }],
+        prompt: "Â¿QuÃ© arquero argentino ganÃ³ el Mundial 2022 y fue clave en los penales?",
+        explanation: "Emiliano 'Dibu' MartÃ­nez fue figura atajando en la tanda final.",
+        options: [{ text: "Emiliano MartÃ­nez", isCorrect: true }, { text: "Romero" }, { text: "Musso" }, { text: "Armani" }],
         timeSeconds: 8,
       },
     ],
@@ -437,96 +437,96 @@ const lessons: LessonSeed[] = [
 
   {
     title: "Crack test",
-    description: "Afirmaciones rápidas de verdadero o falso.",
-    emoji: "⚡",
+    description: "Afirmaciones rÃ¡pidas de verdadero o falso.",
+    emoji: "âš¡",
     color: "#d97706",
     type: "GAME",
     xpReward: 10,
     questions: [
-      { type: "TRUE_FALSE", prompt: "El fútbol se juega con 11 jugadores por equipo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "El fÃºtbol se juega con 11 jugadores por equipo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
       { type: "TRUE_FALSE", prompt: "El penalti se cobra desde 11 metros.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Messi ganó el Mundial 2022 con Argentina.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "Messi ganÃ³ el Mundial 2022 con Argentina.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
       { type: "TRUE_FALSE", prompt: "La Champions League es un torneo de selecciones.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El Real Madrid es el club con más Champions de la historia.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Un córner se cobra desde la línea de fondo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Pelé nació en Portugal.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "La Copa América es más antigua que el Mundial.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El árbitro puede expulsar directamente con tarjeta roja.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Un partido de fútbol dura 120 minutos sin descuento.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "El Real Madrid es el club con mÃ¡s Champions de la historia.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "Un cÃ³rner se cobra desde la lÃ­nea de fondo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "PelÃ© naciÃ³ en Portugal.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "La Copa AmÃ©rica es mÃ¡s antigua que el Mundial.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "El Ã¡rbitro puede expulsar directamente con tarjeta roja.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "Un partido de fÃºtbol dura 120 minutos sin descuento.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
       { type: "TRUE_FALSE", prompt: "El 'hat-trick' son 3 goles en un mismo partido.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Inglaterra ganó la Eurocopa 2024.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
+      { type: "TRUE_FALSE", prompt: "Inglaterra ganÃ³ la Eurocopa 2024.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
     ],
   },
 
   {
-    title: "Técnica: el pase",
-    description: "Perfecciona la base de todo equipo: pasar el balón.",
-    emoji: "👟",
+    title: "TÃ©cnica: el pase",
+    description: "Perfecciona la base de todo equipo: pasar el balÃ³n.",
+    emoji: "ðŸ‘Ÿ",
     color: "#16a34a",
     type: "LESSON",
     xpReward: 15,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué parte del pie se usa para un pase corto preciso?",
-        explanation: "El interior del pie da mayor precisión y control al pase corto.",
-        options: [{ text: "El empeine" }, { text: "El interior del pie", isCorrect: true }, { text: "El talón" }, { text: "La punta" }],
+        prompt: "Â¿QuÃ© parte del pie se usa para un pase corto preciso?",
+        explanation: "El interior del pie da mayor precisiÃ³n y control al pase corto.",
+        options: [{ text: "El empeine" }, { text: "El interior del pie", isCorrect: true }, { text: "El talÃ³n" }, { text: "La punta" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué tipo de pase se usa para superar a un rival a distancia?",
-        explanation: "El pase largo o en profundidad busca romper líneas y llegar lejos.",
-        options: [{ text: "Pase largo o en profundidad", isCorrect: true }, { text: "Pase corto" }, { text: "Pase de tacón" }, { text: "Saque de banda" }],
+        prompt: "Â¿QuÃ© tipo de pase se usa para superar a un rival a distancia?",
+        explanation: "El pase largo o en profundidad busca romper lÃ­neas y llegar lejos.",
+        options: [{ text: "Pase largo o en profundidad", isCorrect: true }, { text: "Pase corto" }, { text: "Pase de tacÃ³n" }, { text: "Saque de banda" }],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El pase con el interior del pie es más preciso que el de empeine.",
+        prompt: "El pase con el interior del pie es mÃ¡s preciso que el de empeine.",
         explanation: "El interior ofrece mayor superficie de contacto y control.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuál es el error más común al pasar?",
-        explanation: "Mirar fijamente el balón impide leer el movimiento de los compañeros.",
+        prompt: "Â¿CuÃ¡l es el error mÃ¡s comÃºn al pasar?",
+        explanation: "Mirar fijamente el balÃ³n impide leer el movimiento de los compaÃ±eros.",
         options: [
-          { text: "Mirar al balón en lugar de a los compañeros", isCorrect: true },
+          { text: "Mirar al balÃ³n en lugar de a los compaÃ±eros", isCorrect: true },
           { text: "Patear demasiado fuerte" },
           { text: "Patear con el interior" },
-          { text: "Tocar el balón dos veces" },
+          { text: "Tocar el balÃ³n dos veces" },
         ],
       },
     ],
   },
 
   {
-    title: "Técnica: control y recepción",
-    description: "Domina el balón al primer toque.",
-    emoji: "🎯",
+    title: "TÃ©cnica: control y recepciÃ³n",
+    description: "Domina el balÃ³n al primer toque.",
+    emoji: "ðŸŽ¯",
     color: "#2563eb",
     type: "LESSON",
     xpReward: 15,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuál es la clave para un buen control de balón?",
-        explanation: "La 'amortiguación': ceder ligeramente al recibir para que el balón no rebote.",
-        options: [{ text: "Ceder y amortiguar el impacto", isCorrect: true }, { text: "Golpear fuerte el balón" }, { text: "Cerrar los ojos" }, { text: "Saltar" }],
+        prompt: "Â¿CuÃ¡l es la clave para un buen control de balÃ³n?",
+        explanation: "La 'amortiguaciÃ³n': ceder ligeramente al recibir para que el balÃ³n no rebote.",
+        options: [{ text: "Ceder y amortiguar el impacto", isCorrect: true }, { text: "Golpear fuerte el balÃ³n" }, { text: "Cerrar los ojos" }, { text: "Saltar" }],
       },
       {
         type: "TRUE_FALSE",
         prompt: "El control orientado permite recibir y encarar en un solo movimiento.",
-        explanation: "El control orientado deja el balón listo para el siguiente pase o disparo.",
+        explanation: "El control orientado deja el balÃ³n listo para el siguiente pase o disparo.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué parte del cuerpo se usa para controlar un balón que viene por alto?",
-        explanation: "El pecho es ideal para amortiguar balones aéreos y dejarlos cerca de los pies.",
+        prompt: "Â¿QuÃ© parte del cuerpo se usa para controlar un balÃ³n que viene por alto?",
+        explanation: "El pecho es ideal para amortiguar balones aÃ©reos y dejarlos cerca de los pies.",
         options: [{ text: "El pecho", isCorrect: true }, { text: "La rodilla siempre" }, { text: "La cabeza siempre" }, { text: "Las manos" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué error rompe el control del balón en movimiento?",
+        prompt: "Â¿QuÃ© error rompe el control del balÃ³n en movimiento?",
         explanation: "Pie de apoyo mal colocado te desequilibra y pierdes el control.",
         options: [{ text: "Pie de apoyo mal colocado", isCorrect: true }, { text: "Mirar al arco" }, { text: "Tener los brazos abiertos" }, { text: "Respirar" }],
       },
@@ -536,78 +536,78 @@ const lessons: LessonSeed[] = [
   {
     title: "Entrenamiento: defensa 1 vs 1",
     description: "Aprende a defender en duelos individuales.",
-    emoji: "🛡️",
+    emoji: "ðŸ›¡ï¸",
     color: "#dc2626",
     type: "LESSON",
     xpReward: 15,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuál es la postura ideal al defender 1 vs 1?",
-        explanation: "Cuerpo bajo, rodillas flexionadas y presión lateral sobre el balón.",
-        options: [{ text: "De pie y muy recto" }, { text: "Cuerpo bajo y lateral, presionando el balón", isCorrect: true }, { text: "De espaldas al atacante" }, { text: "Corriendo al arco" }],
+        prompt: "Â¿CuÃ¡l es la postura ideal al defender 1 vs 1?",
+        explanation: "Cuerpo bajo, rodillas flexionadas y presiÃ³n lateral sobre el balÃ³n.",
+        options: [{ text: "De pie y muy recto" }, { text: "Cuerpo bajo y lateral, presionando el balÃ³n", isCorrect: true }, { text: "De espaldas al atacante" }, { text: "Corriendo al arco" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué NO debes hacer al defender un regate?",
-        explanation: "Ir a 'lancero' (entrar de frente) te hace perder el equilibrio fácilmente.",
+        prompt: "Â¿QuÃ© NO debes hacer al defender un regate?",
+        explanation: "Ir a 'lancero' (entrar de frente) te hace perder el equilibrio fÃ¡cilmente.",
         options: [{ text: "Entrar de frente sin control", isCorrect: true }, { text: "Esperar el movimiento del rival" }, { text: "Presionar lateral" }, { text: "Mantener la distancia" }],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "El defensor debe observar el balón y la posición del atacante a la vez.",
-        explanation: "Leer el balón y al rival permite anticipar el movimiento.",
+        prompt: "El defensor debe observar el balÃ³n y la posiciÃ³n del atacante a la vez.",
+        explanation: "Leer el balÃ³n y al rival permite anticipar el movimiento.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Cuándo es buen momento para intentar quitar el balón?",
-        explanation: "Al controlar mal o cuando el rival golpea el balón más lejos de su pie.",
+        prompt: "Â¿CuÃ¡ndo es buen momento para intentar quitar el balÃ³n?",
+        explanation: "Al controlar mal o cuando el rival golpea el balÃ³n mÃ¡s lejos de su pie.",
         options: [
-          { text: "Cuando el rival golpea el balón fuera de su control", isCorrect: true },
+          { text: "Cuando el rival golpea el balÃ³n fuera de su control", isCorrect: true },
           { text: "Nunca" },
           { text: "Solo al inicio del partido" },
-          { text: "Cuando está de espaldas" },
+          { text: "Cuando estÃ¡ de espaldas" },
         ],
       },
     ],
   },
 
   {
-    title: "Quiz: goleadores históricos",
-    description: "¿Cuánto sabes de los artilleros del fútbol?",
-    emoji: "🥅",
+    title: "Quiz: goleadores histÃ³ricos",
+    description: "Â¿CuÃ¡nto sabes de los artilleros del fÃºtbol?",
+    emoji: "ðŸ¥…",
     color: "#9333ea",
     type: "QUIZ",
     xpReward: 25,
     questions: [
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Quién es el máximo goleador histórico de las Copas del Mundo?",
-        explanation: "Miroslav Klose marcó 16 goles en mundiales, superando a Ronaldo Nazário.",
-        options: [{ text: "Miroslav Klose", isCorrect: true }, { text: "Ronaldo Nazário" }, { text: "Pelé" }, { text: "Messi" }],
+        prompt: "Â¿QuiÃ©n es el mÃ¡ximo goleador histÃ³rico de las Copas del Mundo?",
+        explanation: "Miroslav Klose marcÃ³ 16 goles en mundiales, superando a Ronaldo NazÃ¡rio.",
+        options: [{ text: "Miroslav Klose", isCorrect: true }, { text: "Ronaldo NazÃ¡rio" }, { text: "PelÃ©" }, { text: "Messi" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Quién ganó el Balón de Oro 2022?",
-        explanation: "Karim Benzema lo ganó tras su temporada histórica con el Real Madrid.",
-        options: [{ text: "Karim Benzema", isCorrect: true }, { text: "Messi" }, { text: "Mbappé" }, { text: "Cristiano Ronaldo" }],
+        prompt: "Â¿QuiÃ©n ganÃ³ el BalÃ³n de Oro 2022?",
+        explanation: "Karim Benzema lo ganÃ³ tras su temporada histÃ³rica con el Real Madrid.",
+        options: [{ text: "Karim Benzema", isCorrect: true }, { text: "Messi" }, { text: "MbappÃ©" }, { text: "Cristiano Ronaldo" }],
       },
       {
         type: "TRUE_FALSE",
-        prompt: "Pelé marcó más de 1000 goles en su carrera.",
-        explanation: "Pelé superó la barrera de los 1000 goles, hito histórico.",
+        prompt: "PelÃ© marcÃ³ mÃ¡s de 1000 goles en su carrera.",
+        explanation: "PelÃ© superÃ³ la barrera de los 1000 goles, hito histÃ³rico.",
         options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Qué jugador es conocido como 'el Fenómeno'?",
-        explanation: "Ronaldo Nazário, 'R9', fue apodado 'el Fenómeno'.",
-        options: [{ text: "Ronaldo Nazário", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "Romario" }, { text: "Van Nistelrooy" }],
+        prompt: "Â¿QuÃ© jugador es conocido como 'el FenÃ³meno'?",
+        explanation: "Ronaldo NazÃ¡rio, 'R9', fue apodado 'el FenÃ³meno'.",
+        options: [{ text: "Ronaldo NazÃ¡rio", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "Romario" }, { text: "Van Nistelrooy" }],
       },
       {
         type: "MULTIPLE_CHOICE",
-        prompt: "¿Quién es el máximo goleador de la Champions League?",
+        prompt: "Â¿QuiÃ©n es el mÃ¡ximo goleador de la Champions League?",
         explanation: "Cristiano Ronaldo lidera con 140 goles en la Champions.",
         options: [{ text: "Cristiano Ronaldo", isCorrect: true }, { text: "Messi" }, { text: "Lewandowski" }, { text: "Benzema" }],
       },
@@ -615,8 +615,8 @@ const lessons: LessonSeed[] = [
   },
   {
     title: "Palabras en juego",
-    description: "Ordena las letras para formar la palabra en inglés. A menor tiempo, más goles.",
-    emoji: "🔤",
+    description: "Ordena las letras para formar la palabra en inglÃ©s. A menor tiempo, mÃ¡s goles.",
+    emoji: "ðŸ”¤",
     color: "#0891b2",
     type: "GAME",
     gameMode: "ANAGRAM",
@@ -631,17 +631,17 @@ const lessons: LessonSeed[] = [
       { type: "MULTIPLE_CHOICE", prompt: "PLAYER", explanation: "Jugador", options: [] },
       { type: "MULTIPLE_CHOICE", prompt: "DEFENSE", explanation: "Defensa", options: [] },
       { type: "MULTIPLE_CHOICE", prompt: "FORWARD", explanation: "Delantero", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "CHAMPION", explanation: "Campeón", options: [] },
+      { type: "MULTIPLE_CHOICE", prompt: "CHAMPION", explanation: "CampeÃ³n", options: [] },
     ],
   },
 ];
 
 const temas: { name: string; emoji: string; color: string; xpReward: number }[] = [
-  { name: "Training sport", emoji: "💪", color: "#16a34a", xpReward: 60 },
-  { name: "Gastronomía sport", emoji: "🍽️", color: "#d97706", xpReward: 60 },
-  { name: "Día de Hotel", emoji: "🏨", color: "#2563eb", xpReward: 60 },
-  { name: "Descansar", emoji: "😴", color: "#0891b2", xpReward: 60 },
-  { name: "Día de juego", emoji: "🏟️", color: "#9333ea", xpReward: 60 },
+  { name: "Training sport", emoji: "ðŸ’ª", color: "#16a34a", xpReward: 60 },
+  { name: "GastronomÃ­a sport", emoji: "ðŸ½ï¸", color: "#d97706", xpReward: 60 },
+  { name: "DÃ­a de Hotel", emoji: "ðŸ¨", color: "#2563eb", xpReward: 60 },
+  { name: "Descansar", emoji: "ðŸ˜´", color: "#0891b2", xpReward: 60 },
+  { name: "DÃ­a de juego", emoji: "ðŸŸï¸", color: "#9333ea", xpReward: 60 },
 ];
 
 const clases: {
@@ -654,17 +654,17 @@ const clases: {
 }[] = [
   {
     id: "subject-futbol",
-    name: "Fundamentos del Fútbol",
-    description: "Reglas, posiciones y técnica básica del deporte rey.",
-    emoji: "⚽",
+    name: "Fundamentos del FÃºtbol",
+    description: "Reglas, posiciones y tÃ©cnica bÃ¡sica del deporte rey.",
+    emoji: "âš½",
     color: "#16a34a",
     order: 0,
   },
   {
     id: "subject-cultura",
     name: "Cultura Futbolera",
-    description: "Historia, torneos y curiosidades del mundo del fútbol.",
-    emoji: "🏆",
+    description: "Historia, torneos y curiosidades del mundo del fÃºtbol.",
+    emoji: "ðŸ†",
     color: "#9333ea",
     order: 1,
   },
@@ -738,23 +738,80 @@ async function main() {
   };
 
   const admin = await prisma.user.upsert({
-    where: { email: "admin@gmail.com" },
+    where: { email: "superadmin@gmail.com" },
     update: {
       username: "admin11",
       name: "Admin",
-      role: "ADMIN",
-      password: await bcrypt.hash("admin123", 10),
+      role: "SUPERADMIN",
+      password: await bcrypt.hash("123456", 10),
     },
     create: {
-      email: "admin@gmail.com",
+      email: "superadmin@gmail.com",
       username: "admin11",
       name: "Admin",
-      password: await bcrypt.hash("admin123", 10),
-      role: "ADMIN",
+      password: await bcrypt.hash("123456", 10),
+      role: "SUPERADMIN",
       xp: 120,
     },
   });
-  console.log(`✔ Cuenta admin: ${admin.email} (${admin.role})`);
+  console.log(`âœ” Usuario 1 (superadmin): ${admin.email} (${admin.role})`);
+
+  const adminSecundario = await prisma.user.upsert({
+    where: { email: "admin@11cracks.com" },
+    update: {
+      username: "admin",
+      name: "Administrador",
+      role: "ADMIN",
+      password: await bcrypt.hash("123456", 10),
+    },
+    create: {
+      email: "admin@11cracks.com",
+      username: "admin",
+      name: "Administrador",
+      password: await bcrypt.hash("123456", 10),
+      role: "ADMIN",
+      xp: 90,
+    },
+  });
+  console.log(`âœ” Usuario 2 (admin): ${adminSecundario.email} (${adminSecundario.role})`);
+
+  const entrenador = await prisma.user.upsert({
+    where: { email: "entrenador@11cracks.com" },
+    update: {
+      username: "entrenador11",
+      name: "Entrenador",
+      role: "ENTRENADOR",
+      password: await bcrypt.hash("123456", 10),
+    },
+    create: {
+      email: "entrenador@11cracks.com",
+      username: "entrenador11",
+      name: "Entrenador",
+      password: await bcrypt.hash("123456", 10),
+      role: "ENTRENADOR",
+      xp: 60,
+    },
+  });
+  console.log(`âœ” Usuario 3 (entrenador): ${entrenador.email} (${entrenador.role})`);
+
+  const jugador = await prisma.user.upsert({
+    where: { email: "jugador@11cracks.com" },
+    update: {
+      username: "jugador11",
+      name: "Jugador",
+      role: "JUGADOR",
+      password: await bcrypt.hash("123456", 10),
+    },
+    create: {
+      email: "jugador@11cracks.com",
+      username: "jugador11",
+      name: "Jugador",
+      password: await bcrypt.hash("123456", 10),
+      role: "JUGADOR",
+      xp: 30,
+    },
+  });
+  console.log(`âœ” Usuario 4 (jugador): ${jugador.email} (${jugador.role})`);
 
   if (existing > 0) {
     const dbLessons = await prisma.lesson.findMany({ orderBy: { order: "asc" } });
@@ -802,7 +859,7 @@ async function main() {
       },
     });
     order += 1;
-    console.log(`✔ Lección: ${lesson.title}`);
+    console.log(`âœ” LecciÃ³n: ${lesson.title}`);
   }
 
   console.log(`Seed completado: ${lessons.length} lecciones creadas.`);

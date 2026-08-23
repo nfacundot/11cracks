@@ -69,7 +69,7 @@ export function LessonLoaderGlobal() {
     const onDocClick = (e: MouseEvent) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
       const target = e.target as HTMLElement | null;
-      const link = target?.closest?.('a[href^="/lesson/"]');
+      const link = target?.closest?.('a[href^="/jugador/lesson/"]');
       if (!link) return;
       setLoading(true);
     };

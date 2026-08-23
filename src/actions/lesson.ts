@@ -123,7 +123,7 @@ export async function finishLesson(data: {
       "LESSON",
       "¡Lección perfecta! 🎯",
       `Completaste "${lesson.title}" sin fallar y ganaste ${lesson.xpReward} XP.`,
-      { icon: "🏅", link: "/learn" }
+      { icon: "🏅", link: "/jugador/learn" }
     );
   } else if (grant > 0) {
     await notify(
@@ -131,7 +131,7 @@ export async function finishLesson(data: {
       "XP",
       "Lección completada",
       `Ganaste ${grant} XP en "${lesson.title}".`,
-      { icon: lesson.emoji, link: "/learn" }
+      { icon: lesson.emoji, link: "/jugador/learn" }
     );
   }
 
@@ -141,7 +141,7 @@ export async function finishLesson(data: {
       "XP",
       `¡Subiste al nivel ${afterLevel}! 🚀`,
       "Sigue entrenando para desbloquear más contenido.",
-      { icon: "🚀", link: "/learn" }
+      { icon: "🚀", link: "/jugador/learn" }
     );
   }
 

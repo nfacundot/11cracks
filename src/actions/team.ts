@@ -35,19 +35,19 @@ export async function createTeam(prev: TeamState, formData: FormData): Promise<T
     data: {
       teamId: team.id,
       userId: user.id,
-      role: user.role === "COACH" ? "COACH" : "OWNER",
+      role: user.role === "ENTRENADOR" ? "COACH" : "OWNER",
     },
   });
 
   await notify(
     user.id,
     "TEAM",
-    user.role === "COACH" ? "¡Equipo creado! 🛡️" : "¡Equipo creado! 🛡️",
+    user.role === "ENTRENADOR" ? "¡Equipo creado! 🛡️" : "¡Equipo creado! 🛡️",
     `"${team.name}" está listo. Comparte el código ${team.code} para invitar jugadores.`,
-    { icon: "🛡️", link: `/team/${team.id}` }
+    { icon: "🛡️", link: `/jugador/team/${team.id}` }
   );
 
-  redirect(`/team/${team.id}`);
+  redirect(`/jugador/team/${team.id}`);
 }
 
 export async function joinTeam(prev: TeamState, formData: FormData): Promise<TeamState> {
@@ -80,10 +80,10 @@ export async function joinTeam(prev: TeamState, formData: FormData): Promise<Tea
     "TEAM",
     "¡Te uniste al equipo! ⚽",
     `Ahora formas parte de "${team.name}".`,
-    { icon: "⚽", link: `/team/${team.id}` }
+    { icon: "⚽", link: `/jugador/team/${team.id}` }
   );
 
-  redirect(`/team/${team.id}`);
+  redirect(`/jugador/team/${team.id}`);
 }
 
 export async function addMember(
@@ -131,7 +131,7 @@ export async function addMember(
     "TEAM",
     "¡Te agregaron a un equipo! ⚽",
     `Tu entrenador te agregó al equipo.`,
-    { icon: "⚽", link: `/team/${teamId}` }
+    { icon: "⚽", link: `/jugador/team/${teamId}` }
   );
 
   return { success: `${student.name} se unió al equipo` };
@@ -166,7 +166,7 @@ export async function leaveTeam(teamId: string) {
           "TEAM",
           "Ahora eres el capitán",
           `Has sido nombrado dueño de "${member.teamId}".`,
-          { icon: "🛡️", link: `/team/${teamId}` }
+          { icon: "🛡️", link: `/jugador/team/${teamId}` }
         );
       }
     }
@@ -178,10 +178,10 @@ export async function leaveTeam(teamId: string) {
 
   await notify(user.id, "TEAM", "Saliste del equipo", "Ya no perteneces a este equipo.", {
     icon: "👋",
-    link: "/teams",
+    link: "/jugador/teams",
   });
 
-  redirect("/teams");
+  redirect("/jugador/teams");
 }
 
 export async function removeMember(teamId: string, memberUserId: string) {
@@ -202,8 +202,8 @@ export async function removeMember(teamId: string, memberUserId: string) {
   await prisma.teamMember.deleteMany({ where: { teamId, userId: memberUserId } });
   await notify(memberUserId, "TEAM", "Fuiste eliminado del equipo", "Un capitán te sacó del equipo.", {
     icon: "🚪",
-    link: "/teams",
+    link: "/jugador/teams",
   });
 
-  redirect(`/team/${teamId}`);
+  redirect(`/jugador/team/${teamId}`);
 }

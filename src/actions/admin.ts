@@ -2,9 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/auth";
+import { requireStaff, hasRole, PROTECTED_EMAILS } from "@/lib/auth";
 
 export type AdminState = { error?: string; success?: string } | undefined;
+
+const STAFF_BASES = ["/admin", "/superadmin"] as const;
+
+function revalidateStaff(path: string) {
+  for (const base of STAFF_BASES) {
+    revalidatePath(`${base}${path}`);
+  }
+}
 
 export type EditableLessonData = {
   defaultValues: {
@@ -30,7 +38,7 @@ export type EditableLessonData = {
 };
 
 export async function getEditableLesson(lessonId: string): Promise<EditableLessonData | null> {
-  await requireAdmin();
+  await requireStaff();
 
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
@@ -74,44 +82,73 @@ export async function getEditableLesson(lessonId: string): Promise<EditableLesso
 }
 
 const ROLE_LABELS = {
+  SUPERADMIN: "Superadministrador",
   ADMIN: "Administrador",
-  COACH: "Entrenador",
-  PARENT: "Padre",
-  STUDENT: "Estudiante",
+  ENTRENADOR: "Entrenador",
+  JUGADOR: "Jugador",
 } as const;
 
-export async function setUserRole(userId: string, role: "ADMIN" | "COACH" | "PARENT" | "STUDENT") {
-  await requireAdmin();
+export async function setUserRole(
+  userId: string,
+  role: "SUPERADMIN" | "ADMIN" | "ENTRENADOR" | "JUGADOR"
+) {
+  const me = await requireStaff();
 
-  if (!["ADMIN", "COACH", "PARENT", "STUDENT"].includes(role)) {
+  if (!["SUPERADMIN", "ADMIN", "ENTRENADOR", "JUGADOR"].includes(role)) {
     return { error: "Rol inválido" };
+  }
+
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, role: true },
+  });
+  if (!target) return { error: "Usuario no encontrado" };
+
+  const iAmSuperadmin = hasRole(me.role, "SUPERADMIN");
+  const grantsStaffRole = role === "SUPERADMIN" || role === "ADMIN";
+  const targetIsStaff = target.role === "SUPERADMIN" || target.role === "ADMIN";
+
+  if (!iAmSuperadmin && (grantsStaffRole || targetIsStaff)) {
+    return { error: "Solo un superadministrador puede gestionar cuentas del staff" };
+  }
+  if (PROTECTED_EMAILS.includes(target.email) && !iAmSuperadmin) {
+    return { error: "Solo un superadministrador puede modificar la cuenta principal" };
   }
 
   await prisma.user.update({ where: { id: userId }, data: { role } });
 
-  revalidatePath("/admin/users");
-  revalidatePath("/admin");
+  revalidateStaff("/users");
+  revalidateStaff("");
+  revalidatePath("/coach");
   return { success: `Rol actualizado a ${ROLE_LABELS[role]}` };
 }
 
 export async function deleteUser(userId: string) {
-  await requireAdmin();
+  const me = await requireStaff();
 
-  const me = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-  if (!me) return { error: "Usuario no encontrado" };
-  if (me.email === "admin@gmail.com") {
+  const target = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, role: true },
+  });
+  if (!target) return { error: "Usuario no encontrado" };
+  if (PROTECTED_EMAILS.includes(target.email)) {
     return { error: "No puedes eliminar la cuenta principal del administrador" };
+  }
+
+  const targetIsStaff = target.role === "SUPERADMIN" || target.role === "ADMIN";
+  if (targetIsStaff && !hasRole(me.role, "SUPERADMIN")) {
+    return { error: "Solo un superadministrador puede eliminar cuentas del staff" };
   }
 
   await prisma.user.delete({ where: { id: userId } });
 
-  revalidatePath("/admin/users");
-  revalidatePath("/admin");
+  revalidateStaff("/users");
+  revalidateStaff("");
   return { success: "Usuario eliminado" };
 }
 
 export async function saveClase(prev: AdminState, formData: FormData): Promise<AdminState> {
-  await requireAdmin();
+  await requireStaff();
 
   const id = String(formData.get("id") || "").trim();
   const name = String(formData.get("name") || "").trim();
@@ -134,15 +171,15 @@ export async function saveClase(prev: AdminState, formData: FormData): Promise<A
     });
   }
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin/caminos");
-  revalidatePath("/admin");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("/caminos");
+  revalidateStaff("");
+  revalidatePath("/jugador/learn");
   return { success: id ? "Clase actualizada" : "Clase creada" };
 }
 
 export async function deleteClase(claseId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   const temas = await prisma.tema.findMany({
     where: { claseId },
@@ -157,14 +194,14 @@ export async function deleteClase(claseId: string) {
 
   await prisma.clase.delete({ where: { id: claseId } });
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("");
+  revalidatePath("/jugador/learn");
   return { success: "Clase eliminada" };
 }
 
 export async function saveTema(prev: AdminState, formData: FormData): Promise<AdminState> {
-  await requireAdmin();
+  await requireStaff();
 
   const id = String(formData.get("id") || "").trim();
   const claseId = String(formData.get("claseId") || "").trim() || null;
@@ -187,21 +224,21 @@ export async function saveTema(prev: AdminState, formData: FormData): Promise<Ad
     });
   }
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin/temas");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("/caminos");
+  revalidatePath("/jugador/learn");
   return { success: id ? "Tema actualizado" : "Tema creado" };
 }
 
 export async function deleteTema(temaId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   await prisma.tema.delete({ where: { id: temaId } });
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin/temas");
-  revalidatePath("/admin/lessons");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("/caminos");
+  revalidateStaff("/lessons");
+  revalidatePath("/jugador/learn");
   return { success: "Tema eliminado. Sus lecciones quedaron sin tema." };
 }
 
@@ -213,7 +250,7 @@ const defaultPositionFor = (index: number) => {
 };
 
 export async function assignTema(temaId: string, claseId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   if (!claseId) return { error: "Selecciona una clase" };
 
@@ -226,9 +263,9 @@ export async function assignTema(temaId: string, claseId: string) {
     data: { claseId, ...defaultPositionFor(count) },
   });
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin/temas");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("/caminos");
+  revalidatePath("/jugador/learn");
   return { success: "Tema asociado a la clase" };
 }
 
@@ -236,7 +273,7 @@ const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 export async function saveTemaPosition(temaId: string, posX: number, posY: number) {
-  await requireAdmin();
+  await requireStaff();
 
   if (!Number.isFinite(posX) || !Number.isFinite(posY)) {
     return { error: "Posición inválida" };
@@ -247,19 +284,19 @@ export async function saveTemaPosition(temaId: string, posX: number, posY: numbe
     data: { posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
   });
 
-  revalidatePath("/learn");
-  revalidatePath("/admin/temas");
+  revalidatePath("/jugador/learn");
+  revalidateStaff("/caminos");
   return { success: "Posición guardada" };
 }
 
 export async function unassignTema(temaId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   await prisma.tema.update({ where: { id: temaId }, data: { claseId: null } });
 
-  revalidatePath("/admin/clases");
-  revalidatePath("/admin/temas");
-  revalidatePath("/learn");
+  revalidateStaff("/etapas");
+  revalidateStaff("/caminos");
+  revalidatePath("/jugador/learn");
   return { success: "Tema separado de la clase" };
 }
 
@@ -303,7 +340,7 @@ function parseQuestions(raw: string): QuestionInput[] | null {
 }
 
 export async function saveLesson(prev: AdminState, formData: FormData): Promise<AdminState> {
-  await requireAdmin();
+  await requireStaff();
 
   const id = String(formData.get("id") || "").trim();
   const temaId = String(formData.get("temaId") || "").trim() || null;
@@ -451,32 +488,32 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     }
   }
 
-  revalidatePath("/admin/lessons");
-  revalidatePath("/admin/juegos");
-  revalidatePath("/admin/clases");
-  revalidatePath("/learn");
-  revalidatePath("/games");
+  revalidateStaff("/lessons");
+  revalidateStaff("/juegos");
+  revalidateStaff("/etapas");
+  revalidatePath("/jugador/learn");
+  revalidatePath("/jugador/games");
   return { success: id ? "Lección actualizada" : "Lección creada" };
 }
 
 export async function deleteLesson(lessonId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   await prisma.lesson.delete({ where: { id: lessonId } });
 
-  revalidatePath("/admin/lessons");
-  revalidatePath("/admin/juegos");
-  revalidatePath("/learn");
-  revalidatePath("/games");
+  revalidateStaff("/lessons");
+  revalidateStaff("/juegos");
+  revalidatePath("/jugador/learn");
+  revalidatePath("/jugador/games");
   return { success: "Lección eliminada" };
 }
 
 export async function deleteTeam(teamId: string) {
-  await requireAdmin();
+  await requireStaff();
 
   await prisma.team.delete({ where: { id: teamId } });
 
-  revalidatePath("/admin/teams");
+  revalidateStaff("/teams");
   return { success: "Equipo eliminado" };
 }
 
@@ -484,7 +521,7 @@ export async function upsertIndicator(
   _prev: AdminState,
   formData: FormData
 ): Promise<AdminState> {
-  await requireAdmin();
+  await requireStaff();
 
   const name = (formData.get("name") as string)?.trim();
   const category = (formData.get("category") as string) || "DEPORTE";
@@ -505,15 +542,51 @@ export async function upsertIndicator(
     });
   }
 
-  revalidatePath("/admin/indicators");
-  revalidatePath("/learn");
+  revalidateStaff("/indicators");
+  revalidatePath("/jugador/learn");
   return { success: indicatorId ? "Indicador actualizado" : "Indicador creado" };
 }
 
 export async function deleteIndicator(indicatorId: string) {
-  await requireAdmin();
+  await requireStaff();
   await prisma.indicator.delete({ where: { id: indicatorId } });
-  revalidatePath("/admin/indicators");
-  revalidatePath("/learn");
+  revalidateStaff("/indicators");
+  revalidatePath("/jugador/learn");
   return { success: "Indicador eliminado" };
+}
+
+export async function upsertCharacteristic(
+  _prev: AdminState,
+  formData: FormData
+): Promise<AdminState> {
+  await requireStaff();
+
+  const name = (formData.get("name") as string)?.trim();
+  const color = (formData.get("color") as string)?.trim() || null;
+  const characteristicId = formData.get("characteristicId") as string | null;
+
+  if (!name) return { error: "Escribí el nombre de la característica" };
+
+  if (characteristicId) {
+    await prisma.characteristic.update({
+      where: { id: characteristicId },
+      data: { name, color },
+    });
+  } else {
+    await prisma.characteristic.create({
+      data: { name, color },
+    });
+  }
+
+  revalidateStaff("/caracteristicas");
+  revalidatePath("/jugador/progress");
+  return { success: characteristicId ? "Característica actualizada" : "Característica creada" };
+}
+
+export async function deleteCharacteristic(characteristicId: string) {
+  await requireStaff();
+  await prisma.characteristic.delete({ where: { id: characteristicId } });
+  revalidateStaff("/caracteristicas");
+  revalidatePath("/jugador/progress");
+  return { success: "Característica eliminada" };
 }

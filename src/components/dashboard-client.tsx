@@ -35,9 +35,9 @@ const D = {
     { label: "HORAS VALIDADAS", value: "126", suffix: "/ 540 h", icon: ChartNoAxesColumnIncreasing },
   ],
   nav: [
-    { label: "MI PROGRESO", href: "/learn", color: "#00CFE8", icon: ChartNoAxesColumn },
-    { label: "ENTRENAMIENTO", href: "/training", color: "#C89B32", icon: KeyRound },
-    { label: "NEUROCRACKS", href: "/games", color: "#B35CFF", icon: BookOpen },
+    { label: "MI PROGRESO", href: "/jugador/learn", color: "#00CFE8", icon: ChartNoAxesColumn },
+    { label: "ENTRENAMIENTO", href: "/jugador/training", color: "#C89B32", icon: KeyRound },
+    { label: "NEUROCRACKS", href: "/jugador/games", color: "#B35CFF", icon: BookOpen },
   ],
 };
 

@@ -39,7 +39,7 @@ export async function recordGameScore(gameType: string, score: number): Promise<
     "GAME",
     "¡Partido jugado! ⚽",
     `Terminaste ${GAME_NAMES[gameType] ?? gameType} con ${safeScore} puntos. Ganaste ${xpGained} XP.`,
-    { icon: "🎮", link: "/games" }
+    { icon: "🎮", link: "/jugador/games" }
   );
 
   return { ok: true, xpGained, bestScore: safeScore > 0 };

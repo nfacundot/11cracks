@@ -236,14 +236,14 @@ export function LessonPlayer({
             </button>
           ) : (
             <Link
-              href="/learn"
+              href="/jugador/learn"
               className="w-full rounded-2xl bg-green-500 py-4 text-center text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
             >
               Continuar
             </Link>
           )}
           <Link
-            href="/learn"
+            href="/jugador/learn"
             className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950/40"
           >
             Volver al camino
@@ -263,7 +263,7 @@ export function LessonPlayer({
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Link
-          href="/learn"
+          href="/jugador/learn"
           className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
           aria-label="Salir"
         >

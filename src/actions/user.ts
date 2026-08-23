@@ -29,7 +29,7 @@ export async function updateProfile(
     data: { name, bio: bio || null, position: position || null, favoriteTeam: favoriteTeam || null, country: country || null },
   });
 
-  revalidatePath("/profile");
+  revalidatePath("/jugador/profile");
   return { success: "Perfil actualizado" };
 }
 
@@ -45,7 +45,7 @@ export async function setAvatar(avatarUrl: string) {
     data: { avatarUrl },
   });
 
-  revalidatePath("/profile");
+  revalidatePath("/jugador/profile");
   return { success: true };
 }
 
@@ -62,10 +62,10 @@ export async function setAvatarConfig(config: AvatarConfig) {
     data: { avatarConfig: valid },
   });
 
-  revalidatePath("/profile");
-  revalidatePath("/ranking");
-  revalidatePath("/teams");
-  revalidatePath("/notifications");
+  revalidatePath("/jugador/profile");
+  revalidatePath("/jugador/ranking");
+  revalidatePath("/jugador/teams");
+  revalidatePath("/jugador/notifications");
   return { success: true };
 }
 
@@ -75,7 +75,7 @@ export async function markAllNotificationsRead() {
     where: { userId: user.id, read: false },
     data: { read: true },
   });
-  revalidatePath("/notifications");
+  revalidatePath("/jugador/notifications");
   return { ok: true };
 }
 
@@ -85,13 +85,13 @@ export async function markNotificationRead(id: string) {
     where: { id, userId: user.id },
     data: { read: true },
   });
-  revalidatePath("/notifications");
+  revalidatePath("/jugador/notifications");
   return { ok: true };
 }
 
 export async function claimDailyStreak() {
   const user = await requireUser();
   const result = await touchStreak(user.id);
-  revalidatePath("/profile");
+  revalidatePath("/jugador/profile");
   return { ok: true, ...result };
 }

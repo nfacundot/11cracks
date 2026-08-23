@@ -34,7 +34,7 @@ export function LearnLessonList({
         const locked =
           !done && firstIncompleteIndex !== -1 && i > firstIncompleteIndex;
         const isNext = !done && !locked && i === firstIncompleteIndex;
-        const href = locked ? "#" : `/lesson/${lesson.id}`;
+        const href = locked ? "#" : `/jugador/lesson/${lesson.id}`;
 
         return (
           <Link
