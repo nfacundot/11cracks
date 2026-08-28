@@ -1,14 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState, type FormEvent, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { register, type AuthState } from "@/actions/auth";
-import { EyeIcon, EyeOffIcon, ChevronRightIcon, XIcon } from "@/components/icons";
-import { AuthLoading } from "@/components/auth-loading";
+import { playLoginAudio } from "@/lib/audio/audio-manager";
 
-const inputCls =
-  "w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3.5 font-medium text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-green-500 dark:border-emerald-800 dark:bg-emerald-900/50 dark:text-white dark:placeholder-emerald-300/50 dark:focus:border-green-400";
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3.75 6.75h16.5v10.5H3.75z" />
+      <path d="m4.5 7.5 7.5 5.25 7.5-5.25" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5.5" y="10" width="13" height="10" rx="1.5" />
+      <path d="M8.25 10V7.5a3.75 3.75 0 0 1 7.5 0V10" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 19.5a7 7 0 0 1 14 0" />
+    </svg>
+  );
+}
+
+function EyeIcon({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2.5 12s3.5-5.25 9.5-5.25S21.5 12 21.5 12 18 17.25 12 17.25 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="2.4" />
+      {!open && <path d="m4 4 16 16" />}
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h13M14 7l5 5-5 5" />
+    </svg>
+  );
+}
 
 export function RegisterForm() {
   const [state, action, pending] = useActionState<AuthState, FormData>(register, undefined);
@@ -17,6 +57,25 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (!state?.error) return;
+    playLoginAudio("ui.error");
+  }, [state?.error]);
+
+  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType === "mouse") playLoginAudio("ui.hover");
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (!event.currentTarget.checkValidity()) return;
+    const trace = document.querySelector<HTMLElement>(".login-energy-trace");
+    trace?.classList.remove("is-active");
+    void trace?.offsetWidth;
+    trace?.classList.add("is-active");
+    playLoginAudio("ui.confirm");
+    document.documentElement.dataset.loginTransition = "leaving";
+  }
 
   const errorModal =
     state?.error
@@ -32,7 +91,6 @@ export function RegisterForm() {
                 onClick={() => window.location.reload()}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-bold uppercase text-white transition hover:bg-white/10"
               >
-                <XIcon className="h-4 w-4" />
                 Cerrar
               </button>
             </div>
@@ -42,76 +100,101 @@ export function RegisterForm() {
       : null;
 
   return (
-    <form action={action} className="flex flex-col items-center gap-4">
+    <form action={action} className="login-form" onSubmit={handleSubmit}>
       {errorModal}
 
-      {pending && <AuthLoading label="Creando cuenta…" />}
-
-      <input
-        name="name"
-        type="text"
-        required
-        minLength={2}
-        autoComplete="name"
-        placeholder="NOMBRE"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className={inputCls}
-      />
-      <input
-        name="username"
-        type="text"
-        required
-        minLength={3}
-        autoComplete="username"
-        placeholder="USUARIO (EJ: CRACK10)"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className={inputCls}
-      />
-      <input
-        name="email"
-        type="email"
-        required
-        autoComplete="email"
-        placeholder="EMAIL"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className={inputCls}
-      />
-      <div className="relative w-full">
-        <input
-          name="password"
-          type={showPassword ? "text" : "password"}
-          required
-          minLength={6}
-          autoComplete="new-password"
-          placeholder="CONTRASEÑA (MÍNIMO 6)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={`${inputCls} pr-12`}
-        />
-        <button
-          type="button"
-          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-          onClick={() => setShowPassword((s) => !s)}
-          className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-3 text-zinc-400 transition hover:text-zinc-600 dark:text-emerald-300/60 dark:hover:text-emerald-200"
-        >
-          {showPassword ? (
-            <EyeOffIcon className="h-5 w-5" />
-          ) : (
-            <EyeIcon className="h-5 w-5" />
-          )}
-        </button>
+      <div className="field-group">
+        <label htmlFor="name">Nombre</label>
+        <div className="input-shell">
+          <span className="input-shell__icon"><UserIcon /></span>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            required
+            minLength={2}
+            autoComplete="name"
+            placeholder="Tu nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={pending}
+            onPointerEnter={handlePointerEnter}
+          />
+        </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-500 py-4 text-lg font-black uppercase text-white shadow-lg shadow-green-900/40 transition hover:bg-green-600 active:scale-95 disabled:opacity-60 dark:shadow-green-900/40"
-      >
-        {pending ? "Creando…" : "Crear cuenta"}
-        <ChevronRightIcon className="h-5 w-5" />
+      <div className="field-group">
+        <label htmlFor="username">Usuario</label>
+        <div className="input-shell">
+          <span className="input-shell__icon"><UserIcon /></span>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            required
+            minLength={3}
+            autoComplete="username"
+            placeholder="Usuario (ej: crack10)"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            disabled={pending}
+            onPointerEnter={handlePointerEnter}
+          />
+        </div>
+      </div>
+
+      <div className="field-group">
+        <label htmlFor="email">Correo electrónico</label>
+        <div className="input-shell">
+          <span className="input-shell__icon"><MailIcon /></span>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            inputMode="email"
+            placeholder="tu@correo.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={pending}
+            onPointerEnter={handlePointerEnter}
+          />
+        </div>
+      </div>
+
+      <div className="field-group">
+        <label htmlFor="password">Contraseña</label>
+        <div className="input-shell">
+          <span className="input-shell__icon"><LockIcon /></span>
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            required
+            minLength={6}
+            autoComplete="new-password"
+            placeholder="Mínimo 6 caracteres"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={pending}
+          />
+          <button
+            className="password-toggle"
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            aria-pressed={showPassword}
+            onPointerEnter={handlePointerEnter}
+          >
+            <EyeIcon open={showPassword} />
+          </button>
+        </div>
+      </div>
+
+      <button className="login-submit" type="submit" disabled={pending} onPointerEnter={handlePointerEnter}>
+        <span>{pending ? "Creando cuenta" : "Crear cuenta"}</span>
+        {pending ? <span className="login-spinner" aria-hidden="true" /> : <ArrowIcon />}
       </button>
     </form>
   );

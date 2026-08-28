@@ -1,7 +1,6 @@
 import { GlobalClient } from "@/components/admin/global-client";
 import { GlobalSideNav, GlobalBottomNav } from "@/components/admin/global-nav";
 import { GlobalTopBar } from "@/components/admin/global-top-bar";
-import { CleanUrl } from "@/components/admin/clean-url";
 import type { ReactNode } from "react";
 
 export function GlobalSection({
@@ -25,7 +24,6 @@ export function GlobalSection({
 }) {
   return (
     <div className="relative flex min-h-dvh w-full">
-      <CleanUrl base={basePath} />
       {/* Global stadium background */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <div

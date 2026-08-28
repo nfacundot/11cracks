@@ -30,6 +30,7 @@ export async function updateProfile(
   });
 
   revalidatePath("/jugador/profile");
+  revalidatePath("/coach/perfil");
   return { success: "Perfil actualizado" };
 }
 
@@ -46,6 +47,7 @@ export async function setAvatar(avatarUrl: string) {
   });
 
   revalidatePath("/jugador/profile");
+  revalidatePath("/coach/perfil");
   return { success: true };
 }
 

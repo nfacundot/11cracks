@@ -5,6 +5,7 @@ import { GlobalTopBar } from "@/components/admin/global-top-bar";
 
 export function CoachShell({
   user,
+  team = null,
   children,
 }: {
   user: {
@@ -12,6 +13,7 @@ export function CoachShell({
     username: string;
     avatarUrl: string | null;
   };
+  team?: { name: string; logoUrl: string | null } | null;
   children: React.ReactNode;
 }) {
   return (
@@ -36,6 +38,7 @@ export function CoachShell({
           }}
           title="Panel de entrenador"
           roleText="Entrenador"
+          team={team}
         />
 
         <main className="flex-1 px-6 pb-6 max-md:px-4 max-md:pb-28">

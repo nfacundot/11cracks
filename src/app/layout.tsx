@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed } from "next/font/google";
+import {
+  Barlow_Condensed,
+  Bebas_Neue,
+  Geist,
+} from "next/font/google";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { LessonLoaderGlobal } from "@/components/lesson-loader";
@@ -9,6 +13,17 @@ const barlow = Barlow_Condensed({
   variable: "--font-barlow",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas-neue",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const geist = Geist({
+  variable: "--font-geist",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -47,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${barlow.variable} h-full antialiased`}
+      className={`${barlow.variable} ${bebasNeue.variable} ${geist.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-[var(--font-barlow)]">

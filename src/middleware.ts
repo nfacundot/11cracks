@@ -6,8 +6,17 @@ const SECTION_PREFIXES = ["/jugador", "/coach", "/admin", "/superadmin"];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/login" || pathname === "/register") {
-    return NextResponse.redirect(new URL("/", request.url));
+  // /register no existe como ruta propia (el registro es una pestaña en /login).
+  if (pathname === "/register") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Normaliza URLs antiguas <sección>/dashboard a la ruta real de la sección.
+  if (pathname === "/coach/dashboard") {
+    return NextResponse.redirect(new URL("/coach", request.url));
+  }
+  if (pathname === "/jugador/dashboard") {
+    return NextResponse.redirect(new URL("/jugador", request.url));
   }
 
   if (SECTION_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {

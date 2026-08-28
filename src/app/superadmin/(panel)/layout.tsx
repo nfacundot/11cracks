@@ -1,17 +1,21 @@
 import { requireSection } from "@/lib/auth";
-import { StaffShell } from "@/components/admin/staff-shell";
+import { getNavigationForRole } from "@/lib/shell/navigation";
+import { AppShell, type ShellUser } from "@/components/shell/app-shell";
 
 export default async function SuperadminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireSection("SUPERADMIN");
 
+  const shellUser: ShellUser = {
+    name: user.name,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    role: "superadmin",
+    scopeLabel: "Gobierno global",
+  };
+
   return (
-    <StaffShell
-      basePath="/superadmin"
-      title="11Cracks Superadmin"
-      subtitle="Panel de superadministración"
-      user={user}
-    >
+    <AppShell user={shellUser} groups={getNavigationForRole("superadmin")}>
       {children}
-    </StaffShell>
+    </AppShell>
   );
 }

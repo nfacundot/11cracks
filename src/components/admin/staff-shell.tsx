@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AdminNav } from "@/components/admin-nav";
-import { CleanUrl } from "@/components/admin/clean-url";
 import { LogOutIcon } from "@/components/icons";
 import { logout } from "@/actions/auth";
 
@@ -24,7 +23,6 @@ export function StaffShell({
 }) {
   return (
     <div className="flex min-h-dvh bg-zinc-100 dark:bg-black">
-      <CleanUrl base={basePath} />
       <AdminNav basePath={basePath} title={title} subtitle={subtitle} user={user} />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-green-100 bg-white/60 backdrop-blur-xl px-6 dark:border-emerald-900 dark:bg-emerald-950/60 dark:backdrop-blur-xl">

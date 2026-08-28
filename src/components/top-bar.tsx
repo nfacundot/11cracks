@@ -17,8 +17,17 @@ const ROLE_LABELS: Record<string, string> = {
   JUGADOR: "JUGADOR",
 };
 
+const PROFILE_URL: Record<string, string> = {
+  JUGADOR: "/jugador/profile",
+  ENTRENADOR: "/coach/perfil",
+  ADMIN: "/admin/perfil",
+  SUPERADMIN: "/superadmin/perfil",
+};
+
 export function TopBar({
   user,
+  teamName = null,
+  teamLogoUrl = null,
 }: {
   user: {
     name: string;
@@ -26,6 +35,8 @@ export function TopBar({
     avatarUrl: string | null;
     role: string;
   };
+  teamName?: string | null;
+  teamLogoUrl?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -68,16 +79,19 @@ export function TopBar({
             <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A5A39C]">
               Alcance Activo
             </span>
-            <span className="text-[11px] font-medium text-[#686862]">
-              Forjadores Pro · Rionegro
+            <span
+              className="max-w-[220px] truncate text-[11px] font-medium text-[#686862]"
+              title={teamName ?? undefined}
+            >
+              {teamName || "Sin equipo"}
             </span>
           </div>
 
           {/* Club avatar */}
           <img
-            src="/img/icons/favicon.png"
+            src={teamLogoUrl || "/img/icons/favicon.png"}
             alt=""
-            className="hidden h-8 w-8 shrink-0 rounded-full border border-[#C9A24A]/20 sm:block"
+            className="hidden h-8 w-8 shrink-0 rounded-full border border-[#C9A24A]/20 object-cover sm:block"
           />
 
           {/* Profile dropdown */}
@@ -108,7 +122,7 @@ export function TopBar({
             {open && (
               <div className="absolute right-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-[12px] border border-[#806322]/30 bg-[#080909] shadow-2xl shadow-black/60">
                 <Link
-                  href="/jugador/profile"
+                  href={PROFILE_URL[user.role] ?? "/jugador/profile"}
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >
@@ -116,7 +130,7 @@ export function TopBar({
                   Perfil
                 </Link>
                 <Link
-                  href="/jugador/profile"
+                  href={PROFILE_URL[user.role] ?? "/jugador/profile"}
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >

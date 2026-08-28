@@ -9,10 +9,18 @@ import {
   UserIcon,
 } from "@/components/icons";
 
+const PROFILE_URL: Record<string, string> = {
+  JUGADOR: "/jugador/profile",
+  ENTRENADOR: "/coach/perfil",
+  ADMIN: "/admin/perfil",
+  SUPERADMIN: "/superadmin/perfil",
+};
+
 export function GlobalTopBar({
   user,
   title = "Vista Global",
   roleText = "Superadministrador",
+  team = null,
 }: {
   user: {
     name: string;
@@ -22,6 +30,7 @@ export function GlobalTopBar({
   };
   title?: string;
   roleText?: string;
+  team?: { name: string; logoUrl: string | null } | null;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -57,21 +66,27 @@ export function GlobalTopBar({
           </span>
         </div>
 
-        {/* Right: Network status + Avatar dropdown */}
-        <div className="flex items-center gap-4">
-          <div className="hidden flex-col items-end gap-0.5 sm:flex">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A5A39C]">
-              Alcance
-            </span>
-            <span className="text-[11px] font-medium text-[#686862]">
-              Toda la red · Global
-            </span>
-          </div>
+          {/* Right: Network status + Avatar dropdown */}
+          <div className="flex items-center gap-4">
+            <div className="hidden flex-col items-end gap-0.5 sm:flex">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#A5A39C]">
+                Alcance
+              </span>
+              {team ? (
+                <span className="max-w-[160px] truncate text-[12px] font-bold uppercase tracking-wide text-[#F2F0E9]">
+                  {team.name}
+                </span>
+              ) : (
+                <span className="text-[11px] font-medium text-[#686862]">
+                  Toda la red · Global
+                </span>
+              )}
+            </div>
 
           <img
-            src="/img/icons/favicon.png"
-            alt=""
-            className="hidden h-8 w-8 shrink-0 rounded-full border border-[#C9A24A]/20 sm:block"
+            src={team?.logoUrl ?? "/img/icons/favicon.png"}
+            alt={team ? team.name : ""}
+            className="hidden h-8 w-8 shrink-0 rounded-full border border-[#C9A24A]/20 object-cover sm:block"
           />
 
           {/* Profile dropdown */}
@@ -106,7 +121,7 @@ export function GlobalTopBar({
                   <p className="truncate text-[11px] text-[#686862]">@{user.username}</p>
                 </div>
                 <Link
-                  href="/jugador/profile"
+                  href={PROFILE_URL[user.role ?? "JUGADOR"] ?? "/jugador/profile"}
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
                 >

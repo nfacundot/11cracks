@@ -7,7 +7,18 @@ export default async function Page() {
   const user = await requireUser();
   return (
     <div className="space-y-6">
-      <MiPerfilView user={{ name: user.name, email: user.email, role: user.role }} />
+      <MiPerfilView
+        user={{
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+          bio: user.bio,
+          position: user.position,
+          favoriteTeam: user.favoriteTeam,
+          country: user.country,
+        }}
+      />
     </div>
   );
 }

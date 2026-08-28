@@ -102,21 +102,40 @@ model Team {
   description String?
   logoUrl     String?
   totalXp     Int      @default(0)
+  tactics     Json?
   createdAt   DateTime @default(now())
 
-  members TeamMember[]
+  members    TeamMember[]
+  alignments Alignment[]
 
   @@index([totalXp])
 }
 
+model Alignment {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  name      String
+  formation String   @default("4-3-3")
+  positions Json     @default("{}")
+  trazos    Json     @default("[]")
+  published Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId, order])
+}
+
 model TeamMember {
-  id       String   @id @default(cuid())
-  teamId   String
-  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  userId   String
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role     TeamRole @default(PLAYER)
-  joinedAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  teamId         String
+  team           Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           TeamRole @default(PLAYER)
+  joinedAt       DateTime @default(now())
+  lineupPosition String?
 
   @@unique([teamId, userId])
 }

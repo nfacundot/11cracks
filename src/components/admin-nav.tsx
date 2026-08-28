@@ -18,6 +18,13 @@ import {
 } from "@/components/icons";
 import { roleLabel } from "@/lib/roles";
 
+const PROFILE_URL: Record<string, string> = {
+  JUGADOR: "/jugador/profile",
+  ENTRENADOR: "/coach/perfil",
+  ADMIN: "/admin/perfil",
+  SUPERADMIN: "/superadmin/perfil",
+};
+
 const NAV_ITEMS: { path: string; label: string; icon: ReactNode }[] = [
   { path: "", label: "Dashboard", icon: <HomeIcon className="h-5 w-5" /> },
   { path: "/indicators", label: "Indicadores", icon: <StarIcon className="h-5 w-5" /> },
@@ -145,7 +152,7 @@ export function AdminNav({
           Ver la app
         </Link>
         <Link
-          href="/jugador/profile"
+          href={PROFILE_URL[user.role] ?? "/jugador/profile"}
           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-zinc-600 transition hover:bg-green-50 dark:text-zinc-300 dark:hover:bg-emerald-900"
         >
           <LogOutIcon className="h-5 w-5" />

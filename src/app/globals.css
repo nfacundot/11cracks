@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/shell.css";
+@import "./styles/login.css";
+@import "./styles/player-home.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

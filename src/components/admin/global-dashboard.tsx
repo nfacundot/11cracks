@@ -1,7 +1,6 @@
 import { GlobalClient } from "@/components/admin/global-client";
 import { GlobalSideNav, GlobalBottomNav } from "@/components/admin/global-nav";
 import { GlobalTopBar } from "@/components/admin/global-top-bar";
-import { CleanUrl } from "@/components/admin/clean-url";
 
 export function GlobalDashboard({
   user,
@@ -18,7 +17,6 @@ export function GlobalDashboard({
 }) {
   return (
     <div className="relative flex min-h-dvh w-full">
-      <CleanUrl base={basePath} />
       {/* Global stadium background */}
       <div className="pointer-events-none fixed inset-0 z-0">
         <div

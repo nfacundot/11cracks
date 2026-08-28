@@ -1,0 +1,322 @@
+/* Ported from edtech11 design system (shell.css). Adapts to 11cracks assets (stadium background). */
+
+.app-shell {
+  --shell-rail-width: 15rem;
+  --shell-mobile-dock-height: 4.75rem;
+  min-height: 100svh;
+  overflow-x: clip;
+  color: var(--text-primary);
+  background: var(--surface-canvas-deep);
+}
+
+.role-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--surface-canvas-deep);
+}
+
+.role-atmosphere__image {
+  object-fit: cover;
+  filter: saturate(0.86) contrast(1.04) brightness(0.86);
+  transform: scale(1.018);
+  animation: role-scene-enter 800ms var(--ease-standard) both;
+}
+
+.role-atmosphere[data-world="player"] .role-atmosphere__image { object-position: 58% center; }
+.role-atmosphere[data-world="coach"] .role-atmosphere__image { object-position: 58% center; filter: saturate(0.82) contrast(1.06) brightness(0.82); }
+.role-atmosphere[data-world="admin"] .role-atmosphere__image { object-position: 58% center; filter: saturate(0.78) contrast(1.05) brightness(0.8); }
+.role-atmosphere[data-world="superadmin"] .role-atmosphere__image { object-position: 60% center; filter: saturate(0.72) contrast(1.06) brightness(0.76); }
+
+.role-atmosphere__grade,
+.role-atmosphere__vignette,
+.role-atmosphere__light {
+  position: absolute;
+  inset: 0;
+}
+
+.role-atmosphere__grade {
+  background:
+    linear-gradient(90deg, oklch(0.045 0.004 100 / 0.99) 0 var(--shell-rail-width), oklch(0.045 0.004 100 / 0.7) 34%, transparent 66%),
+    linear-gradient(0deg, oklch(0.045 0.004 100 / 0.74), transparent 45%, oklch(0.045 0.004 100 / 0.34));
+}
+
+.app-shell[data-role="player"] .role-atmosphere__grade {
+  background:
+    linear-gradient(90deg, oklch(0.04 0.004 100 / 0.99) 0 var(--shell-rail-width), oklch(0.04 0.004 100 / 0.77) 32%, oklch(0.04 0.004 100 / 0.12) 58%, transparent 75%),
+    linear-gradient(0deg, oklch(0.04 0.004 100 / 0.72), transparent 48%, oklch(0.04 0.004 100 / 0.22));
+}
+
+.app-shell[data-role="coach"] .role-atmosphere__grade {
+  background:
+    linear-gradient(90deg, oklch(0.045 0.004 100 / 0.99) 0 var(--shell-rail-width), oklch(0.045 0.004 100 / 0.78) 34%, transparent 68%),
+    linear-gradient(0deg, oklch(0.04 0.01 125 / 0.77), transparent 48%, oklch(0.04 0.004 100 / 0.31));
+}
+
+.app-shell[data-role="admin"] .role-atmosphere__grade,
+.app-shell[data-role="superadmin"] .role-atmosphere__grade {
+  background:
+    linear-gradient(90deg, oklch(0.045 0.004 100 / 0.99) 0 var(--shell-rail-width), oklch(0.045 0.004 100 / 0.75) 32%, oklch(0.045 0.004 100 / 0.18) 62%, transparent 82%),
+    linear-gradient(0deg, oklch(0.04 0.004 100 / 0.76), transparent 48%, oklch(0.04 0.004 100 / 0.28));
+}
+
+.role-atmosphere__vignette {
+  box-shadow: inset 0 0 11rem oklch(0.025 0.003 100 / 0.62);
+}
+
+.role-atmosphere__light {
+  inset: -24% 5% -24% auto;
+  width: 29%;
+  opacity: 0.48;
+  transform: rotate(10deg);
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--brand-gold) 10%, transparent), transparent);
+  animation: role-light-drift 9s ease-in-out infinite alternate;
+}
+
+.role-atmosphere__geometry {
+  position: absolute;
+  inset: 10% 2% 5% auto;
+  width: min(67vw, 76rem);
+  height: 78%;
+  overflow: visible;
+  opacity: 0.3;
+  fill: none;
+  stroke: color-mix(in oklch, var(--brand-gold) 58%, transparent);
+  stroke-width: 1.05;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0.7rem 1.4rem oklch(0.02 0.003 100 / 0.38));
+}
+
+.role-atmosphere__node { fill: var(--brand-gold); stroke-width: 0; filter: drop-shadow(0 0 0.55rem var(--brand-gold)); }
+
+.shell-rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  display: none;
+  width: var(--shell-rail-width);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border-right: 1px solid color-mix(in oklch, var(--brand-gold) 24%, transparent);
+  background: linear-gradient(180deg, oklch(0.055 0.004 100 / 0.93), oklch(0.035 0.003 100 / 0.97));
+  box-shadow: 1.8rem 0 5rem oklch(0.02 0.003 100 / 0.42);
+  backdrop-filter: blur(1.35rem);
+}
+
+.shell-rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 1px;
+  height: 42%;
+  background: linear-gradient(var(--brand-gold-bright), transparent);
+  box-shadow: 0 0 1.4rem var(--brand-gold);
+}
+
+.shell-brand-context {
+  display: flex;
+  min-height: 6.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.shell-brand-context > img { width: 8.35rem; height: auto; }
+.shell-brand-context[data-compact="true"] { min-height: auto; padding: 0; border: 0; }
+.shell-brand-context[data-compact="true"] > img { width: 8.2rem; }
+
+.shell-nav { display: grid; align-content: start; gap: var(--space-5); overflow-y: auto; padding: var(--space-5) var(--space-4); scrollbar-width: thin; scrollbar-color: var(--brand-gold-muted) transparent; }
+.shell-nav__group { min-width: 0; }
+.shell-nav__group h2 { margin: 0 0 var(--space-2); padding-inline: var(--space-4); color: var(--text-muted); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+.shell-nav__group > div { display: grid; gap: 0.1rem; }
+
+.shell-nav__link {
+  position: relative;
+  display: grid;
+  min-height: var(--touch-target-min);
+  grid-template-columns: 1.4rem minmax(0, 1fr) 0.25rem;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.55rem var(--space-4);
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 0.18rem;
+  color: var(--text-secondary);
+  background: transparent;
+  font-family: var(--font-display-source), sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color var(--motion-ui) ease, background-color var(--motion-ui) ease, border-color var(--motion-ui) ease, transform var(--motion-press) ease;
+}
+
+.shell-nav__link::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 1px; transform: scaleY(0); background: var(--brand-gold-bright); box-shadow: 0 0 1rem var(--brand-gold); transition: transform var(--motion-ui) var(--ease-standard); }
+.shell-nav__link:hover { color: var(--text-primary); background: color-mix(in oklch, var(--text-primary) 4%, transparent); transform: translateX(0.12rem); }
+.shell-nav__link[data-active="true"] { color: var(--text-primary); border-color: color-mix(in oklch, var(--brand-gold) 25%, transparent); background: linear-gradient(90deg, color-mix(in oklch, var(--brand-gold) 14%, transparent), transparent 82%); }
+.shell-nav__link[data-active="true"]::before { transform: scaleY(1); }
+.shell-nav__icon { display: grid; place-items: center; color: var(--text-muted); }
+.shell-nav__icon svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.55; stroke-linecap: round; stroke-linejoin: round; }
+.shell-nav__link[data-active="true"] .shell-nav__icon { color: var(--brand-gold-bright); filter: drop-shadow(0 0 0.45rem color-mix(in oklch, var(--brand-gold) 36%, transparent)); }
+.shell-nav__active-mark { width: 0.2rem; height: 0.2rem; transform: rotate(45deg); background: transparent; }
+.shell-nav__link[data-active="true"] .shell-nav__active-mark { background: var(--brand-gold-bright); box-shadow: 0 0 0.7rem var(--brand-gold); animation: active-mark-response 2.8s ease-in-out infinite; }
+
+.shell-nav__link:focus-visible,
+.shell-menu-trigger:focus-visible,
+.shell-account summary:focus-visible,
+.shell-dock a:focus-visible,
+.shell-dock button:focus-visible,
+.shell-drawer button:focus-visible,
+.shell-account-actions a:focus-visible,
+.shell-account-actions button:focus-visible,
+.world-stage a:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+
+.shell-rail__identity,
+.shell-drawer__account { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom)); border-top: 1px solid var(--border-subtle); background: linear-gradient(90deg, color-mix(in oklch, var(--brand-gold) 5%, transparent), transparent); }
+.shell-rail__identity div,
+.shell-drawer__account div { display: grid; min-width: 0; }
+.shell-rail__identity strong,
+.shell-drawer__account strong { overflow: hidden; font-size: var(--type-sm); text-overflow: ellipsis; white-space: nowrap; }
+.shell-rail__identity small,
+.shell-drawer__account small { overflow: hidden; color: var(--text-muted); font-size: 0.66rem; text-overflow: ellipsis; white-space: nowrap; }
+
+.shell-avatar { display: grid; width: 2.75rem; height: 2.75rem; flex: 0 0 auto; place-items: center; overflow: hidden; border: 1px solid var(--brand-gold-muted); border-radius: 50%; background: var(--surface-elevated); box-shadow: inset 0 0 0 2px var(--surface-canvas-deep), 0 0.85rem 1.8rem color-mix(in oklch, var(--club-accent) 15%, oklch(0.02 0.003 100 / 0.3)); }
+.shell-avatar__image { width: 100%; height: 100%; object-fit: cover; }
+.shell-avatar__initials { color: var(--brand-gold-bright); font-family: var(--font-display-source), sans-serif; font-weight: 700; letter-spacing: 0.04em; }
+
+.shell-mobile-head { position: relative; z-index: 20; display: flex; min-height: 4.65rem; align-items: center; justify-content: space-between; padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) var(--space-3); border-bottom: 1px solid var(--border-subtle); background: linear-gradient(180deg, oklch(0.055 0.004 100 / 0.96), oklch(0.055 0.004 100 / 0.7)); backdrop-filter: blur(1rem); }
+.app-shell[data-role="player"] .shell-mobile-head { position: sticky; top: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-3); }
+.shell-mobile-scope { display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid color-mix(in oklch, var(--club-accent) 58%, var(--brand-gold-muted)); border-radius: 50%; box-shadow: 0 0 1rem var(--club-accent-soft); }
+.shell-mobile-scope__club { width: 2.75rem; height: auto; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 0.7rem 1rem var(--club-accent-soft)); }
+.shell-menu-trigger { display: grid; width: var(--touch-target-min); height: var(--touch-target-min); place-content: center; gap: 0.36rem; border: 1px solid var(--brand-gold-muted); border-radius: 0.18rem; color: var(--text-primary); background: color-mix(in oklch, var(--surface-control) 86%, transparent); }
+.shell-menu-trigger span { display: block; width: 1.15rem; height: 1px; background: currentColor; }
+.shell-menu-trigger span:last-child { width: 0.75rem; margin-left: auto; background: var(--brand-gold); }
+
+.shell-main { position: relative; z-index: 1; min-width: 0; min-height: 100svh; }
+.shell-topbar { position: sticky; top: 0; z-index: 15; display: grid; min-height: 4.65rem; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-6); padding: var(--space-2) clamp(var(--space-5), 3.5vw, var(--space-7)); border-bottom: 1px solid color-mix(in oklch, var(--brand-gold) 17%, transparent); background: linear-gradient(90deg, oklch(0.05 0.004 100 / 0.86), oklch(0.05 0.004 100 / 0.55)); backdrop-filter: blur(1.15rem); }
+.shell-location { display: grid; gap: 0.08rem; }
+.shell-location span,
+.shell-scope small { color: var(--text-muted); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase; }
+.shell-location strong { font-family: var(--font-display-source), sans-serif; font-size: 1.15rem; text-transform: uppercase; }
+.shell-scope { display: flex; align-items: center; gap: var(--space-3); }
+.shell-scope > span { width: 1.8rem; height: 1px; background: linear-gradient(90deg, transparent, var(--brand-gold)); }
+.shell-scope__club { width: 2.75rem; height: auto; aspect-ratio: 1; object-fit: contain; filter: drop-shadow(0 0.7rem 1rem var(--club-accent-soft)); }
+.shell-scope div { display: grid; }
+.shell-scope strong { max-width: 18rem; overflow: hidden; color: var(--text-secondary); font-size: 0.73rem; text-overflow: ellipsis; white-space: nowrap; }
+.shell-account { position: relative; }
+.shell-account summary { display: flex; min-height: var(--touch-target-min); align-items: center; gap: var(--space-3); padding: 0.2rem; border-radius: var(--shape-control); cursor: pointer; list-style: none; }
+.shell-account summary::-webkit-details-marker { display: none; }
+.shell-account__copy { display: grid; min-width: 8rem; text-align: right; }
+.shell-account__copy strong { font-size: var(--type-sm); }
+.shell-account__copy small { color: var(--text-muted); font-size: 0.7rem; }
+.shell-account__control-icon { display: grid; place-items: center; color: var(--text-secondary); }
+.shell-account__control-icon svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.55; stroke-linecap: round; stroke-linejoin: round; }
+.shell-account__chevron { color: var(--brand-gold); transition: transform var(--motion-ui) ease; }
+.shell-account__chevron svg { width: 0.8rem; height: 0.8rem; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; }
+.shell-account[open] .shell-account__chevron { transform: rotate(180deg); }
+.shell-account-actions { display: grid; gap: 0.2rem; }
+.shell-account > .shell-account-actions { position: absolute; top: calc(100% + var(--space-3)); right: 0; width: 13rem; padding: var(--space-2); border: 1px solid var(--brand-gold-muted); border-radius: var(--shape-surface); background: oklch(0.09 0.006 100 / 0.97); box-shadow: var(--shadow-surface); backdrop-filter: blur(1rem); }
+.shell-account-actions a,
+.shell-account-actions button { display: flex; width: 100%; min-height: var(--touch-target-min); align-items: center; justify-content: center; padding: 0 var(--space-3); border: 0; border-radius: var(--shape-control); color: var(--text-secondary); background: transparent; font-size: var(--type-sm); text-decoration: none; cursor: pointer; }
+.shell-account-actions a:hover,
+.shell-account-actions button:hover { color: var(--text-primary); background: var(--surface-control-hover); }
+
+.shell-content { width: 100%; min-height: calc(100svh - 9.5rem); margin-inline: auto; padding: 0 clamp(var(--space-5), 3.5vw, var(--space-7)) calc(var(--shell-mobile-dock-height) + 1.65rem + env(safe-area-inset-bottom)); }
+.shell-preview { animation: shell-enter var(--motion-entrance) var(--ease-standard) both; }
+
+.shell-dock { position: fixed; right: var(--space-3); bottom: max(var(--space-3), env(safe-area-inset-bottom)); left: var(--space-3); z-index: 35; display: grid; grid-template-columns: repeat(4, 1fr); min-height: var(--shell-mobile-dock-height); overflow: visible; border: 1px solid color-mix(in oklch, var(--brand-gold) 30%, transparent); border-radius: 0.25rem; background: linear-gradient(180deg, oklch(0.1 0.007 100 / 0.96), oklch(0.045 0.004 100 / 0.98)); box-shadow: 0 1.4rem 3.2rem oklch(0.02 0.003 105 / 0.72), 0 0 2.4rem color-mix(in oklch, var(--brand-gold) 7%, transparent); backdrop-filter: blur(1.05rem); }
+.shell-dock::before { content: ""; position: absolute; top: -0.28rem; left: 18%; width: 64%; height: 0.28rem; border-inline: 1px solid var(--brand-gold-muted); background: oklch(0.065 0.005 100 / 0.96); clip-path: polygon(2% 100%, 5% 0, 95% 0, 98% 100%); }
+.shell-dock .shell-nav__link,
+.shell-dock > button { display: flex; min-width: 0; min-height: var(--shell-mobile-dock-height); flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.3rem 0.2rem; border: 0; border-radius: 0; color: var(--text-muted); background: transparent; font-family: var(--font-display-source), sans-serif; font-size: 0.67rem; font-weight: 600; line-height: 1.05; text-align: center; text-decoration: none; text-transform: uppercase; }
+.shell-dock .shell-nav__link::before { inset: 0.08rem 22% auto; width: auto; height: 2px; transform: scaleX(0); }
+.shell-dock .shell-nav__link[data-active="true"]::before { transform: scaleX(1); }
+.shell-dock .shell-nav__link + .shell-nav__link,
+.shell-dock > button + .shell-nav__link,
+.shell-dock > button { border-left: 1px solid var(--border-subtle); }
+.shell-dock .shell-nav__link[data-active="true"] { color: var(--text-primary); background: linear-gradient(180deg, color-mix(in oklch, var(--brand-gold) 15%, transparent), transparent 74%); box-shadow: inset 0 1px 0 color-mix(in oklch, var(--brand-gold) 55%, transparent); }
+.shell-dock .shell-nav__active-mark { display: none; }
+.shell-dock .shell-nav__icon svg { width: 1.25rem; height: 1.25rem; }
+.shell-dock__more { display: flex; gap: 0.18rem; }
+.shell-dock__more i { width: 0.22rem; height: 0.22rem; transform: rotate(45deg); background: var(--brand-gold); }
+
+.shell-drawer { position: fixed; inset: 0; z-index: 60; visibility: hidden; }
+.shell-drawer[data-open="true"] { visibility: visible; }
+.shell-drawer__backdrop { position: absolute; inset: 0; width: 100%; border: 0; opacity: 0; background: oklch(0.03 0.003 105 / 0.76); transition: opacity var(--motion-layout) ease; }
+.shell-drawer[data-open="true"] .shell-drawer__backdrop { opacity: 1; }
+.shell-drawer__panel { position: absolute; top: 0; right: 0; display: grid; width: min(88vw, 23rem); height: 100dvh; max-height: 100dvh; grid-template-rows: auto minmax(0, 1fr) auto auto; transform: translateX(100%); border-left: 1px solid var(--brand-gold-muted); background: linear-gradient(180deg, oklch(0.075 0.006 100 / 0.99), oklch(0.04 0.004 100 / 0.99)); box-shadow: -2rem 0 4rem oklch(0.03 0.003 105 / 0.5); transition: transform var(--motion-layout) var(--ease-standard); }
+.shell-drawer[data-open="true"] .shell-drawer__panel { transform: translateX(0); }
+.shell-drawer__panel > header { display: flex; min-height: 5.4rem; align-items: center; justify-content: space-between; padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) var(--space-3); border-bottom: 1px solid var(--border-subtle); }
+.shell-drawer__panel > header .shell-brand-context { flex: 1; padding: 0; border: 0; }
+.shell-drawer__panel > header button { width: var(--touch-target-min); height: var(--touch-target-min); border: 1px solid var(--border-subtle); border-radius: 0.18rem; color: var(--text-primary); background: transparent; }
+.shell-drawer__panel > header button svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; }
+.shell-drawer__panel .shell-nav { padding-bottom: var(--space-6); }
+.shell-drawer__account { padding-bottom: var(--space-3); }
+.shell-drawer__panel > .shell-account-actions { grid-template-columns: 1fr; padding: var(--space-3) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom)); border-top: 1px solid var(--border-subtle); }
+.shell-drawer__panel > .shell-account-actions a,
+.shell-drawer__panel > .shell-account-actions button { justify-content: center; padding: 0.3rem; font-size: 0.72rem; text-align: center; }
+
+@keyframes shell-enter { from { opacity: 0; transform: translateY(0.7rem); filter: blur(0.3rem); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes role-scene-enter { from { opacity: 0.55; transform: scale(1.055); } to { opacity: 1; transform: scale(1.018); } }
+@keyframes role-light-drift { from { transform: rotate(10deg) translateX(-5%); opacity: 0.32; } to { transform: rotate(10deg) translateX(8%); opacity: 0.56; } }
+@keyframes active-mark-response { 0%, 100% { opacity: 0.55; transform: rotate(45deg) scale(0.72); } 50% { opacity: 1; transform: rotate(45deg) scale(1.12); } }
+
+@media (max-width: 63.9375rem) {
+  .role-atmosphere__grade,
+  .app-shell[data-role="player"] .role-atmosphere__grade,
+  .app-shell[data-role="coach"] .role-atmosphere__grade,
+  .app-shell[data-role="admin"] .role-atmosphere__grade,
+  .app-shell[data-role="superadmin"] .role-atmosphere__grade { background: linear-gradient(90deg, oklch(0.04 0.004 100 / 0.77), oklch(0.04 0.004 100 / 0.27) 62%, transparent), linear-gradient(0deg, oklch(0.04 0.004 100 / 0.78), transparent 52%, oklch(0.04 0.004 100 / 0.25)); }
+  .shell-topbar { grid-template-columns: minmax(0, 1fr) auto; min-height: 4.1rem; padding-block: var(--space-2); }
+  .shell-scope { display: none; }
+  .shell-account__chevron { display: none; }
+  .shell-account__copy { min-width: 0; max-width: 7.5rem; }
+  .shell-account__copy strong,
+  .shell-account__copy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+
+@media (min-width: 64rem) {
+  .shell-rail { display: grid; }
+  .shell-mobile-head,
+  .shell-dock,
+  .shell-drawer { display: none; }
+  .app-shell[data-role="player"] .shell-mobile-head { display: none; }
+  .shell-main { margin-left: var(--shell-rail-width); }
+  .shell-content { min-height: calc(100svh - 4.65rem); padding-bottom: 0; }
+}
+
+@media (max-width: 47.9375rem) {
+  .role-atmosphere__image { transform: scale(1.02); }
+  .role-atmosphere[data-world="player"] .role-atmosphere__image { object-position: 68% center; filter: saturate(0.9) contrast(1.03) brightness(0.9); }
+  .role-atmosphere[data-world="coach"] .role-atmosphere__image { object-position: 68% center; }
+  .role-atmosphere[data-world="admin"] .role-atmosphere__image { object-position: 65% center; }
+  .role-atmosphere[data-world="superadmin"] .role-atmosphere__image { object-position: 69% center; }
+  .role-atmosphere__grade,
+  .app-shell[data-role="player"] .role-atmosphere__grade,
+  .app-shell[data-role="coach"] .role-atmosphere__grade,
+  .app-shell[data-role="admin"] .role-atmosphere__grade,
+  .app-shell[data-role="superadmin"] .role-atmosphere__grade { background: linear-gradient(0deg, oklch(0.035 0.003 100 / 0.9) 0%, oklch(0.035 0.003 100 / 0.48) 52%, oklch(0.035 0.003 100 / 0.22) 100%), linear-gradient(90deg, oklch(0.035 0.003 100 / 0.54), transparent 86%); }
+  .role-atmosphere__vignette { box-shadow: inset 0 0 6rem oklch(0.02 0.003 100 / 0.45); }
+  .shell-topbar { padding-inline: var(--space-4); }
+  .shell-account { min-width: 0; }
+  .shell-account summary { gap: var(--space-2); }
+  .shell-account__copy { max-width: 6.8rem; }
+  .shell-account__copy small { display: none; }
+  .shell-content { padding: 0 clamp(var(--space-4), 5vw, var(--space-6)) calc(var(--shell-mobile-dock-height) + 1.65rem + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-preview,
+  .role-atmosphere__image,
+  .role-atmosphere__light,
+  .shell-nav__active-mark { animation: none; }
+  .shell-drawer__backdrop,
+  .shell-drawer__panel,
+  .shell-account__chevron,
+  .shell-nav__link,
+  .shell-nav__link::before { transition: none; }
+}

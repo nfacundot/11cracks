@@ -1,0 +1,126 @@
+/* Ported from edtech11 design system (tokens.css), adapted to 11cracks font sources. */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface-canvas: oklch(0.115 0.007 105);
+  --surface-canvas-deep: oklch(0.08 0.006 105);
+  --surface-panel: oklch(0.155 0.009 100);
+  --surface-elevated: oklch(0.195 0.011 95);
+  --surface-control: oklch(0.17 0.008 95 / 0.78);
+  --surface-control-hover: oklch(0.21 0.01 95 / 0.86);
+  --surface-glass: oklch(0.16 0.008 100 / 0.72);
+
+  --text-primary: oklch(0.965 0.013 90);
+  --text-secondary: oklch(0.76 0.012 90);
+  --text-muted: oklch(0.61 0.012 90);
+  --text-on-action: oklch(0.15 0.015 85);
+
+  --brand-gold: oklch(0.76 0.105 81);
+  --brand-gold-bright: oklch(0.84 0.12 85);
+  --brand-gold-deep: oklch(0.63 0.09 74);
+  --brand-gold-muted: oklch(0.7 0.075 80 / 0.34);
+  --action-gold: var(--brand-gold-bright);
+  --action-gold-hover: oklch(0.88 0.125 88);
+  --action-primary: var(--action-gold);
+  --action-primary-hover: var(--action-gold-hover);
+
+  --action-energy: oklch(0.86 0.205 125);
+  --action-energy-hover: oklch(0.9 0.22 127);
+  --context-progress: oklch(0.75 0.14 220);
+  --context-training: oklch(0.81 0.12 82);
+  --context-neurocracks: oklch(0.68 0.2 305);
+
+  --border-subtle: oklch(0.72 0.052 81 / 0.26);
+  --border-strong: oklch(0.78 0.08 82 / 0.58);
+  --focus-ring: oklch(0.86 0.13 88);
+
+  --status-success: oklch(0.72 0.135 145);
+  --status-warning: oklch(0.8 0.12 82);
+  --status-error: oklch(0.72 0.14 30);
+  --status-info: oklch(0.79 0.09 84);
+
+  --club-accent: oklch(0.66 0.16 250);
+  --club-accent-soft: oklch(0.66 0.16 250 / 0.14);
+  --environment-overlay-strong: oklch(0.08 0.006 105 / 0.92);
+  --environment-overlay-soft: oklch(0.08 0.006 105 / 0.28);
+  --login-label-mobile: var(--brand-gold-bright);
+
+  --canvas: var(--surface-canvas);
+  --canvas-deep: var(--surface-canvas-deep);
+  --line-subtle: var(--border-strong);
+
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  --type-xs: 0.75rem;
+  --type-sm: 0.875rem;
+  --type-base: 1rem;
+  --type-md: 1.125rem;
+  --type-lg: 1.375rem;
+  --type-xl: clamp(1.75rem, 3vw, 2.75rem);
+  --type-display: clamp(3.25rem, 9vw, 8.5rem);
+
+  --shape-control: 0.3125rem;
+  --shape-surface: 0.75rem;
+  --shape-feature: 1.125rem;
+
+  --shadow-surface: 0 1.5rem 4rem oklch(0.04 0.004 105 / 0.34);
+  --shadow-focus: 0 0 0 0.1875rem oklch(0.82 0.11 85 / 0.2);
+
+  --motion-press: 120ms;
+  --motion-ui: 250ms;
+  --motion-layout: 400ms;
+  --motion-entrance: 650ms;
+  --ease-standard: cubic-bezier(0.2, 0.72, 0, 1);
+
+  --layout-reading-max: 72ch;
+  --layout-content-max: 72rem;
+  --layout-page-max: 90rem;
+  --touch-target-min: 2.75rem;
+
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-navigation: 30;
+  --z-popover: 40;
+  --z-overlay-root: 1000;
+  --z-overlay-backdrop: 0;
+  --z-overlay-surface: 1;
+  --z-critical: 2;
+  --z-backdrop: var(--z-overlay-backdrop);
+  --z-modal: var(--z-overlay-surface);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --surface-canvas: oklch(0.965 0.012 90);
+  --surface-canvas-deep: oklch(0.92 0.015 88);
+  --surface-panel: oklch(0.99 0.006 90);
+  --surface-elevated: oklch(1 0 0);
+  --surface-control: oklch(0.94 0.012 90 / 0.92);
+  --surface-control-hover: oklch(0.91 0.016 88 / 0.96);
+  --surface-glass: oklch(0.98 0.006 90 / 0.82);
+  --text-primary: oklch(0.18 0.012 95);
+  --text-secondary: oklch(0.38 0.012 95);
+  --text-muted: oklch(0.52 0.01 95);
+  --border-subtle: oklch(0.42 0.025 82 / 0.18);
+  --environment-overlay-strong: oklch(0.14 0.008 100 / 0.84);
+}
+
+/* Font mapping for the 11cracks bundle (Barlow Condensed = display, Bebas = score, Geist = UI). */
+:root {
+  --font-display: var(--font-barlow);
+  --font-display-source: var(--font-barlow);
+  --font-score-source: var(--font-bebas-neue);
+  --font-ui-source: var(--font-geist);
+}
