@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GlobalHero, globalStyles as S } from "@/components/admin/global-hero";
+import { AlertDialog } from "@/components/shared/dialog";
 
 const JUGADORES = [
   { id: 1, nombre: "Diego Marín", posicion: "Portero · #1" },
@@ -33,6 +34,7 @@ export function AsistenciaView() {
   const [sesion, setSesion] = useState("1");
   const [asistencias, setAsistencias] = useState<Record<number, string>>({});
   const [horasValidar, setHorasValidar] = useState(2);
+  const [alerta, setAlerta] = useState<string | null>(null);
 
   const handleAsistencia = (jugadorId: number, estado: string) => {
     setAsistencias((prev) => ({ ...prev, [jugadorId]: estado }));
@@ -40,7 +42,7 @@ export function AsistenciaView() {
 
   const validarHoras = () => {
     // Lógica de validación (maqueta)
-    alert(`Validando ${horasValidar} horas para Carlos Herrera`);
+    setAlerta(`Validando ${horasValidar} horas para Carlos Herrera`);
   };
 
   return (
@@ -98,7 +100,7 @@ export function AsistenciaView() {
                 </select>
                 <button
                   type="button"
-                  onClick={() => alert(`Guardando asistencia de ${j.nombre}: ${asistencias[j.id] || "pendiente"}`)}
+                  onClick={() => setAlerta(`Guardando asistencia de ${j.nombre}: ${asistencias[j.id] || "pendiente"}`)}
                   className="shrink-0 rounded-[8px] border border-[#C9A24A]/25 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition hover:border-[#C9A24A]/50 hover:bg-[#C9A24A]/10"
                   style={{ fontFamily: S.barlow, color: S.textPrimary }}
                 >
@@ -152,6 +154,13 @@ export function AsistenciaView() {
           </p>
         </div>
       </section>
+
+      <AlertDialog
+        open={alerta !== null}
+        onClose={() => setAlerta(null)}
+        title="Asistencia"
+        message={alerta ?? ""}
+      />
     </div>
   );
 }

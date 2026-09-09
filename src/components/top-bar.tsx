@@ -20,7 +20,7 @@ const ROLE_LABELS: Record<string, string> = {
 const PROFILE_URL: Record<string, string> = {
   JUGADOR: "/jugador/profile",
   ENTRENADOR: "/coach/perfil",
-  ADMIN: "/admin/perfil",
+  ADMIN: "/admin/profile",
   SUPERADMIN: "/superadmin/perfil",
 };
 

@@ -1,13 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { GlobalHero, globalStyles as S } from "@/components/admin/global-hero";
-
-const PRIORITY = [
-  "2 horas requieren validación",
-  "6 jugadores requieren seguimiento de asistencia",
-  "Alineación publicada",
-];
 
 const ACTIONS = [
   { href: "/coach/equipo", label: "Abrir plantel" },
@@ -15,94 +8,85 @@ const ACTIONS = [
   { href: "/coach/cancha", label: "Abrir cancha" },
 ];
 
-export function CoachDashboardView() {
-  return (
-    <div className="flex flex-col gap-6 pt-12">
-      <GlobalHero
-        eyebrow="COACH · Forjadores Pro"
-        title="Dashboard"
-        subtitle="Lo importante de tu equipo, hoy."
-      />
+type CoachDashboardViewProps = {
+  clubName?: string;
+  publicado?: boolean;
+};
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* ─── Panel 1: Próximo entrenamiento ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
-          <h3
-            className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-            style={{ fontFamily: S.barlow, color: S.textSecondary }}
-          >
-            Próximo entrenamiento
-          </h3>
-          <div className="mt-4 flex flex-col gap-2">
-            <p
-              className="text-[16px] font-bold"
-              style={{ fontFamily: S.barlow, color: S.textPrimary }}
-            >
-              Martes · 5:30 PM
-            </p>
-            <p
-              className="text-[13px] font-medium"
-              style={{ fontFamily: S.barlow, color: S.textSecondary }}
-            >
-              Cancha principal · Técnica + definición
-            </p>
-            <Link
-              href="/coach/asistencia"
-              className="mt-2 inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#C9A24A] hover:underline"
-              style={{ fontFamily: S.barlow }}
-            >
-              Gestionar asistencia →
-            </Link>
+export function CoachDashboardView({
+  clubName = "Forjadores Pro",
+  publicado = false,
+}: CoachDashboardViewProps) {
+  return (
+    <div className="coach-home">
+      <header className="coach-home__header">
+        <span>COACH · {clubName}</span>
+        <h1>Dashboard</h1>
+        <p>Lo importante de tu equipo, hoy.</p>
+      </header>
+
+      <div className="coach-home__dashboard">
+        {/* ─── Panel 1: Mi desarrollo y mi club ─── */}
+        <section className="coach-home__progression" aria-label="Mi desarrollo y mi club">
+          <div className="coach-home__progression-heading">
+            <div>
+              <span className="coach-home__progression-eyebrow">COACH · PROGRESIÓN</span>
+              <h2>
+                Mi desarrollo <em>y</em> mi club
+              </h2>
+              <p>Tu progreso profesional permanece separado del progreso institucional.</p>
+            </div>
+            <strong className="coach-home__progression-score">SIN DATOS</strong>
+          </div>
+          <div className="coach-home__progression-split">
+            <div>
+              <span>Mis cartas</span>
+              <b>Datos insuficientes</b>
+            </div>
+            <div>
+              <span>Mi club · {clubName}</span>
+              <b>DATOS INSUFICIENTES</b>
+              <small>Aún no hay cartas institucionales desbloqueadas</small>
+            </div>
           </div>
         </section>
 
+        {/* ─── Panel 2: Próximo entrenamiento ─── */}
+        <section className="coach-home__panel" data-tone="lime">
+          <div className="coach-home__panel-heading">
+            <h2>Próximo entrenamiento</h2>
+          </div>
+          <strong className="coach-home__big-number">Martes · 5:30 PM</strong>
+          <p>Cancha principal · Técnica + definición</p>
+          <Link href="/coach/asistencia">Gestionar asistencia →</Link>
+        </section>
+
         {/* ─── Panel 2: Atención prioritaria ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
-          <h3
-            className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-            style={{ fontFamily: S.barlow, color: S.textSecondary }}
-          >
-            Atención prioritaria
-          </h3>
-          <ul className="mt-4 flex flex-col gap-3">
-            {PRIORITY.map((item) => (
-              <li
-                key={item}
-                className="flex items-center gap-3 text-[13px] font-medium"
-                style={{ fontFamily: S.barlow, color: S.textSecondary }}
-              >
-                <span
-                  className="h-1.5 w-1.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: S.gold }}
-                />
-                {item}
-              </li>
-            ))}
+        <section className="coach-home__panel" data-tone="gold">
+          <div className="coach-home__panel-heading">
+            <h2>Atención prioritaria</h2>
+          </div>
+          <ul className="coach-home__list">
+            <li>2 horas requieren validación</li>
+            <li>6 jugadores requieren seguimiento de asistencia</li>
+            <li>{publicado ? "Alineación publicada" : "Alineación pendiente de publicar"}</li>
           </ul>
         </section>
-      </div>
 
-      {/* ─── Panel 3: Acciones rápidas ─── */}
-      <section>
-        <h3
-          className="text-[11px] font-semibold uppercase tracking-[0.14em]"
-          style={{ fontFamily: S.barlow, color: S.textSecondary }}
-        >
-          Acciones rápidas
-        </h3>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {ACTIONS.map((action) => (
-            <Link
-              key={action.href}
-              href={action.href}
-              className="flex items-center justify-center gap-2.5 rounded-[12px] border border-[#C9A24A]/20 bg-[#080909] px-4 py-3.5 text-[13px] font-semibold transition hover:border-[#C9A24A]/40 hover:bg-[#0B0D0D]"
-              style={{ fontFamily: S.barlow, color: S.textPrimary }}
-            >
-              {action.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+        {/* ─── Panel 4: Acciones rápidas ─── */}
+        <section className="coach-home__panel">
+          <div className="coach-home__panel-heading">
+            <h2>Acciones rápidas</h2>
+          </div>
+          <div className="coach-home__actions">
+            {ACTIONS.map((action) => (
+              <Link key={action.href} href={action.href}>
+                {action.label}
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

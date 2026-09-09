@@ -1,0 +1,38 @@
+.coach-home { padding: clamp(1.4rem, 3.5vw, 2.6rem) 0 0; }
+.coach-home__header { max-width: 760px; margin-bottom: 28px; }
+.coach-home__header > span { color: var(--brand-gold); font-size: 11px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; }
+.coach-home__header h1 { margin: 8px 0 4px; font: 700 clamp(40px, 5vw, 68px) / 0.9 var(--font-display); text-transform: uppercase; }
+.coach-home__header p { color: var(--text-secondary); line-height: 1.55; }
+.coach-home__dashboard { display: grid; grid-template-columns: 1.25fr 0.9fr; gap: 16px; max-width: 1080px; }
+.coach-home__panel { margin-top: 16px; padding: 22px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 12px; background: rgba(7, 10, 9, 0.72); box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18); }
+.coach-home__panel[data-tone="gold"] { border-color: rgba(221, 180, 94, 0.4); }
+.coach-home__panel[data-tone="lime"] { border-color: rgba(176, 236, 107, 0.38); }
+.coach-home__panel:last-child { grid-column: 1 / -1; }
+.coach-home__panel-heading h2 { margin: 0 0 14px; font: 700 26px / 1 var(--font-display); text-transform: uppercase; }
+.coach-home__big-number { display: block; margin: 8px 0; font: 700 38px / 1 var(--font-score); color: #baf1ff; }
+.coach-home__panel p { margin: 0; color: var(--text-secondary); line-height: 1.45; }
+.coach-home__panel > a, .coach-home__actions a { display: inline-flex; min-height: 44px; align-items: center; padding: 0 14px; margin-top: 12px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 6px; color: var(--brand-gold-bright); text-decoration: none; }
+.coach-home__panel > a:hover, .coach-home__actions a:hover { border-color: var(--brand-gold); background: rgba(221, 180, 94, 0.06); }
+.coach-home__list { display: grid; gap: 12px; margin: 0; padding-left: 20px; color: var(--text-secondary); }
+.coach-home__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.coach-home__progression { grid-column: 1 / -1; margin-top: 16px; padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid color-mix(in oklch, var(--action-lime) 25%, transparent); border-radius: 1.15rem; background: linear-gradient(135deg, color-mix(in oklch, var(--surface-canvas-deep) 88%, var(--context-progress)), color-mix(in oklch, var(--surface-canvas-deep) 95%, var(--brand-gold))); box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.15); }
+.coach-home__progression-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.coach-home__progression-eyebrow { color: var(--action-lime); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.coach-home__progression h2 { margin: 0.25rem 0; font: 700 clamp(1.15rem, 2.6vw, 1.55rem) / 1 var(--font-display); text-transform: uppercase; }
+.coach-home__progression h2 em { color: var(--brand-gold-bright); font-style: normal; }
+.coach-home__progression p { margin: 0; color: var(--text-secondary); font-size: 0.84rem; }
+.coach-home__progression-score { color: var(--brand-gold-bright); font-size: clamp(1.2rem, 3vw, 1.7rem); font-weight: 700; white-space: nowrap; }
+.coach-home__progression-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1.2rem; }
+.coach-home__progression-split > div { display: flex; min-width: 0; flex-direction: column; gap: 0.25rem; border-radius: 0.75rem; background: rgb(0 0 0 / 0.16); padding: 0.7rem; }
+.coach-home__progression-split span { color: var(--text-secondary); font-size: 0.67rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+.coach-home__progression-split b { color: var(--text-primary); font-size: 0.86rem; }
+.coach-home__progression-split small { color: var(--text-secondary); font-size: 0.75rem; }
+@media (max-width: 47.9375rem) {
+  .coach-home { padding-top: 1.2rem; }
+  .coach-home__header h1 { font-size: 52px; }
+  .coach-home__dashboard { grid-template-columns: 1fr; }
+  .coach-home__panel { padding: 17px; }
+  .coach-home__progression-heading { flex-direction: column; }
+  .coach-home__progression-split { grid-template-columns: 1fr; }
+}

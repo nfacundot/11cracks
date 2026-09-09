@@ -9,11 +9,11 @@ type QuestionSeed = {
   type: "MULTIPLE_CHOICE" | "TRUE_FALSE";
   prompt: string;
   explanation?: string;
-  timeSeconds?: number;
   options: { text: string; isCorrect?: boolean }[];
 };
 
 type LessonSeed = {
+  id: string;
   title: string;
   description: string;
   emoji: string;
@@ -21,630 +21,12 @@ type LessonSeed = {
   type: "LESSON" | "QUIZ" | "GAME";
   gameMode?: "ANAGRAM" | null;
   xpReward: number;
+  posX?: number;
+  posY?: number;
   questions: QuestionSeed[];
 };
 
-const lessons: LessonSeed[] = [
-  {
-    title: "Reglas bÃ¡sicas del fÃºtbol",
-    description: "Aprende las reglas fundamentales del deporte rey.",
-    emoji: "âš½",
-    color: "#16a34a",
-    type: "LESSON",
-    xpReward: 20,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡ntos jugadores de campo tiene cada equipo durante un partido?",
-        explanation: "Son 11 por equipo, incluido el portero. De ahÃ­ el nombre '11Cracks'.",
-        options: [
-          { text: "10" },
-          { text: "11", isCorrect: true },
-          { text: "12" },
-          { text: "9" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡nto dura un partido de fÃºtbol profesional en tiempo reglamentario?",
-        explanation: "90 minutos divididos en dos tiempos de 45 minutos, mÃ¡s el descuento.",
-        options: [
-          { text: "80 minutos" },
-          { text: "100 minutos" },
-          { text: "90 minutos", isCorrect: true },
-          { text: "120 minutos" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El Ãºnico jugador que puede usar las manos en su Ã¡rea es el portero.",
-        explanation: "Correcto. El portero puede usar las manos dentro de su Ã¡rea penal.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© sucede si el balÃ³n cruza completamente la lÃ­nea de meta fuera de la porterÃ­a?",
-        explanation: "Si lo toca por Ãºltimo un atacante es saque de meta; si lo toca un defensor es cÃ³rner.",
-        options: [
-          { text: "Saque de banda" },
-          { text: "CÃ³rner o saque de meta, segÃºn quiÃ©n tocÃ³ el balÃ³n", isCorrect: true },
-          { text: "Tiro libre" },
-          { text: "Penalti" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© Ã¡rbitro adicional revisa las jugadas con video en los partidos grandes?",
-        explanation: "El VAR (Video Assistant Referee) asiste al Ã¡rbitro principal.",
-        options: [
-          { text: "El cuarto Ã¡rbitro" },
-          { text: "El VAR", isCorrect: true },
-          { text: "El juez de lÃ­nea" },
-          { text: "El delegado" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "Un saque de banda se cobra con los pies.",
-        explanation: "El saque de banda se realiza con las manos, por encima de la cabeza.",
-        options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }],
-      },
-    ],
-  },
-  {
-    title: "Las posiciones",
-    description: "Conoce el rol de cada jugador en el campo.",
-    emoji: "ðŸ§¤",
-    color: "#2563eb",
-    type: "LESSON",
-    xpReward: 20,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© jugador estÃ¡ autorizado a usar las manos dentro del Ã¡rea?",
-        explanation: "El portero o guardameta es el Ãºnico autorizado dentro de su Ã¡rea.",
-        options: [
-          { text: "El delantero" },
-          { text: "El defensa central" },
-          { text: "El portero", isCorrect: true },
-          { text: "El mediocampista" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CÃ³mo se llama el jugador que se ubica entre los defensas y los delanteros?",
-        explanation: "El mediocampista conecta la defensa con el ataque.",
-        options: [
-          { text: "Extremo" },
-          { text: "Mediocampista", isCorrect: true },
-          { text: "Portero" },
-          { text: "Lateral" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© posiciÃ³n juega normalmente en las bandas cerca del Ã¡rea rival?",
-        explanation: "El extremo o volante ofensivo juega pegado a las bandas para desbordar.",
-        options: [
-          { text: "Extremo", isCorrect: true },
-          { text: "Central" },
-          { text: "Portero" },
-          { text: "Mediocentro defensivo" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El 9 suele ser el delantero centro o 'referente de Ã¡rea'.",
-        explanation: "El dorsal 9 clÃ¡sico es el delantero centro que define en el Ã¡rea.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© jugador cubre las bandas en defensa y apoya en ataque?",
-        explanation: "El lateral recorre la banda ayudando en defensa y en ataque.",
-        options: [
-          { text: "Lateral", isCorrect: true },
-          { text: "Portero" },
-          { text: "Delantero centro" },
-          { text: "Central" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "El fuera de juego",
-    description: "Domina la regla mÃ¡s polÃ©mica del fÃºtbol.",
-    emoji: "ðŸš©",
-    color: "#d97706",
-    type: "LESSON",
-    xpReward: 25,
-    questions: [
-      {
-        type: "TRUE_FALSE",
-        prompt: "EstÃ¡s en fuera de juego si estÃ¡s mÃ¡s cerca de la porterÃ­a rival que el balÃ³n y el penÃºltimo defensor.",
-        explanation: "El fuera de juego se marca al estar por delante del balÃ³n y del penÃºltimo rival.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿En quÃ© momento se sanciona el fuera de juego?",
-        explanation: "Solo se sanciona cuando el jugador participa de la jugada: recibe, toca o interfiere.",
-        options: [
-          { text: "En cualquier momento" },
-          { text: "Solo al recibir el balÃ³n de un rival" },
-          { text: "Cuando participa en la jugada recibiendo o interfiriendo", isCorrect: true },
-          { text: "Nunca se sanciona" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿Se puede estar en fuera de juego en un saque de esquina?",
-        explanation: "No. En cÃ³rner, saque de banda y saque de meta no hay fuera de juego.",
-        options: [
-          { text: "SÃ­, siempre" },
-          { text: "No, en el cÃ³rner no existe fuera de juego", isCorrect: true },
-          { text: "Solo en la primera jugada" },
-          { text: "Depende del Ã¡rbitro" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "Si un jugador estÃ¡ en posiciÃ³n adelantada pero no toca el balÃ³n, puede seguir la jugada.",
-        explanation: "Si no participa, no hay infracciÃ³n, aunque los Ã¡rbitros pueden marcar si interfiere con el rival.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-    ],
-  },
-  {
-    title: "Faltas y tarjetas",
-    description: "Aprende a distinguir faltas, tarjetas y sanciones.",
-    emoji: "ðŸŸ¨",
-    color: "#dc2626",
-    type: "LESSON",
-    xpReward: 20,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© significan dos tarjetas amarillas para el mismo jugador?",
-        explanation: "Dos amarillas en un partido equivalen a expulsiÃ³n (tarjeta roja).",
-        options: [
-          { text: "Nada" },
-          { text: "AmonestaciÃ³n y sanciÃ³n econÃ³mica" },
-          { text: "ExpulsiÃ³n", isCorrect: true },
-          { text: "Cambio de posiciÃ³n" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡ndo se sanciona un penalti?",
-        explanation: "Cuando se comete una falta sancionable con tiro libre dentro del Ã¡rea penal.",
-        options: [
-          { text: "Cuando la falta es dentro del Ã¡rea penal", isCorrect: true },
-          { text: "En cualquier falta del partido" },
-          { text: "Solo en el Ãºltimo minuto" },
-          { text: "Cuando el portero sale del Ã¡rea" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El Ã¡rbitro puede mostrar una tarjeta roja directa por una falta violenta.",
-        explanation: "Las faltas violentas o el juego peligroso grave se castigan con expulsiÃ³n directa.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© es una 'falta tÃ¡ctica'?",
-        explanation: "Es cortar un ataque rival de forma deliberada, generalmente se castiga con amarilla.",
-        options: [
-          { text: "Cortar un contraataque rival a propÃ³sito", isCorrect: true },
-          { text: "Una falta dentro del Ã¡rea" },
-          { text: "Un pase largo" },
-          { text: "Un cambio de jugador" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Los grandes torneos",
-    description: "El Mundial, la Champions y mÃ¡s competencias legendarias.",
-    emoji: "ðŸ†",
-    color: "#9333ea",
-    type: "LESSON",
-    xpReward: 25,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿Cada cuÃ¡ntos aÃ±os se juega el Mundial de la FIFA?",
-        explanation: "HistÃ³ricamente cada 4 aÃ±os. A partir de 2026 cambiÃ³ a 4 aÃ±os tambiÃ©n (48 selecciones).",
-        options: [
-          { text: "Cada 2 aÃ±os" },
-          { text: "Cada 4 aÃ±os", isCorrect: true },
-          { text: "Cada 3 aÃ±os" },
-          { text: "Cada aÃ±o" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© torneo reÃºne a los mejores clubes de Europa?",
-        explanation: "La UEFA Champions League es el torneo de clubes mÃ¡s prestigioso de Europa.",
-        options: [
-          { text: "La Copa AmÃ©rica" },
-          { text: "La UEFA Champions League", isCorrect: true },
-          { text: "El Mundial de Clubes" },
-          { text: "La Liga de Naciones" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© selecciÃ³n ganÃ³ el Mundial de Qatar 2022?",
-        explanation: "Argentina venciÃ³ a Francia en una final legendaria por penales.",
-        options: [
-          { text: "Francia" },
-          { text: "Brasil" },
-          { text: "Argentina", isCorrect: true },
-          { text: "EspaÃ±a" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El Mundial de 2026 se jugarÃ¡ en Estados Unidos, MÃ©xico y CanadÃ¡.",
-        explanation: "Es el primer Mundial organizado por tres paÃ­ses, con 48 selecciones.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CÃ³mo se llama el torneo continental mÃ¡s importante de SudamÃ©rica?",
-        explanation: "La Copa AmÃ©rica es el torneo de selecciones mÃ¡s antiguo del mundo.",
-        options: [
-          { text: "Copa AmÃ©rica", isCorrect: true },
-          { text: "Copa Libertadores" },
-          { text: "Sudamericano" },
-          { text: "Mundialito" },
-        ],
-      },
-    ],
-  },
-  {
-    title: "Estrategia y tÃ¡ctica",
-    description: "Formaciones, pressing y conceptos tÃ¡cticos bÃ¡sicos.",
-    emoji: "ðŸ§ ",
-    color: "#0891b2",
-    type: "LESSON",
-    xpReward: 25,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "En la formaciÃ³n 4-4-2, Â¿cuÃ¡ntos delanteros hay?",
-        explanation: "4 defensas, 4 mediocampistas y 2 delanteros.",
-        options: [
-          { text: "1" },
-          { text: "2", isCorrect: true },
-          { text: "3" },
-          { text: "4" },
-        ],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© es el 'pressing alto'?",
-        explanation: "Presionar al rival en su propio campo para recuperar el balÃ³n rÃ¡pido.",
-        options: [
-          { text: "Defender en tu propia Ã¡rea" },
-          { text: "Presionar al rival cerca de su porterÃ­a", isCorrect: true },
-          { text: "Jugar con un solo delantero" },
-          { text: "Esperar el error rival sin salir" },
-        ],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "La 'posesiÃ³n' mide el tiempo que un equipo mantiene el control del balÃ³n.",
-        explanation: "La posesiÃ³n es el porcentaje del tiempo en que un equipo controla el balÃ³n.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© significa 'contraataque'?",
-        explanation: "Es atacar rÃ¡pido tras recuperar el balÃ³n, aprovechando que el rival estÃ¡ descolocado.",
-        options: [
-          { text: "Atacar rÃ¡pido tras robar el balÃ³n", isCorrect: true },
-          { text: "Defender con todos los jugadores" },
-          { text: "Tocar el balÃ³n sin avanzar" },
-          { text: "Un cambio de portero" },
-        ],
-      },
-    ],
-  },
-
-  {
-    title: "Quiz relÃ¡mpago",
-    description: "Preguntas rÃ¡pidas para calentar tu mente.",
-    emoji: "ðŸŽ¯",
-    color: "#16a34a",
-    type: "GAME",
-    xpReward: 10,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© paÃ­s ganÃ³ la Eurocopa 2024?",
-        explanation: "EspaÃ±a se coronÃ³ campeona de la Euro 2024 en BerlÃ­n.",
-        options: [{ text: "EspaÃ±a", isCorrect: true }, { text: "Inglaterra" }, { text: "Francia" }, { text: "Italia" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuiÃ©n ganÃ³ el BalÃ³n de Oro 2024?",
-        explanation: "Rodri HernÃ¡ndez fue galardonado tras ganar la Euro y la Premier.",
-        options: [{ text: "Vinicius Jr." }, { text: "Rodri", isCorrect: true }, { text: "Bellingham" }, { text: "MbappÃ©" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© club juega en el estadio Camp Nou?",
-        explanation: "El Camp Nou (ahora Spotify Camp Nou) es la casa del FC Barcelona.",
-        options: [{ text: "Real Madrid" }, { text: "FC Barcelona", isCorrect: true }, { text: "AtlÃ©tico de Madrid" }, { text: "Sevilla" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© paÃ­s tiene mÃ¡s Copas del Mundo?",
-        explanation: "Brasil lidera con 5 tÃ­tulos mundiales.",
-        options: [{ text: "Alemania" }, { text: "Argentina" }, { text: "Brasil", isCorrect: true }, { text: "Italia" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© jugador es apodado 'La Pulga'?",
-        explanation: "Lionel Messi es conocido mundialmente como 'La Pulga'.",
-        options: [{ text: "Neymar" }, { text: "Lionel Messi", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "SuÃ¡rez" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CÃ³mo se llama el trofeo que levanta el campeÃ³n de la Champions League?",
-        explanation: "La 'Orejona' es el apodo del trofeo de la UEFA Champions League.",
-        options: [{ text: "La Orejona", isCorrect: true }, { text: "La Copa" }, { text: "El Dorado" }, { text: "El Oso" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© selecciÃ³n ganÃ³ la Copa AmÃ©rica 2024?",
-        explanation: "Argentina se consagrÃ³ bicampeona de AmÃ©rica en Miami.",
-        options: [{ text: "Colombia" }, { text: "Uruguay" }, { text: "Argentina", isCorrect: true }, { text: "Brasil" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿En quÃ© paÃ­s naciÃ³ PelÃ©?",
-        explanation: "PelÃ© naciÃ³ en TrÃªs CoraÃ§Ãµes, Brasil.",
-        options: [{ text: "Argentina" }, { text: "Brasil", isCorrect: true }, { text: "Uruguay" }, { text: "Portugal" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© equipo inglÃ©s tiene mÃ¡s Champions League?",
-        explanation: "El Liverpool es el club inglÃ©s con mÃ¡s Copas de Europa (6).",
-        options: [{ text: "Manchester City" }, { text: "Chelsea" }, { text: "Liverpool", isCorrect: true }, { text: "Arsenal" }],
-        timeSeconds: 8,
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© arquero argentino ganÃ³ el Mundial 2022 y fue clave en los penales?",
-        explanation: "Emiliano 'Dibu' MartÃ­nez fue figura atajando en la tanda final.",
-        options: [{ text: "Emiliano MartÃ­nez", isCorrect: true }, { text: "Romero" }, { text: "Musso" }, { text: "Armani" }],
-        timeSeconds: 8,
-      },
-    ],
-  },
-
-  {
-    title: "Crack test",
-    description: "Afirmaciones rÃ¡pidas de verdadero o falso.",
-    emoji: "âš¡",
-    color: "#d97706",
-    type: "GAME",
-    xpReward: 10,
-    questions: [
-      { type: "TRUE_FALSE", prompt: "El fÃºtbol se juega con 11 jugadores por equipo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El penalti se cobra desde 11 metros.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Messi ganÃ³ el Mundial 2022 con Argentina.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "La Champions League es un torneo de selecciones.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El Real Madrid es el club con mÃ¡s Champions de la historia.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Un cÃ³rner se cobra desde la lÃ­nea de fondo.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "PelÃ© naciÃ³ en Portugal.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "La Copa AmÃ©rica es mÃ¡s antigua que el Mundial.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El Ã¡rbitro puede expulsar directamente con tarjeta roja.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Un partido de fÃºtbol dura 120 minutos sin descuento.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "El 'hat-trick' son 3 goles en un mismo partido.", options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }], timeSeconds: 5 },
-      { type: "TRUE_FALSE", prompt: "Inglaterra ganÃ³ la Eurocopa 2024.", options: [{ text: "Verdadero" }, { text: "Falso", isCorrect: true }], timeSeconds: 5 },
-    ],
-  },
-
-  {
-    title: "TÃ©cnica: el pase",
-    description: "Perfecciona la base de todo equipo: pasar el balÃ³n.",
-    emoji: "ðŸ‘Ÿ",
-    color: "#16a34a",
-    type: "LESSON",
-    xpReward: 15,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© parte del pie se usa para un pase corto preciso?",
-        explanation: "El interior del pie da mayor precisiÃ³n y control al pase corto.",
-        options: [{ text: "El empeine" }, { text: "El interior del pie", isCorrect: true }, { text: "El talÃ³n" }, { text: "La punta" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© tipo de pase se usa para superar a un rival a distancia?",
-        explanation: "El pase largo o en profundidad busca romper lÃ­neas y llegar lejos.",
-        options: [{ text: "Pase largo o en profundidad", isCorrect: true }, { text: "Pase corto" }, { text: "Pase de tacÃ³n" }, { text: "Saque de banda" }],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El pase con el interior del pie es mÃ¡s preciso que el de empeine.",
-        explanation: "El interior ofrece mayor superficie de contacto y control.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡l es el error mÃ¡s comÃºn al pasar?",
-        explanation: "Mirar fijamente el balÃ³n impide leer el movimiento de los compaÃ±eros.",
-        options: [
-          { text: "Mirar al balÃ³n en lugar de a los compaÃ±eros", isCorrect: true },
-          { text: "Patear demasiado fuerte" },
-          { text: "Patear con el interior" },
-          { text: "Tocar el balÃ³n dos veces" },
-        ],
-      },
-    ],
-  },
-
-  {
-    title: "TÃ©cnica: control y recepciÃ³n",
-    description: "Domina el balÃ³n al primer toque.",
-    emoji: "ðŸŽ¯",
-    color: "#2563eb",
-    type: "LESSON",
-    xpReward: 15,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡l es la clave para un buen control de balÃ³n?",
-        explanation: "La 'amortiguaciÃ³n': ceder ligeramente al recibir para que el balÃ³n no rebote.",
-        options: [{ text: "Ceder y amortiguar el impacto", isCorrect: true }, { text: "Golpear fuerte el balÃ³n" }, { text: "Cerrar los ojos" }, { text: "Saltar" }],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El control orientado permite recibir y encarar en un solo movimiento.",
-        explanation: "El control orientado deja el balÃ³n listo para el siguiente pase o disparo.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© parte del cuerpo se usa para controlar un balÃ³n que viene por alto?",
-        explanation: "El pecho es ideal para amortiguar balones aÃ©reos y dejarlos cerca de los pies.",
-        options: [{ text: "El pecho", isCorrect: true }, { text: "La rodilla siempre" }, { text: "La cabeza siempre" }, { text: "Las manos" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© error rompe el control del balÃ³n en movimiento?",
-        explanation: "Pie de apoyo mal colocado te desequilibra y pierdes el control.",
-        options: [{ text: "Pie de apoyo mal colocado", isCorrect: true }, { text: "Mirar al arco" }, { text: "Tener los brazos abiertos" }, { text: "Respirar" }],
-      },
-    ],
-  },
-
-  {
-    title: "Entrenamiento: defensa 1 vs 1",
-    description: "Aprende a defender en duelos individuales.",
-    emoji: "ðŸ›¡ï¸",
-    color: "#dc2626",
-    type: "LESSON",
-    xpReward: 15,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡l es la postura ideal al defender 1 vs 1?",
-        explanation: "Cuerpo bajo, rodillas flexionadas y presiÃ³n lateral sobre el balÃ³n.",
-        options: [{ text: "De pie y muy recto" }, { text: "Cuerpo bajo y lateral, presionando el balÃ³n", isCorrect: true }, { text: "De espaldas al atacante" }, { text: "Corriendo al arco" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© NO debes hacer al defender un regate?",
-        explanation: "Ir a 'lancero' (entrar de frente) te hace perder el equilibrio fÃ¡cilmente.",
-        options: [{ text: "Entrar de frente sin control", isCorrect: true }, { text: "Esperar el movimiento del rival" }, { text: "Presionar lateral" }, { text: "Mantener la distancia" }],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "El defensor debe observar el balÃ³n y la posiciÃ³n del atacante a la vez.",
-        explanation: "Leer el balÃ³n y al rival permite anticipar el movimiento.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿CuÃ¡ndo es buen momento para intentar quitar el balÃ³n?",
-        explanation: "Al controlar mal o cuando el rival golpea el balÃ³n mÃ¡s lejos de su pie.",
-        options: [
-          { text: "Cuando el rival golpea el balÃ³n fuera de su control", isCorrect: true },
-          { text: "Nunca" },
-          { text: "Solo al inicio del partido" },
-          { text: "Cuando estÃ¡ de espaldas" },
-        ],
-      },
-    ],
-  },
-
-  {
-    title: "Quiz: goleadores histÃ³ricos",
-    description: "Â¿CuÃ¡nto sabes de los artilleros del fÃºtbol?",
-    emoji: "ðŸ¥…",
-    color: "#9333ea",
-    type: "QUIZ",
-    xpReward: 25,
-    questions: [
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuiÃ©n es el mÃ¡ximo goleador histÃ³rico de las Copas del Mundo?",
-        explanation: "Miroslav Klose marcÃ³ 16 goles en mundiales, superando a Ronaldo NazÃ¡rio.",
-        options: [{ text: "Miroslav Klose", isCorrect: true }, { text: "Ronaldo NazÃ¡rio" }, { text: "PelÃ©" }, { text: "Messi" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuiÃ©n ganÃ³ el BalÃ³n de Oro 2022?",
-        explanation: "Karim Benzema lo ganÃ³ tras su temporada histÃ³rica con el Real Madrid.",
-        options: [{ text: "Karim Benzema", isCorrect: true }, { text: "Messi" }, { text: "MbappÃ©" }, { text: "Cristiano Ronaldo" }],
-      },
-      {
-        type: "TRUE_FALSE",
-        prompt: "PelÃ© marcÃ³ mÃ¡s de 1000 goles en su carrera.",
-        explanation: "PelÃ© superÃ³ la barrera de los 1000 goles, hito histÃ³rico.",
-        options: [{ text: "Verdadero", isCorrect: true }, { text: "Falso" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuÃ© jugador es conocido como 'el FenÃ³meno'?",
-        explanation: "Ronaldo NazÃ¡rio, 'R9', fue apodado 'el FenÃ³meno'.",
-        options: [{ text: "Ronaldo NazÃ¡rio", isCorrect: true }, { text: "Cristiano Ronaldo" }, { text: "Romario" }, { text: "Van Nistelrooy" }],
-      },
-      {
-        type: "MULTIPLE_CHOICE",
-        prompt: "Â¿QuiÃ©n es el mÃ¡ximo goleador de la Champions League?",
-        explanation: "Cristiano Ronaldo lidera con 140 goles en la Champions.",
-        options: [{ text: "Cristiano Ronaldo", isCorrect: true }, { text: "Messi" }, { text: "Lewandowski" }, { text: "Benzema" }],
-      },
-    ],
-  },
-  {
-    title: "Palabras en juego",
-    description: "Ordena las letras para formar la palabra en inglÃ©s. A menor tiempo, mÃ¡s goles.",
-    emoji: "ðŸ”¤",
-    color: "#0891b2",
-    type: "GAME",
-    gameMode: "ANAGRAM",
-    xpReward: 20,
-    questions: [
-      { type: "MULTIPLE_CHOICE", prompt: "GOAL", explanation: "Gol", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "PENALTY", explanation: "Penal", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "MATCH", explanation: "Partido", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "TEAM", explanation: "Equipo", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "COACH", explanation: "Entrenador", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "STADIUM", explanation: "Estadio", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "PLAYER", explanation: "Jugador", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "DEFENSE", explanation: "Defensa", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "FORWARD", explanation: "Delantero", options: [] },
-      { type: "MULTIPLE_CHOICE", prompt: "CHAMPION", explanation: "CampeÃ³n", options: [] },
-    ],
-  },
-];
-
-const temas: { name: string; emoji: string; color: string; xpReward: number }[] = [
-  { name: "Training sport", emoji: "ðŸ’ª", color: "#16a34a", xpReward: 60 },
-  { name: "GastronomÃ­a sport", emoji: "ðŸ½ï¸", color: "#d97706", xpReward: 60 },
-  { name: "DÃ­a de Hotel", emoji: "ðŸ¨", color: "#2563eb", xpReward: 60 },
-  { name: "Descansar", emoji: "ðŸ˜´", color: "#0891b2", xpReward: 60 },
-  { name: "DÃ­a de juego", emoji: "ðŸŸï¸", color: "#9333ea", xpReward: 60 },
-];
-
-const clases: {
+const ETAPAS: {
   id: string;
   name: string;
   description: string;
@@ -654,88 +36,268 @@ const clases: {
 }[] = [
   {
     id: "subject-futbol",
-    name: "Fundamentos del FÃºtbol",
-    description: "Reglas, posiciones y tÃ©cnica bÃ¡sica del deporte rey.",
-    emoji: "âš½",
+    name: "Fundamentos del Fútbol",
+    description: "Reglas, posiciones y técnica básica del deporte rey.",
+    emoji: "⚽",
     color: "#16a34a",
     order: 0,
   },
   {
     id: "subject-cultura",
     name: "Cultura Futbolera",
-    description: "Historia, torneos y curiosidades del mundo del fÃºtbol.",
-    emoji: "ðŸ†",
+    description: "Historia, torneos y curiosidades del mundo del fútbol.",
+    emoji: "🏆",
     color: "#9333ea",
     order: 1,
   },
+  {
+    id: "cmswgp0i5000e24kuumhko0u0",
+    name: "Etapa 3",
+    description: "Día de partido: convivencia, táctica y afición en el estadio.",
+    emoji: "🎯",
+    color: "#dc2626",
+    order: 2,
+  },
 ];
 
-const TEMA_CLASES: Record<string, string> = {
-  "stage-1": "subject-futbol",
-  "stage-2": "subject-cultura",
-  "stage-3": "subject-futbol",
-  "stage-4": "subject-cultura",
-  "stage-5": "subject-futbol",
-};
+const MATERIAS_TEMPLATE_ETAPA3: {
+  slug: string;
+  title: string;
+  emoji: string;
+  color: string;
+  posX: number;
+  posY: number;
+  vocab: [string, string][];
+}[] = [
+  {
+    slug: "casa",
+    title: "CASA",
+    emoji: "🏠",
+    color: "#b39af5",
+    posX: 50,
+    posY: 16,
+    vocab: [["mascota", "mascot"], ["foto", "photo"], ["uniforme", "uniform"], ["familia", "family"], ["desayuno", "breakfast"]],
+  },
+  {
+    slug: "entrenamiento",
+    title: "ENTRENAMIENTO",
+    emoji: "💪",
+    color: "#16a34a",
+    posX: 22,
+    posY: 40,
+    vocab: [["táctica", "tactics"], ["remate", "shot"], ["defensa", "defense"], ["resistencia", "stamina"], ["silbato", "whistle"]],
+  },
+  {
+    slug: "gastronomia",
+    title: "GASTRONOMÍA",
+    emoji: "🍽️",
+    color: "#d97706",
+    posX: 78,
+    posY: 40,
+    vocab: [["hidratación", "hydration"], ["ensalada", "salad"], ["pasta", "pasta"], ["jugo", "juice"], ["plátano", "banana"]],
+  },
+  {
+    slug: "hotel",
+    title: "HOTEL",
+    emoji: "🏨",
+    color: "#2563eb",
+    posX: 22,
+    posY: 66,
+    vocab: [["recepción", "reception"], ["maleta", "suitcase"], ["alarma", "alarm"], ["descanso", "rest"], ["toalla", "towel"]],
+  },
+  {
+    slug: "estadio",
+    title: "ESTADIO",
+    emoji: "🏟️",
+    color: "#9333ea",
+    posX: 78,
+    posY: 66,
+    vocab: [["bandera", "flag"], ["cántico", "chant"], ["árbitro", "referee"], ["marcador", "scoreboard"], ["golazo", "great goal"]],
+  },
+];
 
-const STAGE_SIZES = [3, 3, 2, 2, 2];
+function optionsFor(correct: string, distractors: string[]): QuestionSeed["options"] {
+  const pool = [...distractors.filter((item) => item !== correct)];
+  const correctIndex = Math.floor(Math.random() * 4);
+  const options: QuestionSeed["options"] = [{ text: correct, isCorrect: true }];
+  for (let i = 0; i < 4; i++) {
+    if (i === correctIndex) options[i] = { text: correct, isCorrect: true };
+    else {
+      const word = pool[i % pool.length];
+      options[i] = { text: word, isCorrect: false };
+    }
+  }
+  return options;
+}
+
+function juegosUnicos(): LessonSeed[] {
+  const vocabulary = MATERIAS_TEMPLATE_ETAPA3.flatMap((materia) => materia.vocab);
+  const esWords = vocabulary.map(([es]) => es);
+  const enWords = vocabulary.map(([, en]) => en);
+
+  return [
+    {
+      id: "bib-oido-de-crack",
+      title: "Oído de Crack",
+      description: "Escucha la palabra y elige la respuesta correcta.",
+      emoji: "🎧",
+      color: "#0ea5e9",
+      type: "LESSON",
+      xpReward: 20,
+      questions: vocabulary.map(([es, en]) => ({
+        type: "MULTIPLE_CHOICE",
+        prompt: `Escuchaste "${en}". ¿Cuál es la palabra correcta?`,
+        explanation: `${en} significa ${es}.`,
+        options: optionsFor(es, esWords),
+      })),
+    },
+    {
+      id: "bib-gol-de-palabra",
+      title: "Gol de Palabra",
+      description: "Une la palabra en español con su traducción en inglés.",
+      emoji: "⚽",
+      color: "#16a34a",
+      type: "LESSON",
+      xpReward: 20,
+      questions: vocabulary.map(([es, en]) => ({
+        type: "MULTIPLE_CHOICE",
+        prompt: `¿Cómo se dice "${es}" en inglés?`,
+        explanation: `${es} se traduce como ${en}.`,
+        options: optionsFor(en, enWords),
+      })),
+    },
+    {
+      id: "bib-letras-de-crack",
+      title: "Letras de Crack",
+      description: "Ordena las letras para formar la palabra en inglés.",
+      emoji: "🔤",
+      color: "#9333ea",
+      type: "GAME",
+      gameMode: "ANAGRAM",
+      xpReward: 20,
+      questions: vocabulary.map(([es, en]) => ({
+        type: "MULTIPLE_CHOICE",
+        prompt: en,
+        explanation: es,
+        options: [],
+      })),
+    },
+  ];
+}
 
 async function main() {
-  const existing = await prisma.lesson.count();
+  const oldStageLessons = await prisma.lesson.findMany({ where: { temaId: { startsWith: "stage-" } }, select: { id: true } });
+  if (oldStageLessons.length > 0) {
+    await prisma.lesson.deleteMany({ where: { id: { in: oldStageLessons.map((lesson) => lesson.id) } } });
+  }
+  await prisma.tema.deleteMany({ where: { id: { startsWith: "stage-" } } });
+  await prisma.tema.deleteMany({ where: { id: { startsWith: "demo-materia-" } } });
+  await prisma.etapaTema.deleteMany({ where: { temaId: { startsWith: "demo-materia-" } } });
+  await prisma.lesson.deleteMany({ where: { id: { startsWith: "demo-materia-" } } });
+  await prisma.lesson.deleteMany({
+    where: {
+      title: {
+        in: ["Reglas básicas del fútbol", "Las posiciones", "El fuera de juego", "Faltas y tarjetas", "Los grandes torneos", "Estrategia y táctica", "Quiz relámpago", "Crack test", "Técnica: el pase", "Técnica: control y recepción", "Entrenamiento: defensa 1 vs 1", "Quiz: goleadores históricos", "Palabras en juego", "Memoria Táctica", "Palabra a Gol"],
+      },
+    },
+  });
 
-  for (const clase of clases) {
+  for (const etapa of ETAPAS) {
     await prisma.clase.upsert({
-      where: { id: clase.id },
+      where: { id: etapa.id },
       update: {
-        name: clase.name,
-        description: clase.description,
-        emoji: clase.emoji,
-        color: clase.color,
-        order: clase.order,
+        name: etapa.name,
+        description: etapa.description,
+        emoji: etapa.emoji,
+        color: etapa.color,
+        order: etapa.order,
       },
       create: {
-        id: clase.id,
-        name: clase.name,
-        description: clase.description,
-        emoji: clase.emoji,
-        color: clase.color,
-        order: clase.order,
+        id: etapa.id,
+        name: etapa.name,
+        description: etapa.description,
+        emoji: etapa.emoji,
+        color: etapa.color,
+        order: etapa.order,
       },
     });
+    console.log(`✔ Etapa: ${etapa.emoji} ${etapa.name}`);
   }
 
-  const stageRows = await Promise.all(
-    temas.map((s, i) =>
-      prisma.tema.upsert({
-        where: { id: `stage-${i + 1}` },
-        update: {
-          name: s.name,
-          emoji: s.emoji,
-          color: s.color,
-          xpReward: s.xpReward,
-          claseId: TEMA_CLASES[`stage-${i + 1}`],
-        },
-        create: {
-          id: `stage-${i + 1}`,
-          name: s.name,
-          emoji: s.emoji,
-          color: s.color,
-          order: i,
-          xpReward: s.xpReward,
-          claseId: TEMA_CLASES[`stage-${i + 1}`],
-        },
-      })
-    )
-  );
+  const materias = MATERIAS_TEMPLATE_ETAPA3;
 
-  const temaIdFor = (lessonIndex: number) => {
-    let acc = 0;
-    for (let i = 0; i < STAGE_SIZES.length; i++) {
-      acc += STAGE_SIZES[i];
-      if (lessonIndex < acc) return stageRows[i]?.id ?? null;
-    }
-    return stageRows[stageRows.length - 1]?.id ?? null;
-  };
+  for (const [index, materia] of materias.entries()) {
+    const materiaId = `demo-materia-cmswgp0i5000e24kuumhko0u0-${materia.slug}`;
+    await prisma.tema.upsert({
+      where: { id: materiaId },
+      update: {
+        name: materia.title,
+        emoji: materia.emoji,
+        color: materia.color,
+        order: index + 1,
+        xpReward: 60,
+        posX: materia.posX,
+        posY: materia.posY,
+      },
+      create: {
+        id: materiaId,
+        name: materia.title,
+        emoji: materia.emoji,
+        color: materia.color,
+        order: index + 1,
+        xpReward: 60,
+        posX: materia.posX,
+        posY: materia.posY,
+      },
+    });
+    const etapaIndex = Math.min(2, Math.floor(index / 2));
+    const etapaId = ETAPAS[etapaIndex].id;
+    await prisma.tema.update({
+      where: { id: materiaId },
+      data: { clases: { set: [{ id: etapaId }] } },
+    });
+
+    await prisma.etapaTema.upsert({
+      where: { claseId_temaId: { claseId: etapaId, temaId: materiaId } },
+      update: {},
+      create: { claseId: etapaId, temaId: materiaId, posX: materia.posX, posY: materia.posY },
+    });
+    console.log(`  ✔ Materia: ${materia.emoji} ${materia.title} → ${ETAPAS[etapaIndex].name} (${materia.posX}%, ${materia.posY}%)`);
+  }
+
+  for (const leccion of juegosUnicos()) {
+    await prisma.lesson.deleteMany({ where: { id: leccion.id } });
+    await prisma.lesson.create({
+      data: {
+        id: leccion.id,
+        title: leccion.title,
+        description: leccion.description,
+        emoji: leccion.emoji,
+        color: leccion.color,
+        type: leccion.type,
+        gameMode: leccion.gameMode ?? null,
+        xpReward: leccion.xpReward,
+        order: 100,
+        temaId: null,
+        questions: {
+          create: leccion.questions.map((q, qi) => ({
+            type: q.type,
+            prompt: q.prompt,
+            explanation: q.explanation,
+            order: qi,
+            options: {
+              create: q.options.map((o, oi) => ({
+                text: o.text,
+                isCorrect: o.isCorrect ?? false,
+                order: oi,
+              })),
+            },
+          })),
+        },
+      },
+    });
+    console.log(`  ✔ Lección suelta: ${leccion.title} (${leccion.questions.length} preguntas)`);
+  }
 
   const admin = await prisma.user.upsert({
     where: { email: "superadmin@gmail.com" },
@@ -754,7 +316,7 @@ async function main() {
       xp: 120,
     },
   });
-  console.log(`âœ” Usuario 1 (superadmin): ${admin.email} (${admin.role})`);
+  console.log(`✔ Usuario 1 (superadmin): ${admin.email} (${admin.role})`);
 
   const adminSecundario = await prisma.user.upsert({
     where: { email: "admin@11cracks.com" },
@@ -773,7 +335,7 @@ async function main() {
       xp: 90,
     },
   });
-  console.log(`âœ” Usuario 2 (admin): ${adminSecundario.email} (${adminSecundario.role})`);
+  console.log(`✔ Usuario 2 (admin): ${adminSecundario.email} (${adminSecundario.role})`);
 
   const entrenador = await prisma.user.upsert({
     where: { email: "entrenador@11cracks.com" },
@@ -792,7 +354,7 @@ async function main() {
       xp: 60,
     },
   });
-  console.log(`âœ” Usuario 3 (entrenador): ${entrenador.email} (${entrenador.role})`);
+  console.log(`✔ Usuario 3 (entrenador): ${entrenador.email} (${entrenador.role})`);
 
   const jugador = await prisma.user.upsert({
     where: { email: "jugador@11cracks.com" },
@@ -811,58 +373,569 @@ async function main() {
       xp: 30,
     },
   });
-  console.log(`âœ” Usuario 4 (jugador): ${jugador.email} (${jugador.role})`);
+  console.log(`✔ Usuario 4 (jugador): ${jugador.email} (${jugador.role})`);
 
-  if (existing > 0) {
-    const dbLessons = await prisma.lesson.findMany({ orderBy: { order: "asc" } });
-    let assigned = 0;
-    for (const [i, lesson] of dbLessons.entries()) {
-      const temaId = temaIdFor(i);
-      if (lesson.temaId !== temaId) {
-        await prisma.lesson.update({ where: { id: lesson.id }, data: { temaId } });
-        assigned += 1;
-      }
-    }
-    console.log(`Ya hay ${existing} lecciones. Temas asignados: ${assigned}. Seed omitido.`);
-    return;
-  }
+  const games = [
+    {
+      id: "game-oido-de-crack",
+      slug: "oido-de-crack",
+      name: "Oído de Crack",
+      category: "OIDO" as const,
+      emoji: "👂",
+      color: "#22c55e",
+      description: "Escucha y elige la imagen correcta",
+      order: 0,
+    },
+    {
+      id: "game-gol-de-palabra",
+      slug: "gol-de-palabra",
+      name: "Gol de Palabra",
+      category: "GOL" as const,
+      emoji: "⚽",
+      color: "#3b82f6",
+      description: "Vincula la palabra con su significado",
+      order: 1,
+    },
+    {
+      id: "game-letras-de-crack",
+      slug: "letras-de-crack",
+      name: "Letras de Crack",
+      category: "LETRAS" as const,
+      emoji: "🧩",
+      color: "#a855f7",
+      description: "Ordena las letras para formar la palabra",
+      order: 2,
+    },
+    {
+      id: "game-alimentacion",
+      slug: "alimentacion",
+      name: "Alimentación",
+      category: "ALIMENTACION" as const,
+      emoji: "🍎",
+      color: "#f97316",
+      description: "Arrastra alimentos a saludable/no saludable y escucha su pronunciación",
+      order: 3,
+    },
+  ];
 
-  let order = 0;
-  for (const lesson of lessons) {
-    await prisma.lesson.create({
-      data: {
-        title: lesson.title,
-        description: lesson.description,
-        emoji: lesson.emoji,
-        color: lesson.color,
-        type: lesson.type,
-        gameMode: lesson.gameMode ?? null,
-        xpReward: lesson.xpReward,
-        order,
-        temaId: temaIdFor(order),
-        questions: {
-          create: lesson.questions.map((q, qi) => ({
-            type: q.type,
-            prompt: q.prompt,
-            explanation: q.explanation,
-            timeSeconds: q.timeSeconds,
-            order: qi,
-            options: {
-              create: q.options.map((o, oi) => ({
-                text: o.text,
-                isCorrect: o.isCorrect ?? false,
-                order: oi,
-              })),
-            },
-          })),
-        },
+  const gameIds: Record<string, string> = {};
+  for (const game of games) {
+    const saved = await prisma.game.upsert({
+      where: { id: game.id },
+      update: {
+        slug: game.slug,
+        name: game.name,
+        category: game.category,
+        emoji: game.emoji,
+        color: game.color,
+        description: game.description,
+        active: true,
+        order: game.order,
+      },
+      create: { ...game, active: true },
+    });
+    gameIds[game.category] = saved.id;
+
+    await prisma.lesson.upsert({
+      where: { gameId: saved.id },
+      update: {
+        title: game.name,
+        description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
+        emoji: game.emoji,
+        color: game.color,
+        type: "GAME",
+        xpReward: 25,
+        order: 100,
+      },
+      create: {
+        title: game.name,
+        description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
+        emoji: game.emoji,
+        color: game.color,
+        type: "GAME",
+        xpReward: 25,
+        order: 100,
+        gameId: saved.id,
       },
     });
-    order += 1;
-    console.log(`âœ” LecciÃ³n: ${lesson.title}`);
+
+    console.log(`✔ Juego (${game.category}): ${game.name} (${game.slug})`);
   }
 
-  console.log(`Seed completado: ${lessons.length} lecciones creadas.`);
+  const oidoWords: {
+    id: string;
+    word: string;
+    label: string;
+    language: string;
+    options: { label: string; imageUrl: string; isCorrect: boolean }[];
+  }[] = [
+    {
+      id: "oido-en-jersey",
+      word: "jersey",
+      label: "Camiseta",
+      language: "en",
+      options: [
+        { label: "Camiseta", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: true },
+        { label: "Pantaloneta", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: false },
+        { label: "Botines", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: false },
+        { label: "Medias largas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: false },
+      ],
+    },
+    {
+      id: "oido-en-shorts",
+      word: "shorts",
+      label: "Pantaloneta",
+      language: "en",
+      options: [
+        { label: "Camiseta", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: false },
+        { label: "Pantaloneta", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: true },
+        { label: "Botines", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: false },
+        { label: "Medias largas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: false },
+      ],
+    },
+    {
+      id: "oido-en-boots",
+      word: "football boots",
+      label: "Botines",
+      language: "en",
+      options: [
+        { label: "Camiseta", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: false },
+        { label: "Pantaloneta", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: false },
+        { label: "Botines", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: true },
+        { label: "Medias largas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: false },
+      ],
+    },
+    {
+      id: "oido-en-socks",
+      word: "long socks",
+      label: "Medias largas",
+      language: "en",
+      options: [
+        { label: "Camiseta", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: false },
+        { label: "Pantaloneta", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: false },
+        { label: "Botines", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: false },
+        { label: "Medias largas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: true },
+      ],
+    },
+    {
+      id: "oido-pt-camisa",
+      word: "camisa",
+      label: "Camisa",
+      language: "pt",
+      options: [
+        { label: "Camisa", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: true },
+        { label: "Calção", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: false },
+        { label: "Chuteiras", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: false },
+        { label: "Meias longas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: false },
+      ],
+    },
+    {
+      id: "oido-pt-chuteiras",
+      word: "chuteiras",
+      label: "Chuteiras",
+      language: "pt",
+      options: [
+        { label: "Camisa", imageUrl: "/game-assets/bilinguisimo/oido/jersey-phase03b-v1.png", isCorrect: false },
+        { label: "Calção", imageUrl: "/game-assets/bilinguisimo/oido/shorts-phase03b-v1.png", isCorrect: false },
+        { label: "Chuteiras", imageUrl: "/game-assets/bilinguisimo/oido/football-boots-phase03b-v1.png", isCorrect: true },
+        { label: "Meias longas", imageUrl: "/game-assets/bilinguisimo/oido/long-socks-phase03b-v1.png", isCorrect: false },
+      ],
+    },
+  ];
+
+  for (const [index, item] of oidoWords.entries()) {
+    const word = await prisma.oidoCrackWord.upsert({
+      where: { id: item.id },
+      update: {
+        gameId: gameIds.OIDO,
+        word: item.word,
+        label: item.label,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+      create: {
+        id: item.id,
+        gameId: gameIds.OIDO,
+        word: item.word,
+        label: item.label,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+    });
+    await prisma.oidoCrackOption.deleteMany({ where: { wordId: word.id } });
+    await prisma.oidoCrackOption.createMany({
+      data: item.options.map((option, oi) => ({
+        wordId: word.id,
+        label: option.label,
+        imageUrl: option.imageUrl,
+        isCorrect: option.isCorrect,
+        order: oi,
+      })),
+    });
+    console.log(`    ✔ Oído de Crack: ${item.word} (${item.language})`);
+  }
+
+  const golWords: {
+    id: string;
+    word: string;
+    meaning: string;
+    language: string;
+    options: { label: string; isCorrect: boolean }[];
+  }[] = [
+    {
+      id: "gol-en-forward",
+      word: "forward",
+      meaning: "Delantero",
+      language: "en",
+      options: [
+        { label: "Delantero", isCorrect: true },
+        { label: "Mediocampista", isCorrect: false },
+        { label: "Defensa", isCorrect: false },
+        { label: "Extremo", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-en-midfielder",
+      word: "midfielder",
+      meaning: "Mediocampista",
+      language: "en",
+      options: [
+        { label: "Delantero", isCorrect: false },
+        { label: "Mediocampista", isCorrect: true },
+        { label: "Defensa", isCorrect: false },
+        { label: "Extremo", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-en-defender",
+      word: "defender",
+      meaning: "Defensa",
+      language: "en",
+      options: [
+        { label: "Delantero", isCorrect: false },
+        { label: "Mediocampista", isCorrect: false },
+        { label: "Defensa", isCorrect: true },
+        { label: "Extremo", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-en-winger",
+      word: "winger",
+      meaning: "Extremo",
+      language: "en",
+      options: [
+        { label: "Delantero", isCorrect: false },
+        { label: "Mediocampista", isCorrect: false },
+        { label: "Defensa", isCorrect: false },
+        { label: "Extremo", isCorrect: true },
+      ],
+    },
+    {
+      id: "gol-pt-atacante",
+      word: "atacante",
+      meaning: "Atacante",
+      language: "pt",
+      options: [
+        { label: "Atacante", isCorrect: true },
+        { label: "Meio-campista", isCorrect: false },
+        { label: "Defensor", isCorrect: false },
+        { label: "Ponta", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-pt-meiocampista",
+      word: "meio-campista",
+      meaning: "Meio-campista",
+      language: "pt",
+      options: [
+        { label: "Atacante", isCorrect: false },
+        { label: "Meio-campista", isCorrect: true },
+        { label: "Defensor", isCorrect: false },
+        { label: "Ponta", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-pt-defensor",
+      word: "defensor",
+      meaning: "Defensor",
+      language: "pt",
+      options: [
+        { label: "Atacante", isCorrect: false },
+        { label: "Meio-campista", isCorrect: false },
+        { label: "Defensor", isCorrect: true },
+        { label: "Ponta", isCorrect: false },
+      ],
+    },
+    {
+      id: "gol-pt-ponta",
+      word: "ponta",
+      meaning: "Ponta",
+      language: "pt",
+      options: [
+        { label: "Atacante", isCorrect: false },
+        { label: "Meio-campista", isCorrect: false },
+        { label: "Defensor", isCorrect: false },
+        { label: "Ponta", isCorrect: true },
+      ],
+    },
+  ];
+
+  for (const [index, item] of golWords.entries()) {
+    const word = await prisma.golPalabraWord.upsert({
+      where: { id: item.id },
+      update: {
+        gameId: gameIds.GOL,
+        word: item.word,
+        meaning: item.meaning,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+      create: {
+        id: item.id,
+        gameId: gameIds.GOL,
+        word: item.word,
+        meaning: item.meaning,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+    });
+    await prisma.golPalabraOption.deleteMany({ where: { wordId: word.id } });
+    await prisma.golPalabraOption.createMany({
+      data: item.options.map((option, oi) => ({
+        wordId: word.id,
+        label: option.label,
+        isCorrect: option.isCorrect,
+        order: oi,
+      })),
+    });
+    console.log(`    ✔ Gol de Palabra: ${item.word} (${item.language})`);
+  }
+
+  const letrasWords: {
+    id: string;
+    word: string;
+    meaning: string;
+    language: string;
+    imageUrl: string;
+    letters: string[];
+  }[] = [
+    {
+      id: "letras-en-rice",
+      word: "rice",
+      meaning: "Arroz",
+      language: "en",
+      imageUrl: "/game-assets/bilinguisimo/letras/rice-v1.png",
+      letters: ["E", "A", "R", "I", "C", "O"],
+    },
+    {
+      id: "letras-en-eggs",
+      word: "eggs",
+      meaning: "Huevos",
+      language: "en",
+      imageUrl: "/game-assets/bilinguisimo/letras/eggs-v1.png",
+      letters: ["S", "E", "A", "G", "G", "O"],
+    },
+    {
+      id: "letras-en-salad",
+      word: "salad",
+      meaning: "Ensalada",
+      language: "en",
+      imageUrl: "/game-assets/bilinguisimo/letras/salad-v1.png",
+      letters: ["L", "S", "A", "O", "D", "A", "E"],
+    },
+    {
+      id: "letras-en-soda",
+      word: "soda",
+      meaning: "Gaseosa",
+      language: "en",
+      imageUrl: "/game-assets/bilinguisimo/letras/soda-v1.png",
+      letters: ["D", "A", "S", "E", "O", "I"],
+    },
+    {
+      id: "letras-pt-arroz",
+      word: "arroz",
+      meaning: "Arroz",
+      language: "pt",
+      imageUrl: "/game-assets/bilinguisimo/letras/rice-v1.png",
+      letters: ["O", "A", "R", "Z", "R", "I"],
+    },
+    {
+      id: "letras-pt-ovos",
+      word: "ovos",
+      meaning: "Ovos",
+      language: "pt",
+      imageUrl: "/game-assets/bilinguisimo/letras/eggs-v1.png",
+      letters: ["S", "O", "V", "A", "O", "E"],
+    },
+    {
+      id: "letras-pt-salada",
+      word: "salada",
+      meaning: "Salada",
+      language: "pt",
+      imageUrl: "/game-assets/bilinguisimo/letras/salad-v1.png",
+      letters: ["L", "S", "A", "D", "A", "E", "A"],
+    },
+    {
+      id: "letras-pt-refrigerante",
+      word: "refrigerante",
+      meaning: "Refrigerante",
+      language: "pt",
+      imageUrl: "/game-assets/bilinguisimo/letras/soda-v1.png",
+      letters: ["R", "E", "F", "R", "I", "G", "E", "R", "A", "N", "T", "E"],
+    },
+  ];
+
+  for (const [index, item] of letrasWords.entries()) {
+    await prisma.letrasCrackWord.upsert({
+      where: { id: item.id },
+      update: {
+        gameId: gameIds.LETRAS,
+        word: item.word,
+        meaning: item.meaning,
+        imageUrl: item.imageUrl,
+        language: item.language,
+        active: true,
+        order: index,
+        letters: item.letters,
+      },
+      create: {
+        id: item.id,
+        gameId: gameIds.LETRAS,
+        word: item.word,
+        meaning: item.meaning,
+        imageUrl: item.imageUrl,
+        language: item.language,
+        active: true,
+        order: index,
+        letters: item.letters,
+      },
+    });
+    console.log(`    ✔ Letras de Crack: ${item.word} (${item.language})`);
+  }
+
+  const alimentacionWords: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    audioUrl: string | null;
+    isHealthy: boolean;
+    language: string;
+  }[] = [
+    {
+      id: "alim-manzana",
+      name: "Manzana",
+      imageUrl: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: true,
+      language: "es",
+    },
+    {
+      id: "alim-banana",
+      name: "Banana",
+      imageUrl: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: true,
+      language: "es",
+    },
+    {
+      id: "alim-zanahoria",
+      name: "Zanahoria",
+      imageUrl: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: true,
+      language: "es",
+    },
+    {
+      id: "alim-brocoli",
+      name: "Brócoli",
+      imageUrl: "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: true,
+      language: "es",
+    },
+    {
+      id: "alim-pescado",
+      name: "Pescado",
+      imageUrl: "https://images.unsplash.com/photo-1544943910-4c1dc44a2e85?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: true,
+      language: "es",
+    },
+    {
+      id: "alim-hamburguesa",
+      name: "Hamburguesa",
+      imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: false,
+      language: "es",
+    },
+    {
+      id: "alim-papas-fritas",
+      name: "Papas fritas",
+      imageUrl: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: false,
+      language: "es",
+    },
+    {
+      id: "alim-refresco",
+      name: "Refresco",
+      imageUrl: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: false,
+      language: "es",
+    },
+    {
+      id: "alim-donut",
+      name: "Donut",
+      imageUrl: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: false,
+      language: "es",
+    },
+    {
+      id: "alim-dulces",
+      name: "Dulces",
+      imageUrl: "https://images.unsplash.com/photo-1553909489-cd47e0ef937f?w=400&h=400&fit=crop",
+      audioUrl: null,
+      isHealthy: false,
+      language: "es",
+    },
+  ];
+
+  for (const [index, item] of alimentacionWords.entries()) {
+    await prisma.alimentacionWord.upsert({
+      where: { id: item.id },
+      update: {
+        gameId: gameIds.ALIMENTACION,
+        name: item.name,
+        imageUrl: item.imageUrl,
+        audioUrl: item.audioUrl,
+        isHealthy: item.isHealthy,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+      create: {
+        id: item.id,
+        gameId: gameIds.ALIMENTACION,
+        name: item.name,
+        imageUrl: item.imageUrl,
+        audioUrl: item.audioUrl,
+        isHealthy: item.isHealthy,
+        language: item.language,
+        active: true,
+        order: index,
+      },
+    });
+    console.log(`    ✔ Alimentación: ${item.name} (${item.isHealthy ? "saludable" : "no saludable"})`);
+  }
+
+  console.log("Seed completado.");
 }
 
 main()

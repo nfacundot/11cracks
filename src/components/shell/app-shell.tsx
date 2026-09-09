@@ -26,7 +26,7 @@ const roleNames: Record<ShellRole, string> = {
 const profileHrefByRole: Record<ShellRole, string> = {
   player: "/jugador/profile",
   coach: "/coach/perfil",
-  admin: "/admin/perfil",
+  admin: "/admin/profile",
   superadmin: "/superadmin/perfil",
 };
 

@@ -6,6 +6,7 @@ export type PlayerRpgData = {
   xpToNext: number;
   streakCurrent: number;
   streakBest: number;
+  streakProgress: number;
   nextMilestone: number;
   nextRewardTitle: string;
   nextActionTitle?: string;

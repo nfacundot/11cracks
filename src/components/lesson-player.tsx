@@ -12,7 +12,7 @@ export type PlayerQuestion = {
   prompt: string;
   explanation?: string | null;
   timeSeconds?: number | null;
-  options: { id: string; text: string }[];
+  options: { id: string; text: string; imageUrl?: string | null }[];
 };
 
 export type PlayerLesson = {
@@ -20,6 +20,9 @@ export type PlayerLesson = {
   title: string;
   emoji: string;
   xpReward: number;
+  type?: string;
+  optionMode?: "TEXT" | "IMAGE" | "BOTH";
+  timeSeconds?: number | null;
 };
 
 const MAX_HEARTS = 3;
@@ -27,9 +30,11 @@ const MAX_HEARTS = 3;
 export function LessonPlayer({
   lesson,
   questions,
+  returnHref = "/jugador/learn",
 }: {
   lesson: PlayerLesson;
   questions: PlayerQuestion[];
+  returnHref?: string;
 }) {
   const [phase, setPhase] = useState<"intro" | "question" | "feedback" | "results">("intro");
   const [qIndex, setQIndex] = useState(0);
@@ -47,6 +52,16 @@ export function LessonPlayer({
   const isLast = qIndex === total - 1;
   const isPerfect = correctCount === total;
 
+  const lessonSeconds = useCallback(
+    (qi: number) => {
+      const q = questions[qi];
+      if (q?.timeSeconds) return q.timeSeconds;
+      if (lesson.type === "CONTRARRELOJ") return Number(lesson.timeSeconds) || 10;
+      return null;
+    },
+    [questions, lesson]
+  );
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clearTimer = useCallback(() => {
@@ -61,7 +76,11 @@ export function LessonPlayer({
   }, [clearTimer]);
 
   useEffect(() => {
-    if (phase !== "question" || !question?.timeSeconds) return;
+    if (phase !== "question") return;
+    const secs =
+      questions[qIndex]?.timeSeconds ??
+      (lesson.type === "CONTRARRELOJ" ? Number(lesson.timeSeconds) || 10 : null);
+    if (!secs) return;
     timerRef.current = setInterval(() => {
       setSecondsLeft((s) => {
         if (s === null || s <= 1) return 0;
@@ -69,9 +88,9 @@ export function LessonPlayer({
       });
     }, 1000);
     return clearTimer;
-  }, [phase, question, clearTimer]);
+  }, [phase, qIndex, questions, lesson, clearTimer]);
 
-  const timeout = secondsLeft === 0 && phase === "question" && !!question?.timeSeconds;
+  const timeout = secondsLeft === 0 && phase === "question" && !!lessonSeconds(qIndex);
 
   useEffect(() => {
     if (!timeout || busy) return;
@@ -133,10 +152,10 @@ export function LessonPlayer({
       return;
     }
 
-    setSecondsLeft(questions[qIndex + 1]?.timeSeconds ?? null);
+    setSecondsLeft(lessonSeconds(qIndex + 1));
     setQIndex((i) => i + 1);
     setPhase("question");
-  }, [clearTimer, isLast, lesson.id, correctCount, total, questions, qIndex]);
+  }, [clearTimer, isLast, lesson.id, correctCount, total, qIndex, lessonSeconds]);
 
   const resetQuiz = useCallback(() => {
     clearTimer();
@@ -152,6 +171,7 @@ export function LessonPlayer({
   }, [clearTimer]);
 
   const progressPct = Math.round((qIndex / total) * 100);
+  const timedSeconds = lesson.type === "CONTRARRELOJ" ? Number(lesson.timeSeconds) || 10 : null;
 
   if (phase === "intro") {
     return (
@@ -163,11 +183,17 @@ export function LessonPlayer({
           <h1 className="text-2xl font-black">{lesson.title}</h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {total} preguntas · {lesson.xpReward} XP · 3 corazones
+            {timedSeconds ? ` · ⏱ ${timedSeconds}s por pregunta` : ""}
+            {lesson.optionMode === "IMAGE"
+              ? " · 🖼️ opciones por imagen"
+              : lesson.optionMode === "BOTH"
+                ? " · 🖼️ texto e imagen"
+                : ""}
           </p>
         </div>
         <button
           onClick={() => {
-            setSecondsLeft(question?.timeSeconds ?? null);
+            setSecondsLeft(lessonSeconds(0));
             setPhase("question");
           }}
           className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
@@ -236,14 +262,14 @@ export function LessonPlayer({
             </button>
           ) : (
             <Link
-              href="/jugador/learn"
+              href={returnHref}
               className="w-full rounded-2xl bg-green-500 py-4 text-center text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
             >
               Continuar
             </Link>
           )}
           <Link
-            href="/jugador/learn"
+            href={returnHref}
             className="w-full rounded-2xl border-2 border-green-200 py-3 text-center font-bold text-green-700 transition hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950/40"
           >
             Volver al camino
@@ -263,7 +289,7 @@ export function LessonPlayer({
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Link
-          href="/jugador/learn"
+          href={returnHref}
           className="rounded-full p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
           aria-label="Salir"
         >
@@ -285,7 +311,7 @@ export function LessonPlayer({
         </div>
       </div>
 
-      {question.timeSeconds && (
+      {lessonSeconds(qIndex) && (
         <div className="flex items-center justify-between text-xs font-bold text-zinc-500 dark:text-zinc-400">
           <span>Tiempo</span>
           <div className="flex items-center gap-1">
@@ -322,6 +348,10 @@ export function LessonPlayer({
                 style = "bg-white/50 text-zinc-400 border-zinc-200 dark:bg-emerald-900/50 dark:text-zinc-500 dark:border-zinc-700";
               }
 
+              const isImageMode = lesson.optionMode === "IMAGE";
+              const showImage = !!option.imageUrl && lesson.optionMode !== "TEXT";
+              const showText = !isImageMode;
+
               return (
                 <button
                   key={option.id}
@@ -332,7 +362,17 @@ export function LessonPlayer({
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-300">
                     {["A", "B", "C", "D"][i] ?? i + 1}
                   </span>
-                  <span className="flex-1">{option.text}</span>
+                  <span className="flex flex-1 items-center gap-3">
+                    {showImage && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={option.imageUrl ?? ""}
+                        alt=""
+                        className="h-12 w-12 shrink-0 rounded-xl object-cover"
+                      />
+                    )}
+                    {showText && <span className="flex-1">{option.text}</span>}
+                  </span>
                   {isFeedback && showCorrect && option.id === selectedId && (
                     <CheckIcon className="h-5 w-5" />
                   )}

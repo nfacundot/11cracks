@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GlobalHero, globalStyles as S } from "@/components/admin/global-hero";
+import { PencilIcon } from "@/components/icons";
 import { Modal } from "@/components/admin/modal";
 import {
   saveAlignment,
@@ -29,12 +30,29 @@ type Trazo = { color: string; width: number; alpha: number; puntos: Punto[] };
 
 const FORMACIONES = ["4-3-3", "4-4-2", "3-5-2", "4-5-1"];
 
-const COLORES = [
-  { valor: "#F3F0E8", nombre: "Blanco" },
-  { valor: "#E3C065", nombre: "Dorado" },
-  { valor: "#EF4444", nombre: "Rojo" },
-  { valor: "#3B82F6", nombre: "Azul" },
-];
+function MoveIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M5 9l-3 3 3 3" />
+      <path d="M9 5l3-3 3 3" />
+      <path d="M15 19l-3 3-3-3" />
+      <path d="M19 9l3 3-3 3" />
+      <path d="M2 12h20" />
+      <path d="M12 2v20" />
+    </svg>
+  );
+}
+
+function MarkerIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="m12 19 7-7 3 3-7 7-3-3z" />
+      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+      <path d="M2 2l7.586 7.586" />
+      <circle cx="11" cy="11" r="2" />
+    </svg>
+  );
+}
 
 const POSICION_LABEL: Record<string, string> = {
   POR: "Portero",
@@ -121,6 +139,11 @@ function pintarTrazo(ctx: CanvasRenderingContext2D, t: Trazo, w: number, h: numb
   ctx.globalAlpha = 1;
 }
 
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.replace("#", ""), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
 const toolCls = (activo: boolean) =>
   `rounded-[8px] border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition ${
     activo
@@ -139,6 +162,7 @@ export function CanchaView({
   initialAlignmentId = null,
   readOnly = false,
   meId = null,
+  playerWindow = false,
 }: {
   teamId: string | null;
   teamName: string | null;
@@ -150,6 +174,7 @@ export function CanchaView({
   initialAlignmentId?: string | null;
   readOnly?: boolean;
   meId?: string | null;
+  playerWindow?: boolean;
 }) {
   const [formacion, setFormacion] = useState(
     FORMACIONES.includes(initialFormation) ? initialFormation : initialFormation || "4-3-3",
@@ -159,7 +184,9 @@ export function CanchaView({
   );
   const [dragId, setDragId] = useState<string | null>(null);
   const [tool, setTool] = useState<"mover" | "lapiz" | "marcador">("mover");
-  const [color, setColor] = useState(COLORES[0].valor);
+  const [color, setColor] = useState("#F3F0E8");
+  const [alpha, setAlpha] = useState(1);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [trazos, setTrazos] = useState<Trazo[]>(initialTrazos);
   const [alignmentId, setAlignmentId] = useState<string | null>(initialAlignmentId);
   const [alignmentList, setAlignmentList] = useState<AlignmentSummary[]>(alignments);
@@ -454,7 +481,7 @@ export function CanchaView({
     trazoActual.current = {
       color,
       width: tool === "marcador" ? 9 : 2.5,
-      alpha: tool === "marcador" ? 0.45 : 1,
+      alpha,
       puntos: [puntoDe(e)],
     };
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -503,22 +530,24 @@ export function CanchaView({
             : null;
 
   return (
-    <div className="flex flex-col gap-6 pt-12">
-      <GlobalHero
-        eyebrow={readOnly ? "CANCHA · TIEMPO REAL" : "COACH · FIELD BOARD"}
-        title="Alineación"
-        subtitle={
-          readOnly
-            ? teamName
-              ? `El tablero táctico de ${teamName}, en vivo.`
-              : "El tablero táctico de tu equipo, en vivo."
-            : teamName
-              ? `Organiza a ${teamName} y publica la formación.`
-              : "Organiza tu equipo y publica la formación."
-        }
-      />
+    <div className={playerWindow ? "player-alineacion__wrap" : "flex flex-col gap-6 pt-12"}>
+      {!playerWindow ? (
+        <GlobalHero
+          eyebrow={readOnly ? "CANCHA · TIEMPO REAL" : "COACH · FIELD BOARD"}
+          title="Alineación"
+          subtitle={
+            readOnly
+              ? teamName
+                ? `El tablero táctico de ${teamName}, en vivo.`
+                : "El tablero táctico de tu equipo, en vivo."
+              : teamName
+                ? `Organiza a ${teamName} y publica la formación.`
+                : "Organiza tu equipo y publica la formación."
+          }
+        />
+      ) : null}
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className={playerWindow ? "player-alineacion__panel" : "rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6"}>
         {/* ─── Header del panel ─── */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {readOnly ? (
@@ -667,51 +696,8 @@ export function CanchaView({
               )}
             </div>
 
-            {/* ─── Herramientas de trazos ─── */}
-            <div className="flex flex-wrap items-center gap-2 rounded-[10px] border border-white/[0.05] bg-white/[0.02] px-3 py-2">
-              <button type="button" onClick={() => setTool("mover")} className={toolCls(tool === "mover")} style={{ fontFamily: S.barlow }}>
-                ✥ Mover
-              </button>
-              <button type="button" onClick={() => setTool("lapiz")} className={toolCls(tool === "lapiz")} style={{ fontFamily: S.barlow }}>
-                ✏ Lápiz
-              </button>
-              <button type="button" onClick={() => setTool("marcador")} className={toolCls(tool === "marcador")} style={{ fontFamily: S.barlow }}>
-                ◍ Marcador
-              </button>
-              <span className="mx-1 h-5 w-px bg-white/10" aria-hidden />
-              {COLORES.map((c) => (
-                <button
-                  key={c.valor}
-                  type="button"
-                  title={c.nombre}
-                  onClick={() => setColor(c.valor)}
-                  aria-label={`Color ${c.nombre}`}
-                  className={`h-6 w-6 rounded-full border transition ${
-                    color === c.valor ? "scale-110 border-white ring-2 ring-[#C9A24A]" : "border-white/20 hover:scale-105"
-                  }`}
-                  style={{ backgroundColor: c.valor }}
-                />
-              ))}
-              <span className="mx-1 h-5 w-px bg-white/10" aria-hidden />
-              <button
-                type="button"
-                onClick={() => setTrazos((t) => t.slice(0, -1))}
-                disabled={trazos.length === 0}
-                className={toolCls(false) + " disabled:cursor-not-allowed disabled:opacity-40"}
-                style={{ fontFamily: S.barlow }}
-              >
-                ↩ Deshacer
-              </button>
-              <button
-                type="button"
-                onClick={() => setTrazos([])}
-                disabled={trazos.length === 0}
-                className={toolCls(false) + " disabled:cursor-not-allowed disabled:opacity-40"}
-                style={{ fontFamily: S.barlow }}
-              >
-                ✕ Borrar trazos
-              </button>
-            </div>
+            {/* ─── Herramientas de trazos: movidas al control flotante ─── */}
+            {/* (Ver botón ✏ dentro de la cancha) */}
           </div>
         )}
 
@@ -850,6 +836,119 @@ export function CanchaView({
                 </button>
               );
             })
+          )}
+
+          {/* ─── Control flotante: herramientas + color RGBA ─── */}
+          {!readOnly && (
+            <div className="absolute right-3 top-3 z-40 flex flex-col items-end gap-2">
+              <div className="group/fab relative">
+                <button
+                  type="button"
+                  onClick={() => setToolsOpen((o) => !o)}
+                  aria-expanded={toolsOpen}
+                  aria-label="Herramientas de cancha"
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-lg shadow-black/40 transition ${
+                    toolsOpen
+                      ? "border-[#C9A24A]/70 bg-[#C9A24A]/15 text-[#E3C065]"
+                      : "border-white/10 bg-[#080909]/90 text-[#F3F0E8] hover:border-white/25"
+                  }`}
+                  style={{ fontFamily: S.barlow }}
+                >
+                  <PencilIcon className="h-5 w-5" />
+                </button>
+                <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/fab:opacity-100">
+                  Herramientas de cancha
+                </span>
+              </div>
+              {toolsOpen && (
+                <div
+                  className="w-[15rem] rounded-[12px] border border-white/10 bg-[#080909]/95 p-3 shadow-2xl shadow-black/60 backdrop-blur"
+                  style={{ fontFamily: S.barlow }}
+                >
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">Herramientas</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { id: "mover" as const, icon: <MoveIcon className="h-4 w-4" />, label: "Mover", desc: "Arrastrar jugadores" },
+                      { id: "lapiz" as const, icon: <PencilIcon className="h-4 w-4" />, label: "Lápiz", desc: "Dibujar trazos finos" },
+                      { id: "marcador" as const, icon: <MarkerIcon className="h-4 w-4" />, label: "Marcador", desc: "Resaltar con trazo grueso" },
+                    ].map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setTool(t.id)}
+                        aria-label={t.desc}
+                        className={`group/tool relative flex flex-col items-center gap-1 rounded-[10px] border px-1 py-2 transition ${
+                          tool === t.id
+                            ? "border-[#C9A24A]/70 bg-[#C9A24A]/15 text-[#E3C065]"
+                            : "border-white/10 text-[#F3F0E8] hover:border-white/25 hover:bg-white/[0.03]"
+                        }`}
+                      >
+                        {t.icon}
+                        <span className="text-[9px] font-bold uppercase tracking-[0.08em]">{t.label}</span>
+                        <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/tool:opacity-100">
+                          {t.desc}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <p className="mb-2 mt-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">Color RGBA</p>
+                  <div className="flex items-center gap-2">
+                    <label
+                      className="group/color relative shrink-0 cursor-pointer"
+                      aria-label="Elegir color"
+                      title="Elegir color"
+                    >
+                      <input
+                        type="color"
+                        value={color}
+                        onChange={(e) => setColor(e.target.value)}
+                        className="sr-only"
+                      />
+                      <span
+                        className="block h-9 w-9 rounded-full border-2 border-white/25 shadow-inner shadow-black/40 transition group-hover/color:scale-110"
+                        style={{ background: `rgba(${hexToRgb(color).join(", ")}, ${alpha})` }}
+                      />
+                      <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/color:opacity-100">
+                        Elegir color
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={alpha}
+                      onChange={(e) => setAlpha(Number(e.target.value))}
+                      className="h-1.5 flex-1 accent-[#C9A24A]"
+                      aria-label="Opacidad (canal alfa)"
+                    />
+                    <span className="w-10 shrink-0 text-right text-[10px] font-bold text-[#E3C065]">
+                      {Math.round(alpha * 100)}%
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex gap-1.5 border-t border-white/[0.06] pt-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setTrazos((t) => t.slice(0, -1))}
+                      disabled={trazos.length === 0}
+                      className={toolCls(false) + " disabled:cursor-not-allowed disabled:opacity-40"}
+                    >
+                      ↩ Deshacer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTrazos([])}
+                      disabled={trazos.length === 0}
+                      className={toolCls(false) + " disabled:cursor-not-allowed disabled:opacity-40"}
+                    >
+                      ✕ Limpiar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Leyendas */}

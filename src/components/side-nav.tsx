@@ -9,10 +9,13 @@ import {
   CoinIcon,
   DumbbellIcon,
   HomeIcon,
+  MapIcon,
+  PlayIcon,
   SettingsIcon,
   StarIcon,
   TrophyIcon,
   UserIcon,
+  UserPlusIcon,
 } from "@/components/icons";
 import { roleLabel } from "@/lib/roles";
 
@@ -27,6 +30,9 @@ function groupsFor(): Group[] {
         { href: "/jugador", label: "Inicio", icon: <HomeIcon className="h-[18px] w-[18px]" /> },
         { href: "/jugador/progress", label: "Mi Progreso", icon: <BarChartIcon className="h-[18px] w-[18px]" /> },
         { href: "/jugador/entrenamiento", label: "Entrenamiento", icon: <DumbbellIcon className="h-[18px] w-[18px]" /> },
+        { href: "/jugador/camino", label: "El Camino", icon: <MapIcon className="h-[18px] w-[18px]" /> },
+        { href: "/jugador/videos", label: "Videos", icon: <PlayIcon className="h-[18px] w-[18px]" /> },
+        { href: "/jugador/postulaciones", label: "Postulaciones", icon: <UserPlusIcon className="h-[18px] w-[18px]" /> },
         { href: "/jugador/neurocracks", label: "NeuroCracks", icon: <StarIcon className="h-[18px] w-[18px]" /> },
       ],
     },

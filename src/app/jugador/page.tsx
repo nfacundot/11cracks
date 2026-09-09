@@ -1,71 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { PlayerHome, type PlayerHomeMetric } from "@/components/player/player-home";
+import { PlayerDashboard, type PlayerDashboardPending, type PlayerDashboardCard, type PlayerDashboardVideo } from "@/components/player/player-dashboard";
 import type { PlayerHomeEvolution } from "@/components/player/player-evolution-preview";
-import type { PlayerRpgData } from "@/components/player/player-rpg-home";
+import { seriesFor, buildRpgData } from "@/lib/player/metrics";
 
 export const metadata = { title: "Inicio" };
-
-const HERO = {
-  src: "/scenes/player/candidates/player-threshold-stadium-candidate-01.png",
-  focal: { x: 0.66, y: 0.5 },
-  mobileFocal: { x: 0.7, y: 0.44 },
-};
-
-type IndicatorRow = { name: string; percentage: number; category: string };
-
-function axisFromValues(values: number[]): [number, number, number, number, number, number] {
-  const filled = [...values];
-  while (filled.length < 6) filled.push(0);
-  return [filled[0], filled[1], filled[2], filled[3], filled[4], filled[5]].map((v) =>
-    Math.max(0, Math.min(100, Math.round(v) || 0)),
-  ) as [number, number, number, number, number, number];
-}
-
-function seriesFor(category: string, indicators: IndicatorRow[]) {
-  const rows = indicators.filter((i) => i.category === category).sort((a, b) => b.percentage - a.percentage).slice(0, 6);
-  const current = axisFromValues(rows.map((r) => r.percentage));
-  const previous = axisFromValues(rows.map((r) => Math.max(0, r.percentage - 15)));
-  return { label: category === "NEUROCRACKS" ? "NeuroCracks" : "Deporte", current, previous };
-}
-
-function levelInfo(xp: number) {
-  let level = 1;
-  let cumulative = 0;
-  while (cumulative + level * 200 <= xp) {
-    cumulative += level * 200;
-    level += 1;
-  }
-  const xpToNext = cumulative + level * 200;
-  return { level, xpToNext };
-}
-
-const REWARD_TITLES: Record<number, string> = {
-  10: "Kit del primer hito",
-  15: "Camiseta conmemorativa",
-  20: "Sesión con el equipo",
-  25: "Reconocimiento del club",
-  30: "Experiencia premium",
-};
-
-function rpgData(xp: number, currentStreak: number, bestStreak: number): PlayerRpgData {
-  const { level, xpToNext } = levelInfo(xp);
-  const nextMilestone = Math.max(10, (Math.floor(currentStreak / 5) + 1) * 5);
-  return {
-    level,
-    xp,
-    xpToNext,
-    streakCurrent: currentStreak,
-    streakBest: bestStreak,
-    nextMilestone,
-    nextRewardTitle: REWARD_TITLES[nextMilestone] ?? "Nueva recompensa",
-  };
-}
 
 export default async function JugadorHomePage() {
   const user = await requireUser();
 
-  const [indicators, membership, lessonProgress] = await Promise.all([
+  const [indicators, membership, lessons, progressRows] = await Promise.all([
     prisma.indicator.findMany({
       where: { userId: user.id },
       orderBy: { percentage: "desc" },
@@ -76,37 +20,64 @@ export default async function JugadorHomePage() {
       orderBy: { joinedAt: "asc" },
       select: { team: { select: { name: true } } },
     }),
-    prisma.lessonProgress.count({
-      where: {
-        userId: user.id,
-        status: "COMPLETED",
-      },
+    prisma.lesson.findMany({
+      orderBy: [{ type: "asc" }, { order: "asc" }],
+      select: { id: true, title: true, type: true },
+    }),
+    prisma.lessonProgress.findMany({
+      where: { userId: user.id, status: "COMPLETED" },
+      select: { lessonId: true },
     }),
   ]);
+
+  const completedIds = new Set(progressRows.map((row) => row.lessonId));
+  const completedLessons = completedIds.size;
+  const nextLesson = lessons.find((lesson) => !completedIds.has(lesson.id));
 
   const clubName = membership?.team.name;
   const scopeLabel = clubName ?? "Jugador — 11 Cracks";
 
-  const metrics: [PlayerHomeMetric, PlayerHomeMetric, PlayerHomeMetric] = [
-    { id: "consistency", icon: "achievements", label: "Racha actual", value: String(user.currentStreak), detail: `${user.currentStreak === 1 ? "día" : "días"}` },
-    { id: "xp", icon: "progress", label: "XP total", value: String(user.xp) },
-    { id: "lessons", icon: "training", label: "Lecciones", value: String(lessonProgress), detail: "completadas" },
-  ];
-
-  const hasProgress = indicators.length > 0 || lessonProgress > 0;
+  const hasProgress = indicators.length > 0 || completedLessons > 0;
   const nextStep = hasProgress
-    ? { title: "Continúa tu formación", description: "Retoma tu aprendizaje y suma puntos.", actionLabel: "Continuar", href: "/jugador/neurocracks" }
-    : { title: "Sigue creciendo hoy", description: "Explora una lección y continúa tu formación.", actionLabel: "Ir a estudiar", href: "/jugador/neurocracks" };
+    ? { kind: "continue", title: "Continúa tu formación", description: "Retoma tu aprendizaje y suma XP.", actionLabel: "Continuar", href: "/jugador/neurocracks/bilinguismo/gol-de-palabra" }
+    : { kind: "start", title: "Empieza tu recorrido", description: "Completa tu primera lección y enciende tu racha.", actionLabel: "Empezar", href: "/jugador/neurocracks/bilinguismo/gol-de-palabra" };
+
+  const nextMilestone = user.currentStreak > 0 ? (Math.floor(user.currentStreak / 7) + 1) * 7 : null;
+
+  const pending: PlayerDashboardPending[] = [];
+  if (nextLesson) {
+    pending.push({
+      id: `lesson-${nextLesson.id}`,
+      actionLabel: "ACTIVIDAD",
+      title: nextLesson.title,
+      description: "Completa esta lección para sumar XP.",
+      href: "/jugador/neurocracks",
+    });
+  }
+  if (nextMilestone) {
+    pending.push({
+      id: "streak-milestone",
+      actionLabel: "RACHA",
+      title: "Alcanza tu próximo hito",
+      description: `Faltan ${nextMilestone - user.currentStreak} días para el hito de ${nextMilestone} días.`,
+      href: "/jugador/progress",
+    });
+  }
+  if (user.bestStreak > 0) {
+    pending.push({
+      id: "best-record",
+      actionLabel: "RÉCORD",
+      title: "Supera tu mejor racha",
+      description: `Tu mejor marca es ${user.bestStreak} días.`,
+      href: "/jugador/progress",
+    });
+  }
 
   const racha = {
     streak: user.currentStreak,
     best: user.bestStreak,
     state: user.currentStreak > 0 ? "Activa" : "Sin racha",
-    explanation:
-      user.currentStreak > 0
-        ? `Llevas ${user.currentStreak} ${user.currentStreak === 1 ? "día" : "días"} consecutivos. Tu mejor marca es ${user.bestStreak}.`
-        : "Completa lecciones a diario para encender tu racha.",
-    nextMilestone: user.currentStreak > 0 ? (Math.floor(user.currentStreak / 7) + 1) * 7 : null,
+    nextMilestone,
   };
 
   const evolution: PlayerHomeEvolution = {
@@ -114,20 +85,37 @@ export default async function JugadorHomePage() {
     neurocracks: seriesFor("NEUROCRACKS", indicators),
   };
 
+  const card: PlayerDashboardCard = {
+    state: "next",
+    eyebrow: "TU PRÓXIMA CARTA",
+    badge: "En camino",
+    rarity: "Por descubrir",
+    category: "Camino de Crack",
+    title: "Tu próxima recompensa",
+    reason: "Sigue con tu actividad validada para acercarte.",
+    progress: null,
+    href: "/jugador/progress",
+    ctaLabel: "Ver progreso",
+  };
+
+  const video: PlayerDashboardVideo = {
+    state: "empty",
+  };
+
   return (
-    <PlayerHome
+    <PlayerDashboard
       name={user.name}
       avatarUrl={user.avatarUrl}
-      roleLabel="Jugador"
+      position={user.position}
       scopeLabel={scopeLabel}
-      heroSrc={HERO.src}
-      focal={HERO.focal}
-      mobileFocal={HERO.mobileFocal}
-      nextStep={nextStep}
-      racha={racha}
-      metrics={metrics}
       evolution={evolution}
-      rpg={rpgData(user.xp, user.currentStreak, user.bestStreak)}
+      racha={racha}
+      hours={null}
+      nextStep={nextStep}
+      pending={pending}
+      rpg={buildRpgData(user.xp, user.currentStreak, user.bestStreak)}
+      card={card}
+      video={video}
     />
   );
 }

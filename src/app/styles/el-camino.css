@@ -1,0 +1,366 @@
+/* El Camino: a path-first map, not a dashboard or activity grid. */
+.el-camino {
+  --path-accent: var(--context-neurocracks);
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 96rem);
+  min-height: calc(100svh - 4rem);
+  margin: 0 auto;
+  overflow: hidden;
+  padding: clamp(1.1rem, 3vw, 2.8rem) clamp(1rem, 4vw, 3.8rem) calc(var(--shell-mobile-dock-height) + 3.5rem + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 21%, color-mix(in oklch, var(--context-neurocracks) 14%, transparent), transparent 25rem),
+    linear-gradient(110deg, color-mix(in oklch, var(--surface-canvas-deep) 94%, #0b1830), var(--surface-canvas-deep));
+}
+.el-camino::before,
+.el-camino::after { position: absolute; z-index: -1; pointer-events: none; content: ""; }
+.el-camino::before { inset: 17rem -10rem auto; height: 22rem; opacity: .24; background: repeating-linear-gradient(90deg, transparent 0 6rem, color-mix(in oklch, var(--brand-gold) 15%, transparent) 6.05rem 6.1rem); transform: perspective(32rem) rotateX(62deg); transform-origin: top; }
+.el-camino::after { top: 31rem; right: 10%; width: 14rem; height: 14rem; border: 1px solid color-mix(in oklch, var(--brand-gold) 18%, transparent); border-radius: 50%; box-shadow: 0 0 0 2rem color-mix(in oklch, var(--brand-gold) 3%, transparent), 0 0 0 5rem color-mix(in oklch, var(--brand-gold) 2%, transparent); }
+.el-camino__header { display: flex; align-items: end; justify-content: space-between; gap: 2rem; max-width: 78rem; margin: 0 auto; }
+.el-camino__header-copy { min-width: 0; }
+.el-camino__eyebrow,
+.el-camino__map-heading > div > span,
+.el-camino__header-status > span { color: var(--brand-gold-bright); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
+.el-camino__header h1 { margin: .45rem 0 .6rem; color: var(--text-primary); font: 800 clamp(3.2rem, 8vw, 7.2rem)/.79 var(--font-display); letter-spacing: -.055em; text-transform: uppercase; }
+.el-camino__header h1 em { color: var(--path-accent); font-style: normal; }
+.el-camino__header p { max-width: 34rem; margin: 0; color: var(--text-secondary); font-size: .92rem; line-height: 1.45; }
+.el-camino__header-status { display: grid; min-width: 9.5rem; gap: .4rem; padding: .3rem 0 .5rem 1rem; border-left: 2px solid var(--path-accent); }
+.el-camino__header-status strong { color: var(--text-primary); font: 700 3rem/.78 var(--font-score); }
+.el-camino__header-status strong small { color: var(--text-muted); font-size: 1rem; }
+.el-camino__header-status i { display: block; width: 100%; height: .22rem; overflow: hidden; background: color-mix(in oklch, var(--text-primary) 14%, transparent); }
+.el-camino__header-status i::after { display: block; width: var(--progress); height: 100%; background: var(--path-accent); box-shadow: 0 0 .8rem color-mix(in oklch, var(--path-accent) 68%, transparent); content: ""; transition: width .45s var(--ease-standard); }
+.el-camino__toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 78rem; margin: clamp(1.5rem, 4vw, 2.5rem) auto 0; padding: .65rem 0; border-top: 1px solid color-mix(in oklch, var(--text-primary) 11%, transparent); border-bottom: 1px solid color-mix(in oklch, var(--text-primary) 11%, transparent); }
+.el-camino__legend { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.el-camino__legend span { color: var(--text-secondary); }
+.el-camino__legend b { width: 1.55rem; height: 1.55rem; font-size: .85rem; }
+.el-camino__legend span[data-state="COMPLETED"] b { color: var(--action-energy); }
+.el-camino__legend span[data-state="IN_PROGRESS"] b { color: var(--path-accent); }
+.el-camino__legend span[data-state="AVAILABLE"] b { color: var(--brand-gold-bright); }
+.el-camino__legend span[data-state="LOCKED"] b { color: var(--text-muted); }
+.el-camino__language { display: flex; gap: .35rem; }
+.el-camino__language button { display: inline-flex; min-height: var(--touch-target-min); align-items: center; gap: .45rem; padding: .45rem .75rem; border: 1px solid var(--border-subtle); color: var(--text-secondary); background: transparent; font: 700 var(--text-label)/1.2 var(--font-ui); letter-spacing: .03em; cursor: pointer; text-transform: uppercase; }
+.el-camino__language button span { color: var(--text-secondary); font: 500 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .01em; }
+.el-camino__language button[data-selected="true"] { border-color: var(--path-accent); color: var(--text-primary); background: color-mix(in oklch, var(--path-accent) 13%, transparent); }
+.el-camino__language button:focus-visible,
+.el-camino__node:focus-visible,
+.el-camino__detail-close:focus-visible,
+.el-camino__detail-action:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.el-camino__map { max-width: 78rem; margin: clamp(2rem, 5vw, 3.5rem) auto 0; }
+.el-camino__map-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+.el-camino__map-heading h2 { margin: .22rem 0 0; color: var(--text-primary); font: 700 clamp(2.2rem, 5vw, 4rem)/.8 var(--font-display); letter-spacing: -.035em; text-transform: uppercase; }
+.el-camino__map-heading p { max-width: 20rem; margin: 0; color: var(--text-secondary); font: 600 var(--text-label)/1.4 var(--font-ui); letter-spacing: .04em; text-align: right; text-transform: uppercase; }
+.el-camino__map-heading p strong { color: var(--path-accent); }
+.el-camino__route { position: relative; margin-top: 1.7rem; }
+.el-camino__stage-wrap { position: relative; }
+.el-camino__stage { position: relative; padding: .5rem 0 1.15rem; }
+.el-camino__stage[data-state="locked"] { opacity: .9; }
+.el-camino__landmark { display: flex; width: fit-content; max-width: 75%; align-items: center; gap: .7rem; margin: 0 auto .2rem; }
+.el-camino__landmark-icon { display: grid; width: 3.1rem; height: 3.1rem; flex: 0 0 auto; place-items: center; border: 1px solid color-mix(in oklch, var(--stage-accent, var(--path-accent)) 68%, transparent); color: var(--stage-accent, var(--path-accent)); background: color-mix(in oklch, var(--surface-panel) 84%, transparent); box-shadow: 0 .75rem 2rem color-mix(in oklch, var(--stage-accent, var(--path-accent)) 12%, transparent); transform: rotate(45deg); }
+.el-camino__landmark-icon svg { width: 1.55rem; height: 1.55rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.5; transform: rotate(-45deg); }
+.el-camino__landmark-copy { display: grid; gap: .12rem; }
+.el-camino__landmark-copy small { color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; }
+.el-camino__landmark-copy strong { color: var(--text-primary); font: 800 clamp(1.5rem, 3vw, 2.35rem)/.85 var(--font-display); text-transform: uppercase; }
+.el-camino__landmark-copy > span { color: var(--text-secondary); font-size: var(--text-small); }
+.el-camino__landmark[data-stage="casa"] { --stage-accent: var(--brand-gold-bright); }
+.el-camino__landmark[data-stage="entrenamiento"] { --stage-accent: var(--action-energy); }
+.el-camino__landmark[data-stage="gastronomia"] { --stage-accent: #f2a65a; }
+.el-camino__landmark[data-stage="hotel"] { --stage-accent: #6dd6e8; }
+.el-camino__landmark[data-stage="estadio"] { --stage-accent: #b39af5; }
+.el-camino__stage-track { position: relative; min-height: 12.5rem; }
+.el-camino__stage-track > svg { display: none; }
+.el-camino__stage-track > svg path,
+.el-camino__bridge path { fill: none; stroke: color-mix(in oklch, var(--path-accent) 56%, var(--brand-gold)); stroke-dasharray: .5rem .38rem; stroke-linecap: round; stroke-width: 1.15; vector-effect: non-scaling-stroke; }
+.el-camino__stage[data-state="completed"] .el-camino__stage-track > svg path { stroke: var(--action-energy); }
+.el-camino__nodes { position: relative; z-index: 1; display: grid; height: 100%; min-height: 12.5rem; grid-template-columns: repeat(3, 1fr); align-items: center; gap: .3rem; margin: 0 auto; padding: .6rem 2%; list-style: none; }
+.el-camino__nodes > div { display: flex; justify-content: center; min-width: 0; }
+.el-camino__stage[data-flow="forward"] .el-camino__nodes > div:nth-child(1) { transform: translateY(1.3rem); }
+.el-camino__stage[data-flow="forward"] .el-camino__nodes > div:nth-child(3) { transform: translateY(-1.3rem); }
+.el-camino__stage[data-flow="back"] .el-camino__nodes > div:nth-child(1) { transform: translateY(-1.3rem); }
+.el-camino__stage[data-flow="back"] .el-camino__nodes > div:nth-child(3) { transform: translateY(1.3rem); }
+.el-camino__node { position: relative; display: grid; justify-items: center; width: min(11rem, 100%); min-height: 7.4rem; gap: .35rem; padding: .2rem; border: 0; color: var(--text-primary); background: transparent; cursor: pointer; }
+.el-camino__node:disabled { cursor: not-allowed; }
+.el-camino__node-orb { position: relative; display: grid; width: 4.4rem; height: 4.4rem; place-items: center; border: 2px solid color-mix(in oklch, var(--text-muted) 42%, transparent); border-radius: 50%; color: var(--text-muted); background: radial-gradient(circle at 34% 28%, color-mix(in oklch, var(--surface-panel) 90%, white), var(--surface-canvas-deep)); box-shadow: 0 .65rem 1.8rem oklch(0 0 0 / .28); transition: transform .25s var(--ease-standard), border-color .25s var(--ease-standard), box-shadow .25s var(--ease-standard); }
+.el-camino__node-orb::after { position: absolute; inset: -.38rem; border: 1px solid color-mix(in oklch, var(--path-accent) 22%, transparent); border-radius: inherit; content: ""; }
+.el-camino__node-orb b { font: 700 1.55rem var(--font-score); }
+.el-camino__node-orb i { position: absolute; right: -.32rem; bottom: -.1rem; display: grid; width: 1.2rem; height: 1.2rem; place-items: center; border: 1px solid var(--surface-canvas-deep); border-radius: 50%; color: var(--surface-canvas-deep); background: var(--text-muted); font: 700 .58rem var(--font-score); font-style: normal; }
+.el-camino__node-copy { display: grid; max-width: 10.5rem; gap: .12rem; text-align: center; }
+.el-camino__node-copy strong { overflow-wrap: anywhere; color: var(--text-secondary); font: 700 var(--text-label)/1.15 var(--font-ui); letter-spacing: .02em; text-transform: uppercase; }
+.el-camino__node-copy small { color: var(--text-secondary); font: 600 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .03em; text-transform: uppercase; }
+.el-camino__node[data-state="COMPLETED"] .el-camino__node-orb { border-color: var(--action-energy); color: var(--action-energy); }
+.el-camino__node[data-state="COMPLETED"] .el-camino__node-orb i { color: var(--surface-canvas-deep); background: var(--action-energy); }
+.el-camino__node[data-state="IN_PROGRESS"] .el-camino__node-orb { border-color: var(--path-accent); color: var(--path-accent); box-shadow: 0 0 0 .4rem color-mix(in oklch, var(--path-accent) 10%, transparent), 0 0 2rem color-mix(in oklch, var(--path-accent) 30%, transparent); animation: el-camino-pulse 2.3s ease-in-out infinite; }
+.el-camino__node[data-state="IN_PROGRESS"] .el-camino__node-orb i,
+.el-camino__node[data-state="AVAILABLE"] .el-camino__node-orb i { color: var(--surface-canvas-deep); background: var(--path-accent); }
+.el-camino__node[data-state="AVAILABLE"] .el-camino__node-orb { border-color: var(--brand-gold-bright); color: var(--brand-gold-bright); }
+.el-camino__node:hover:not(:disabled) .el-camino__node-orb { border-color: var(--brand-gold-bright); transform: translateY(-.25rem) scale(1.04); }
+.el-camino__node[data-current="true"] .el-camino__node-copy strong { color: var(--text-primary); }
+.el-camino__current-tag { position: absolute; top: -.5rem; width: max-content; max-width: 8rem; padding: .28rem .45rem; color: var(--surface-canvas-deep); background: var(--brand-gold-bright); font: 800 var(--text-caption)/1.1 var(--font-ui); letter-spacing: .04em; text-transform: uppercase; }
+.el-camino__stage-caption { display: block; color: var(--text-secondary); font: 600 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .1em; text-align: center; text-transform: uppercase; }
+.el-camino__stage-completion { display: block; width: fit-content; margin: .65rem auto 0; padding: .45rem .65rem; border: 1px solid color-mix(in oklch, var(--action-energy) 58%, transparent); color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 8%, transparent); font: 800 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .05em; text-align: center; text-transform: uppercase; }
+.el-camino__bridge { display: none; }
+.el-camino__bridge svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.el-camino__bridge path { stroke: color-mix(in oklch, var(--brand-gold) 45%, var(--path-accent)); stroke-width: 1; }
+.el-camino__completion { max-width: 44rem; margin: 2rem auto -1rem; padding: 1.2rem; border: 1px solid var(--action-energy); background: linear-gradient(110deg, color-mix(in oklch, var(--action-energy) 12%, var(--surface-panel)), var(--surface-panel)); text-align: center; }
+.el-camino__completion span { color: var(--action-energy); font: 700 .65rem var(--font-display); letter-spacing: .15em; }
+.el-camino__completion h2 { margin: .4rem 0 .25rem; color: var(--text-primary); font: 800 clamp(2rem, 5vw, 3.5rem)/.85 var(--font-display); text-transform: uppercase; }
+.el-camino__completion p { margin: 0; color: var(--text-secondary); }
+.el-camino__footer { display: flex; justify-content: space-between; gap: 1rem; max-width: 78rem; margin: 1.2rem auto 0; padding-top: .8rem; border-top: 1px solid color-mix(in oklch, var(--text-primary) 16%, transparent); color: var(--text-secondary); font: 600 var(--text-caption)/1.35 var(--font-ui); letter-spacing: .05em; text-transform: uppercase; }
+.el-camino__footer span:last-child { max-width: 34rem; color: var(--text-secondary); font-weight: 500; letter-spacing: .01em; text-align: right; text-transform: none; }
+.el-camino__detail-layer { position: fixed; inset: 0; z-index: 60; display: flex; justify-content: flex-end; padding: clamp(1rem, 4vw, 3rem); background: oklch(0 0 0 / .54); animation: el-camino-fade .2s ease both; }
+.el-camino__detail { position: relative; width: min(23rem, 100%); align-self: center; max-height: min(42rem, calc(100svh - 2rem)); overflow: auto; padding: 2rem 1.5rem 1.35rem; border: 1px solid color-mix(in oklch, var(--path-accent) 48%, var(--border-subtle)); background: #100d14; box-shadow: 0 2rem 5rem oklch(0 0 0 / .46); animation: el-camino-detail-in .28s var(--ease-standard) both; }
+.el-camino__detail-close { position: absolute; top: .7rem; right: .7rem; display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border: 1px solid var(--border-subtle); color: var(--text-secondary); background: transparent; font-size: 1.5rem; cursor: pointer; }
+.el-camino__detail-kicker { display: flex; justify-content: space-between; gap: .5rem; color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+.el-camino__detail-kicker > span[data-state="IN_PROGRESS"] { color: var(--path-accent); }
+.el-camino__detail-kicker > span[data-state="AVAILABLE"] { color: var(--brand-gold-bright); }
+.el-camino__detail-kicker > span[data-state="COMPLETED"] { color: var(--action-energy); }
+.el-camino__detail h2 { margin: 1.1rem 0 .35rem; color: var(--text-primary); font: 800 clamp(2.4rem, 6vw, 4rem)/.8 var(--font-display); text-transform: uppercase; }
+.el-camino__detail-context { margin: 0; color: var(--text-secondary); font-size: .9rem; line-height: 1.45; }
+.el-camino__detail-facts { display: grid; gap: .55rem; margin: 1.4rem 0; padding: 1rem 0; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); }
+.el-camino__detail-facts div { display: flex; justify-content: space-between; gap: .8rem; }
+.el-camino__detail-facts dt { color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .08em; }
+.el-camino__detail-facts dd { margin: 0; color: var(--text-primary); font-size: var(--text-small); text-align: right; }
+.el-camino__detail-schedule { display: grid; gap: .2rem; margin-bottom: 1.15rem; padding: .75rem; border-left: 2px solid var(--text-muted); background: color-mix(in oklch, var(--surface-panel) 78%, transparent); }
+.el-camino__detail-schedule[data-unlocked="true"] { border-color: var(--action-energy); }
+.el-camino__detail-schedule small { color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .08em; }
+.el-camino__detail-schedule strong { color: var(--text-primary); font: 700 1rem var(--font-display); text-transform: uppercase; }
+.el-camino__detail-schedule span { color: var(--text-secondary); font-size: .75rem; }
+.el-camino__detail-action { display: flex; min-height: 3rem; align-items: center; justify-content: space-between; padding: 0 .9rem; border: 1px solid var(--brand-gold-bright); color: var(--surface-canvas-deep); background: var(--brand-gold-bright); font: 800 .76rem var(--font-display); letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+.el-camino__detail-action--disabled { border-color: var(--border-subtle); color: var(--text-muted); background: transparent; }
+.el-camino__detail-footnote { margin: .9rem 0 0; color: var(--text-secondary); font-size: var(--text-caption); line-height: 1.45; }
+.el-camino__detail-game { display: block; margin-top: 1.2rem; color: color-mix(in oklch, var(--path-accent) 70%, var(--text-muted)); font: 700 .58rem var(--font-display); letter-spacing: .15em; text-transform: uppercase; }
+.el-camino__demo { max-width: 62rem; margin: 2rem auto 0; color: var(--text-muted); font-size: .7rem; }
+.el-camino__demo summary { cursor: pointer; }
+.el-camino__demo > div { display: flex; flex-wrap: wrap; gap: .4rem; padding-top: .6rem; }
+.el-camino__demo button { padding: .4rem .55rem; border: 1px solid var(--border-subtle); color: var(--text-secondary); background: transparent; font: 700 .6rem var(--font-display); text-transform: uppercase; cursor: pointer; }
+@keyframes el-camino-pulse { 0%, 100% { box-shadow: 0 0 0 .35rem color-mix(in oklch, var(--path-accent) 8%, transparent), 0 0 1.5rem color-mix(in oklch, var(--path-accent) 18%, transparent); } 50% { box-shadow: 0 0 0 .6rem color-mix(in oklch, var(--path-accent) 4%, transparent), 0 0 2.5rem color-mix(in oklch, var(--path-accent) 33%, transparent); } }
+@keyframes el-camino-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes el-camino-detail-in { from { opacity: 0; transform: translateX(1rem); } to { opacity: 1; transform: translateX(0); } }
+@media (max-width: 48rem) {
+  .el-camino { min-height: calc(100svh - 3.5rem); padding-right: .8rem; padding-left: .8rem; }
+  .el-camino__header { align-items: start; }
+  .el-camino__header h1 { font-size: clamp(3.15rem, 16vw, 5rem); }
+  .el-camino__header p { max-width: 19rem; font-size: .78rem; }
+  .el-camino__header-status { min-width: 5rem; padding-left: .55rem; }
+  .el-camino__header-status strong { font-size: 2.2rem; }
+  .el-camino__toolbar { display: grid; gap: .7rem; }
+  .el-camino__legend { gap: .35rem .7rem; }
+  .el-camino__legend span { font-size: var(--text-caption); }
+  .el-camino__language { justify-content: flex-start; }
+  .el-camino__language button { min-height: 2.7rem; }
+  .el-camino__map-heading { display: grid; align-items: start; gap: .65rem; }
+  .el-camino__map-heading p { max-width: none; text-align: left; }
+  .el-camino__map-heading h2 { font-size: 3rem; }
+  .el-camino__route { margin-top: 1rem; }
+  .el-camino__landmark { max-width: 90%; margin-bottom: .15rem; }
+  .el-camino__landmark-icon { width: 2.55rem; height: 2.55rem; }
+  .el-camino__landmark-icon svg { width: 1.25rem; height: 1.25rem; }
+  .el-camino__landmark-copy strong { font-size: 1.8rem; }
+  .el-camino__stage-track, .el-camino__nodes { min-height: 8.8rem; }
+  .el-camino__stage-track > svg { inset: .4rem 3% 1.5rem; width: 94%; }
+  .el-camino__nodes { padding-right: 0; padding-left: 0; }
+  .el-camino__node { min-height: 5.9rem; }
+  .el-camino__node-orb { width: 3.15rem; height: 3.15rem; }
+  .el-camino__node-copy strong { font-size: var(--text-caption); }
+  .el-camino__node-copy small { font-size: var(--text-caption); }
+  .el-camino__current-tag { top: -.35rem; max-width: 6.7rem; font-size: .625rem; }
+  .el-camino__bridge { margin-right: 3%; margin-left: 3%; }
+  .el-camino__footer { display: grid; gap: .5rem; font-size: var(--text-caption); }
+  .el-camino__footer span:last-child { text-align: left; }
+  .el-camino__detail-layer { align-items: end; padding: 0; }
+  .el-camino__detail { width: 100%; max-height: min(76svh, 38rem); padding: 1.7rem 1.1rem calc(var(--shell-mobile-dock-height) + 1.2rem); border-right: 0; border-bottom: 0; border-left: 0; animation-name: el-camino-sheet-in; }
+  .el-camino__detail h2 { font-size: 3.2rem; }
+  .el-camino__detail-close { top: .5rem; right: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-camino *, .el-camino *::before, .el-camino *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+@keyframes el-camino-sheet-in { from { opacity: 0; transform: translateY(1.2rem); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mission gate: the learning requirement and its schedule-access outcome are
+   one progression object. Keep the content readable and let the reward carry
+   enough visual weight to be understood before the supporting facts. */
+.el-camino__mission-gate {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  border: 1px solid color-mix(in oklch, var(--path-accent) 40%, var(--border-subtle));
+  border-radius: var(--shape-surface);
+  background:
+    linear-gradient(145deg, color-mix(in oklch, var(--path-accent) 12%, var(--surface-panel)), color-mix(in oklch, var(--surface-canvas-deep) 86%, transparent)),
+    var(--surface-panel);
+  box-shadow: 0 1rem 2.5rem oklch(0 0 0 / .22), inset 0 1px 0 color-mix(in oklch, var(--text-primary) 7%, transparent);
+}
+.el-camino__mission-heading { display: grid; gap: var(--space-2); }
+.el-camino__mission-heading > div { display: grid; gap: var(--space-2); }
+.el-camino__mission-heading > div > span,
+.el-camino__mission-reward > div > span { color: var(--brand-gold-bright); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; }
+.el-camino__mission-heading h3 { margin: 0; color: var(--text-primary); font: 800 clamp(1.45rem, 4vw, 2.15rem)/.95 var(--font-display); text-transform: uppercase; }
+.el-camino__mission-heading p { max-width: 34ch; margin: 0; color: var(--text-secondary); font-size: var(--text-small); line-height: 1.45; }
+.el-camino__mission-progress { display: grid; gap: var(--space-2); }
+.el-camino__mission-progress-label { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.el-camino__mission-progress-label strong { color: var(--text-primary); font: 700 var(--text-small)/1.2 var(--font-ui); letter-spacing: .04em; text-transform: uppercase; }
+.el-camino__mission-progress-label span { color: var(--path-accent); font: 700 var(--text-small)/1.2 var(--font-score); }
+.el-camino__mission-segments { display: grid; grid-template-columns: repeat(auto-fit, minmax(2.25rem, 1fr)); gap: var(--space-2); min-height: .5rem; }
+.el-camino__mission-segments i { display: block; min-height: .5rem; border-radius: 999px; background: color-mix(in oklch, var(--text-primary) 17%, transparent); }
+.el-camino__mission-segments i[data-filled="true"] { background: var(--path-accent); box-shadow: 0 0 .9rem color-mix(in oklch, var(--path-accent) 32%, transparent); }
+.el-camino__mission-connector { display: grid; place-items: center; min-height: 1.25rem; color: var(--path-accent); }
+.el-camino__mission-connector svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.el-camino__mission-reward { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); align-items: center; padding: var(--space-4); border: 1px solid color-mix(in oklch, var(--brand-gold) 58%, var(--border-subtle)); border-radius: calc(var(--shape-surface) - .25rem); background: color-mix(in oklch, var(--surface-canvas-deep) 72%, var(--brand-gold) 4%); box-shadow: 0 .75rem 1.8rem oklch(0 0 0 / .18); }
+.el-camino__mission-reward-icon { display: grid; width: 3.1rem; height: 3.1rem; place-items: center; border: 1px solid color-mix(in oklch, var(--brand-gold-bright) 70%, transparent); border-radius: 50%; color: var(--brand-gold-bright); background: color-mix(in oklch, var(--brand-gold) 12%, var(--surface-canvas-deep)); }
+.el-camino__mission-reward-icon svg { width: 1.45rem; height: 1.45rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.65; }
+.el-camino__mission-reward > div { display: grid; gap: var(--space-1); min-width: 0; }
+.el-camino__mission-reward > div > span { color: var(--text-secondary); }
+.el-camino__mission-reward strong { color: var(--text-primary); font: 800 clamp(1.25rem, 4vw, 1.8rem)/.95 var(--font-display); text-transform: uppercase; }
+.el-camino__mission-reward p { margin: 0; color: var(--text-secondary); font-size: var(--text-small); line-height: 1.4; }
+.el-camino__mission-reward small { color: var(--text-secondary); font-size: var(--text-small); line-height: 1.3; }
+.el-camino__mission-action { width: 100%; min-height: 3rem; padding-inline: var(--space-4); font: 800 var(--text-label)/1.2 var(--font-ui); letter-spacing: .08em; }
+.el-camino__mission-requirements { display: grid; gap: var(--space-3); padding: var(--space-3); border: 1px solid color-mix(in oklch, var(--text-primary) 12%, transparent); border-radius: calc(var(--shape-surface) - .35rem); background: color-mix(in oklch, var(--surface-canvas-deep) 58%, transparent); }
+.el-camino__mission-requirements-title { color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .08em; }
+.el-camino__mission-requirement { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2); align-items: start; }
+.el-camino__mission-requirement-mark { display: grid; width: 1.5rem; height: 1.5rem; place-items: center; border: 1px solid color-mix(in oklch, var(--text-secondary) 48%, transparent); border-radius: 50%; color: var(--text-secondary); font: 700 .9rem/1 var(--font-ui); }
+.el-camino__mission-requirement[data-complete="true"] .el-camino__mission-requirement-mark { border-color: var(--action-energy); color: var(--action-energy); }
+.el-camino__mission-requirement > div { display: grid; gap: var(--space-1); min-width: 0; }
+.el-camino__mission-requirement strong { color: var(--text-primary); font: 700 var(--text-label)/1.2 var(--font-ui); letter-spacing: .03em; }
+.el-camino__mission-requirement > div > span { color: var(--text-secondary); font: 400 var(--text-small)/1.35 var(--font-ui); }
+.el-camino__mission-requirement--language { grid-template-columns: auto minmax(0, 1fr); }
+.el-camino__mission-language-list { grid-column: 2; display: grid; gap: var(--space-2); margin-top: var(--space-1); }
+.el-camino__mission-language { display: grid; grid-template-columns: minmax(5rem, auto) minmax(0, 1fr) auto; gap: var(--space-2); align-items: center; }
+.el-camino__mission-language > span:first-child,
+.el-camino__mission-language > strong { color: var(--text-primary); font: 700 var(--text-small)/1.2 var(--font-ui); }
+.el-camino__mission-language > strong { color: var(--text-secondary); font-size: var(--text-caption); font-variant-numeric: tabular-nums; }
+.el-camino__mission-language-segments { display: grid; grid-template-columns: repeat(3, minmax(1.5rem, 1fr)); gap: var(--space-1); min-height: .4rem; }
+.el-camino__mission-language-segments i { display: block; min-height: .4rem; border-radius: 999px; background: color-mix(in oklch, var(--text-primary) 17%, transparent); }
+.el-camino__mission-language-segments i[data-filled="true"] { background: var(--path-accent); box-shadow: 0 0 .65rem color-mix(in oklch, var(--path-accent) 28%, transparent); }
+.el-camino__mission-action--complete { color: var(--action-energy); border-color: color-mix(in oklch, var(--action-energy) 42%, var(--border-subtle)); background: color-mix(in oklch, var(--action-energy) 8%, var(--surface-panel)); }
+.el-camino__mission-gate[data-schedule-state="unlocked"] { border-color: color-mix(in oklch, var(--action-energy) 58%, var(--border-subtle)); }
+.el-camino__mission-gate[data-schedule-state="unlocked"] .el-camino__mission-reward { border-color: var(--action-energy); }
+.el-camino__mission-gate[data-schedule-state="unlocked"] .el-camino__mission-reward-icon { color: var(--action-energy); border-color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 12%, var(--surface-canvas-deep)); }
+.el-camino__mission-gate[data-schedule-state="unlocked"] .el-camino__mission-reward > div > span { color: var(--action-energy); }
+.el-camino__mission-gate[data-schedule-state="pending"] { border-color: color-mix(in oklch, var(--brand-gold) 62%, var(--border-subtle)); }
+.el-camino__mission-gate[data-schedule-state="pending"] .el-camino__mission-reward { border-color: color-mix(in oklch, var(--brand-gold) 75%, var(--border-subtle)); }
+
+@media (max-width: 48rem) {
+  .el-camino__mission-gate { margin: var(--space-4) 0; padding: var(--space-4); }
+  .el-camino__mission-heading p,
+  .el-camino__mission-reward p,
+  .el-camino__mission-reward small { font-size: var(--text-small); }
+  .el-camino__mission-language { grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr) auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .el-camino__mission-segments i { transition: none; }
+}
+
+/* ── El Camino home: selector de caminos (Bilingüismo + caminos de aprendizaje) ── */
+.el-camino-home { position: relative; z-index: 0; }
+.el-camino__paths { position: relative; z-index: 12; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; max-width: 78rem; margin: 0 auto; padding: clamp(1.1rem, 3vw, 2.4rem) 0 .7rem; border-bottom: 1px solid color-mix(in oklch, var(--text-primary) 11%, transparent); }
+.el-camino__paths-label { color: var(--text-secondary); font: 700 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
+.el-camino__paths-trigger { position: relative; min-width: min(24rem, 100%); }
+.el-camino__paths-button { display: flex; width: 100%; align-items: center; gap: .7rem; padding: .55rem .7rem; border: 1px solid color-mix(in oklch, var(--brand-gold) 45%, var(--border-subtle)); color: var(--text-primary); background: color-mix(in oklch, var(--surface-panel) 86%, transparent); cursor: pointer; text-align: left; }
+.el-camino__paths-button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.el-camino__paths-emoji { display: grid; width: 2.6rem; height: 2.6rem; flex: 0 0 auto; place-items: center; border: 1px solid color-mix(in oklch, var(--brand-gold-bright) 55%, transparent); border-radius: 50%; color: var(--brand-gold-bright); background: color-mix(in oklch, var(--brand-gold) 10%, transparent); font-size: 1.2rem; }
+.el-camino__paths-copy { display: grid; min-width: 0; gap: .08rem; }
+.el-camino__paths-copy small { color: var(--brand-gold-bright); font: 700 .6rem/1.2 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
+.el-camino__paths-copy strong { overflow: hidden; color: var(--text-primary); font: 700 1rem/1.1 var(--font-ui); letter-spacing: .02em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.el-camino__paths-copy > span { color: var(--text-secondary); font: 600 var(--text-caption)/1.2 var(--font-ui); }
+.el-camino__paths-chevron { margin-left: auto; color: var(--text-muted); font-size: .6rem; }
+.el-camino__paths-menu { position: absolute; top: calc(100% + .5rem); right: 0; left: 0; z-index: 5; display: grid; gap: .3rem; padding: .55rem; border: 1px solid color-mix(in oklch, var(--brand-gold) 42%, var(--border-subtle)); background: #100d14; box-shadow: 0 1.25rem 3rem oklch(0 0 0 / .5); animation: el-camino-path-menu-in .22s var(--ease-standard) both; }
+.el-camino__paths-menu > button { display: flex; align-items: center; gap: .7rem; padding: .6rem .6rem; border: 1px solid transparent; color: var(--text-secondary); background: transparent; cursor: pointer; text-align: left; }
+.el-camino__paths-menu > button:hover { border-color: var(--brand-gold-muted); background: color-mix(in oklch, var(--brand-gold) 8%, transparent); }
+.el-camino__paths-menu > button[data-selected="true"] { border-color: color-mix(in oklch, var(--path-accent) 55%, transparent); color: var(--text-primary); background: color-mix(in oklch, var(--path-accent) 10%, transparent); }
+.el-camino__paths-done { display: grid; width: 1.6rem; height: 1.6rem; flex: 0 0 auto; place-items: center; border-radius: 50%; color: var(--surface-canvas-deep); background: var(--action-energy); font: 700 .75rem/1 var(--font-ui); }
+.el-camino__paths-backdrop { position: fixed; inset: 0; z-index: 11; border: 0; background: transparent; cursor: default; }
+@keyframes el-camino-path-menu-in { from { opacity: 0; transform: translateY(-.35rem); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Caminos de aprendizaje: lecciones tipo /learn en diseño El Camino ── */
+.el-camino--lecciones { --path-accent: var(--action-lime); }
+.el-camino__clase-badge { display: inline-flex; min-height: var(--touch-target-min); align-items: center; gap: .45rem; padding: .45rem .75rem; border: 1px solid var(--border-subtle); color: var(--text-primary); background: color-mix(in oklch, var(--path-accent) 11%, transparent); font: 800 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+.el-camino__clase-badge span { color: var(--path-accent); }
+.el-camino__landmark--emoji .el-camino__landmark-icon { font-size: 1.35rem; color: var(--stage-accent, var(--path-accent)); }
+.el-camino__leccion-icon { display: grid; width: 3.6rem; height: 3.6rem; place-items: center; margin-top: 1.1rem; border-radius: 1rem; color: var(--surface-canvas-deep); font-size: 1.55rem; box-shadow: 0 .75rem 1.8rem oklch(0 0 0 / .26); }
+.el-camino--lecciones .el-camino__node[data-state="AVAILABLE"] .el-camino__node-orb,
+.el-camino--lecciones .el-camino__node:hover:not(:disabled) .el-camino__node-orb { border-color: var(--path-accent); color: var(--path-accent); }
+.el-camino--lecciones .el-camino__current-tag { color: var(--surface-canvas-deep); background: var(--path-accent); }
+
+/* ── El Camino mapa libre: temas posicionados por el admin (posX/posY) ── */
+.el-camino--map { --path-accent: var(--action-lime); }
+.el-camino--map .el-camino__map { max-width: 96rem; }
+.el-camino--map .el-camino__header,
+.el-camino--map .el-camino__toolbar,
+.el-camino--map .el-camino__footer { max-width: 96rem; }
+.el-camino__map-canvas { position: relative; margin-top: 1.7rem; overflow: hidden; border: 1px solid color-mix(in oklch, var(--brand-gold) 30%, var(--border-subtle)); border-radius: 1.2rem; background: color-mix(in oklch, var(--surface-canvas-deep) 72%, #0b1830); box-shadow: 0 1.5rem 3.5rem oklch(0 0 0 / .35), inset 0 1px 0 color-mix(in oklch, var(--text-primary) 8%, transparent); }
+.el-camino__map-canvas-bg { object-fit: contain; opacity: .55; }
+.el-camino__map-stage { position: absolute; z-index: 2; display: grid; justify-items: center; width: max-content; max-width: 18rem; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }
+.el-camino__map-stage-connector { display: none; }
+.el-camino__map-stage[data-state="completed"] .el-camino__map-stage-connector { background: linear-gradient(to bottom, var(--action-energy), transparent); }
+.el-camino__map-stage[data-state="locked"] { opacity: .82; }
+.el-camino--map .el-camino__landmark { max-width: none; margin: 0; }
+.el-camino--map .el-camino__landmark-icon { width: 3.6rem; height: 3.6rem; font-size: 1.5rem; }
+.el-camino--map .el-camino__landmark-copy strong { font-size: clamp(1.2rem, 2.6vw, 1.75rem); text-align: left; }
+.el-camino--map .el-camino__landmark-copy small { font-size: .68rem; text-align: left; }
+.el-camino__map-nodes { display: flex; flex-wrap: wrap; justify-content: center; gap: .2rem; margin-top: .15rem; padding: .4rem .5rem; border: 1px solid color-mix(in oklch, var(--text-primary) 14%, transparent); border-radius: .85rem; background: color-mix(in oklch, var(--surface-canvas-deep) 66%, transparent); backdrop-filter: blur(6px); }
+.el-camino--map .el-camino__node { width: min(10.5rem, 100%); min-height: 5.8rem; gap: .25rem; padding: .15rem; }
+.el-camino--map .el-camino__node-orb { width: 3.1rem; height: 3.1rem; font-size: 1.05rem; }
+.el-camino--map .el-camino__node-orb i { width: 1.2rem; height: 1.2rem; right: -.34rem; bottom: -.16rem; font-size: .56rem; }
+.el-camino--map .el-camino__node-copy { max-width: 10rem; }
+.el-camino--map .el-camino__node-copy strong { font-size: .72rem; }
+.el-camino--map .el-camino__node-copy small { font-size: .64rem; }
+.el-camino--map .el-camino__current-tag { top: -.42rem; max-width: 7rem; padding: .22rem .4rem; font-size: .56rem; }
+.el-camino--map .el-camino__stage-completion { margin: .5rem auto 0; padding: .32rem .5rem; font-size: .6rem; }
+@media (max-width: 48rem) {
+  .el-camino--map .el-camino__map-canvas { margin-top: 1.1rem; border-radius: .9rem; }
+  .el-camino--map .el-camino__landmark-copy { max-width: 7.5rem; }
+  .el-camino--map .el-camino__landmark-copy strong { font-size: 1.05rem; line-height: .8; }
+  .el-camino--map .el-camino__landmark-icon { width: 2.4rem; height: 2.4rem; font-size: 1.05rem; }
+  .el-camino--map .el-camino__node { width: min(7rem, 100%); min-height: 4.5rem; }
+  .el-camino--map .el-camino__node-orb { width: 2.2rem; height: 2.2rem; }
+  .el-camino__map-nodes { gap: .15rem; padding: .3rem; }
+}
+
+/* ── Fichas individuales de lección y conectores (modo mapa libre) ── */
+.el-camino__map-links { display: none; }
+.el-camino__map-links path { fill: none; overflow: visible; stroke: color-mix(in oklch, var(--path-accent) 62%, var(--brand-gold)); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 1px oklch(0 0 0 / .4)); }
+.el-camino__map-lesson { position: absolute; z-index: 2; display: grid; justify-items: center; width: max-content; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }
+.el-camino--map .el-camino__map-lesson .el-camino__node { display: grid; width: 7.6rem; min-height: 4.1rem; justify-items: center; gap: .2rem; padding: .3rem .45rem; border: 1px solid color-mix(in oklch, var(--text-primary) 16%, transparent); border-radius: .9rem; background: color-mix(in oklch, var(--surface-canvas-deep) 78%, transparent); box-shadow: 0 .4rem 1.1rem oklch(0 0 0 / .28); backdrop-filter: blur(7px); }
+.el-camino--map .el-camino__map-lesson .el-camino__node-orb { width: 2.15rem; height: 2.15rem; font-size: .78rem; box-shadow: 0 .3rem .8rem oklch(0 0 0 / .3); }
+.el-camino--map .el-camino__map-lesson .el-camino__node-orb i { width: 1rem; height: 1rem; right: -.28rem; bottom: -.12rem; font-size: .48rem; }
+
+/* ── Modo read-only (vista coach / vista previa) ── */
+.el-camino__landmark--readonly { pointer-events: none; }
+.el-camino__node--readonly { cursor: default !important; }
+.el-camino--map .el-camino__node--readonly:hover:not(:disabled) .el-camino__node-orb { border-color: color-mix(in oklch, var(--text-muted) 42%, transparent); transform: none; }
+
+/* ── Aviso de vista en tiempo real (coach) ── */
+.el-camino__coach-note { display: inline-block; padding: .4rem .75rem; border: 1px dashed color-mix(in oklch, var(--path-accent) 45%, var(--border-subtle)); border-radius: 999px; color: var(--text-secondary); background: color-mix(in oklch, var(--surface-panel) 55%, transparent); font: 700 .66rem var(--font-ui); letter-spacing: .04em; text-transform: uppercase; }
+
+/* ── Lección adaptada: shell de El Camino alrededor del LessonPlayer ── */
+.el-camino-lesson { min-height: 100svh; padding: clamp(1rem, 3vw, 2.4rem) clamp(1rem, 4vw, 3.8rem) calc(var(--shell-mobile-dock-height) + 3rem); background: radial-gradient(circle at 50% 18%, color-mix(in oklch, var(--context-neurocracks) 13%, transparent), transparent 22rem), linear-gradient(110deg, color-mix(in oklch, var(--surface-canvas-deep) 94%, #0b1830), var(--surface-canvas-deep)); }
+.el-camino-lesson__bar { display: flex; max-width: 46rem; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 auto .4rem; padding-bottom: .75rem; border-bottom: 1px solid color-mix(in oklch, var(--text-primary) 12%, transparent); }
+.el-camino-lesson__brand { color: var(--brand-gold-bright); font: 800 var(--text-caption)/1.2 var(--font-ui); letter-spacing: .14em; text-decoration: none; text-transform: uppercase; }
+.el-camino-lesson__exit { display: inline-flex; align-items: center; gap: .5rem; color: var(--text-secondary); font: 700 var(--text-label)/1.2 var(--font-ui); text-decoration: none; text-transform: uppercase; }
+.el-camino-lesson__exit i { display: grid; width: 1.6rem; height: 1.6rem; place-items: center; border: 1px solid var(--border-subtle); border-radius: 50%; font-style: normal; }
+.el-camino-lesson__stage { max-width: 46rem; margin: 0 auto; color: var(--text-primary); }
+.el-camino-lesson__stage h1 { color: var(--text-primary); }
+.el-camino-lesson .bg-green-500 { background: var(--brand-gold-bright) !important; border-color: var(--brand-gold-bright) !important; color: var(--surface-canvas-deep) !important; }
+.el-camino-lesson .bg-gradient-to-r, .el-camino-lesson .shadow-green-200, .el-camino-lesson .shadow-green-100, .el-camino-lesson .dark\:shadow-green-950 { box-shadow: none !important; }
+.el-camino-lesson .bg-white { background: var(--surface-panel) !important; color: var(--text-primary) !important; }
+.el-camino-lesson .text-zinc-700, .el-camino-lesson .text-emerald-950 { color: var(--text-primary) !important; }
+.el-camino-lesson .text-zinc-500 { color: var(--text-secondary) !important; }
+.el-camino-lesson .text-zinc-400 { color: var(--text-muted) !important; }
+.el-camino-lesson .border-zinc-200 { border-color: var(--border-subtle) !important; }
+.el-camino-lesson .border-green-200 { border-color: color-mix(in oklch, var(--brand-gold) 45%, var(--border-subtle)) !important; }
+.el-camino-lesson .text-green-700 { color: var(--brand-gold-bright) !important; }
+.el-camino-lesson .bg-zinc-100 { background: color-mix(in oklch, var(--text-primary) 10%, transparent) !important; }
+.el-camino-lesson .bg-zinc-200 { background: color-mix(in oklch, var(--text-primary) 15%, transparent) !important; }
+.el-camino-lesson .dark\:bg-emerald-900 { background: color-mix(in oklch, var(--surface-panel) 92%, transparent) !important; }
+.el-camino-lesson .dark\:bg-emerald-900\/50, .el-camino-lesson .dark\:bg-green-950\/50 { background: color-mix(in oklch, var(--surface-canvas-deep) 78%, transparent) !important; }
+.el-camino-lesson .bg-green-500.text-white { color: var(--surface-canvas-deep) !important; }
+@media (max-width: 48rem) {
+  .el-camino__paths { padding-top: 1rem; }
+  .el-camino__paths-trigger { width: 100%; }
+  .el-camino-lesson { padding-right: .8rem; padding-left: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-camino__paths-menu { animation: none; }
+}

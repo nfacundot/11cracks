@@ -21,8 +21,10 @@ export type EditableLessonData = {
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
     gameMode?: "ANAGRAM" | "INFOGRAMA" | null;
+    optionMode?: "TEXT" | "IMAGE" | "BOTH";
+    timeSeconds?: number | null;
     order: number;
     xpReward: number;
     temaId?: string | null;
@@ -61,6 +63,8 @@ export async function getEditableLesson(lessonId: string): Promise<EditableLesso
       color: lesson.color,
       type: lesson.type as EditableLessonData["defaultValues"]["type"],
       gameMode: lesson.gameMode as EditableLessonData["defaultValues"]["gameMode"],
+      optionMode: lesson.optionMode ?? "TEXT",
+      timeSeconds: lesson.timeSeconds,
       order: lesson.order,
       xpReward: lesson.xpReward,
       temaId: lesson.temaId,
@@ -181,17 +185,6 @@ export async function saveClase(prev: AdminState, formData: FormData): Promise<A
 export async function deleteClase(claseId: string) {
   await requireStaff();
 
-  const temas = await prisma.tema.findMany({
-    where: { claseId },
-    select: { id: true },
-  });
-  if (temas.length > 0) {
-    await prisma.tema.updateMany({
-      where: { claseId },
-      data: { claseId: null },
-    });
-  }
-
   await prisma.clase.delete({ where: { id: claseId } });
 
   revalidateStaff("/etapas");
@@ -204,7 +197,10 @@ export async function saveTema(prev: AdminState, formData: FormData): Promise<Ad
   await requireStaff();
 
   const id = String(formData.get("id") || "").trim();
-  const claseId = String(formData.get("claseId") || "").trim() || null;
+  const etapaIds = formData
+    .getAll("clases")
+    .map((v) => String(v).trim())
+    .filter(Boolean);
   const name = String(formData.get("name") || "").trim();
   const emoji = String(formData.get("emoji") || "⭐").trim().slice(0, 4);
   const color = String(formData.get("color") || "#16a34a").trim();
@@ -213,15 +209,51 @@ export async function saveTema(prev: AdminState, formData: FormData): Promise<Ad
 
   if (!name) return { error: "Escribe el nombre del tema" };
 
-  if (id) {
+  let temaId = id;
+  if (temaId) {
     await prisma.tema.update({
-      where: { id },
-      data: { claseId, name, emoji, color, order, xpReward },
+      where: { id: temaId },
+      data: {
+        name,
+        emoji,
+        color,
+        order,
+        xpReward,
+        clases: { set: etapaIds.map((claseId) => ({ id: claseId })) },
+      },
     });
   } else {
-    await prisma.tema.create({
-      data: { claseId, name, emoji, color, order, xpReward },
+    const created = await prisma.tema.create({
+      data: {
+        name,
+        emoji,
+        color,
+        order,
+        xpReward,
+        clases: { connect: etapaIds.map((claseId) => ({ id: claseId })) },
+      },
     });
+    temaId = created.id;
+  }
+
+  const tema = await prisma.tema.findUnique({
+    where: { id: temaId },
+    select: { posX: true, posY: true },
+  });
+  if (tema) {
+    await prisma.etapaTema.deleteMany({
+      where: { temaId, claseId: { notIn: etapaIds } },
+    });
+    await prisma.etapaLesson.deleteMany({
+      where: { claseId: { notIn: etapaIds }, lesson: { temaId } },
+    });
+    for (const claseId of etapaIds) {
+      await prisma.etapaTema.upsert({
+        where: { claseId_temaId: { claseId, temaId } },
+        update: {},
+        create: { claseId, temaId, posX: tema.posX, posY: tema.posY },
+      });
+    }
   }
 
   revalidateStaff("/etapas");
@@ -257,10 +289,28 @@ export async function assignTema(temaId: string, claseId: string) {
   const clase = await prisma.clase.findUnique({ where: { id: claseId } });
   if (!clase) return { error: "La clase no existe" };
 
-  const count = await prisma.tema.count({ where: { claseId } });
+  const tema = await prisma.tema.findUnique({ where: { id: temaId } });
+  if (!tema) return { error: "El tema no existe" };
+
+  const position: { posX?: number; posY?: number } =
+    tema.posX === 50 && tema.posY === 50
+      ? defaultPositionFor((await prisma.tema.count({ where: { clases: { some: { id: claseId } } } })))
+      : {};
+
   await prisma.tema.update({
     where: { id: temaId },
-    data: { claseId, ...defaultPositionFor(count) },
+    data: { clases: { connect: { id: claseId } }, ...position },
+  });
+
+  await prisma.etapaTema.upsert({
+    where: { claseId_temaId: { claseId, temaId } },
+    update: {},
+    create: {
+      claseId,
+      temaId,
+      posX: position.posX ?? tema.posX,
+      posY: position.posY ?? tema.posY,
+    },
   });
 
   revalidateStaff("/etapas");
@@ -272,27 +322,60 @@ export async function assignTema(temaId: string, claseId: string) {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
-export async function saveTemaPosition(temaId: string, posX: number, posY: number) {
+export async function saveTemaPosition(temaId: string, posX: number, posY: number, claseId: string) {
   await requireStaff();
 
-  if (!Number.isFinite(posX) || !Number.isFinite(posY)) {
+  if (!Number.isFinite(posX) || !Number.isFinite(posY) || !claseId) {
     return { error: "Posición inválida" };
   }
 
-  await prisma.tema.update({
-    where: { id: temaId },
-    data: { posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
+  await prisma.etapaTema.upsert({
+    where: { claseId_temaId: { claseId, temaId } },
+    update: { posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
+    create: { claseId, temaId, posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
   });
 
   revalidatePath("/jugador/learn");
+  revalidatePath("/jugador/neurocracks");
+  revalidatePath("/coach/camino");
   revalidateStaff("/caminos");
   return { success: "Posición guardada" };
 }
 
-export async function unassignTema(temaId: string) {
+export async function saveLeccionPosition(lessonId: string, posX: number, posY: number, claseId: string) {
   await requireStaff();
 
-  await prisma.tema.update({ where: { id: temaId }, data: { claseId: null } });
+  if (!Number.isFinite(posX) || !Number.isFinite(posY) || !claseId) {
+    return { error: "Posición inválida" };
+  }
+
+  await prisma.etapaLesson.upsert({
+    where: { claseId_lessonId: { claseId, lessonId } },
+    update: { posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
+    create: { claseId, lessonId, posX: clamp(posX, 3, 97), posY: clamp(posY, 3, 97) },
+  });
+
+  revalidatePath("/jugador/learn");
+  revalidatePath("/jugador/neurocracks");
+  revalidatePath("/coach/camino");
+  revalidateStaff("/caminos");
+  return { success: "Posición guardada" };
+}
+
+export async function unassignTema(temaId: string, claseId: string) {
+  await requireStaff();
+
+  if (!claseId) return { error: "Falta la clase" };
+
+  await prisma.tema.update({
+    where: { id: temaId },
+    data: { clases: { disconnect: { id: claseId } } },
+  });
+
+  await prisma.etapaTema.deleteMany({ where: { claseId, temaId } });
+  await prisma.etapaLesson.deleteMany({
+    where: { claseId, lesson: { temaId } },
+  });
 
   revalidateStaff("/etapas");
   revalidateStaff("/caminos");
@@ -351,17 +434,34 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   const type = String(formData.get("type") || "LESSON") as
     | "LESSON"
     | "QUIZ"
-    | "GAME";
+    | "GAME"
+    | "PREGUNTADOS"
+    | "CONTRARRELOJ";
   const gameMode = String(formData.get("gameMode") || "") as
     | ""
     | "ANAGRAM"
     | "INFOGRAMA";
+  const optionMode = String(formData.get("optionMode") || "TEXT") as
+    | "TEXT"
+    | "IMAGE"
+    | "BOTH";
+  const timeSecondsRaw = String(formData.get("timeSeconds") || "");
+  const timeSeconds =
+    timeSecondsRaw && Number(timeSecondsRaw) > 0
+      ? Math.max(1, Math.round(Number(timeSecondsRaw)))
+      : null;
   const order = Math.max(0, Math.round(Number(formData.get("order")) || 0));
   const xpReward = Math.max(0, Math.round(Number(formData.get("xpReward")) || 10));
   const questions = parseQuestions(String(formData.get("questions") || "[]"));
 
-  if (!["LESSON", "QUIZ", "GAME"].includes(type)) {
+  if (!["LESSON", "QUIZ", "GAME", "PREGUNTADOS", "CONTRARRELOJ"].includes(type)) {
     return { error: "Tipo de lección inválido" };
+  }
+  if (!["TEXT", "IMAGE", "BOTH"].includes(optionMode)) {
+    return { error: "Modo de opciones inválido" };
+  }
+  if (type === "CONTRARRELOJ" && !timeSeconds) {
+    return { error: "En Contrarreloj indica los segundos por pregunta" };
   }
   if (!title) return { error: "Escribe el título" };
   if (title.length > 80) return { error: "El título es demasiado largo" };
@@ -371,7 +471,8 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   if (questions.some((q) => !q.prompt)) {
     return { error: "Todas las preguntas necesitan enunciado" };
   }
-  const needsOptions = gameMode !== "ANAGRAM";
+  const isQuestionsGame = type === "PREGUNTADOS" || type === "CONTRARRELOJ";
+  const needsOptions = isQuestionsGame || gameMode !== "ANAGRAM";
   if (
     needsOptions &&
     questions.some(
@@ -382,6 +483,24 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     )
   ) {
     return { error: "Cada pregunta necesita opciones y al menos una correcta" };
+  }
+  if (isQuestionsGame) {
+    const barePrompt = questions.some((q) => q.type !== "MULTIPLE_CHOICE");
+    if (barePrompt) {
+      return { error: "En estas lecciones las preguntas deben ser de opción múltiple" };
+    }
+    if (questions.some((q) => q.options.length < 2 || q.options.length > 4)) {
+      return { error: "Cada pregunta necesita entre 2 y 4 opciones (A, B, C, D)" };
+    }
+    if (
+      optionMode !== "TEXT" &&
+      questions.some((q) => q.options.some((o) => !o.imageUrl))
+    ) {
+      return { error: "Con opciones por imagen, cada opción necesita una imagen" };
+    }
+    if (optionMode === "TEXT" && questions.some((q) => q.options.some((o) => o.imageUrl))) {
+      return { error: "Con opciones solo texto no se permiten imágenes en las opciones" };
+    }
   }
   if (gameMode === "INFOGRAMA") {
     if (questions.some((q) => q.options.length !== 4)) {
@@ -400,6 +519,8 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     color,
     type,
     gameMode: gameMode || null,
+    optionMode: isQuestionsGame ? optionMode : "TEXT",
+    timeSeconds: isQuestionsGame ? timeSeconds : null,
     order,
     xpReward,
   };
@@ -491,6 +612,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   revalidateStaff("/lessons");
   revalidateStaff("/juegos");
   revalidateStaff("/etapas");
+  revalidatePath("/admin/settings/lecciones");
   revalidatePath("/jugador/learn");
   revalidatePath("/jugador/games");
   return { success: id ? "Lección actualizada" : "Lección creada" };
@@ -508,6 +630,62 @@ export async function deleteLesson(lessonId: string) {
   return { success: "Lección eliminada" };
 }
 
+export async function addLessonsToTema(temaId: string, lessonIds: string[]) {
+  await requireStaff();
+
+  if (!temaId) return { error: "Falta la materia" };
+  if (!Array.isArray(lessonIds) || lessonIds.length === 0) {
+    return { error: "Selecciona al menos una lección" };
+  }
+
+  const tema = await prisma.tema.findUnique({ where: { id: temaId } });
+  if (!tema) return { error: "La materia no existe" };
+
+  const taken = await prisma.lesson.findMany({
+    where: { id: { in: lessonIds }, temaId: { not: null } },
+    select: { title: true },
+  });
+  if (taken.length > 0) {
+    return { error: `Ya están en otra materia: ${taken.map((l) => l.title).join(", ")}` };
+  }
+
+  await prisma.lesson.updateMany({
+    where: { id: { in: lessonIds }, temaId: null },
+    data: { temaId },
+  });
+
+  revalidateStaff("/settings/materias");
+  revalidateStaff("/asignaturas");
+  revalidateStaff("/lessons");
+  revalidatePath("/jugador/learn");
+  return {
+    success:
+      lessonIds.length === 1
+        ? "Lección agregada a la materia"
+        : `${lessonIds.length} lecciones agregadas a la materia`,
+  };
+}
+
+export async function removeLessonsFromTema(temaId: string, lessonIds: string[]) {
+  await requireStaff();
+
+  if (!temaId) return { error: "Falta la materia" };
+  if (!Array.isArray(lessonIds) || lessonIds.length === 0) {
+    return { error: "Selecciona al menos una lección" };
+  }
+
+  await prisma.lesson.updateMany({
+    where: { id: { in: lessonIds }, temaId },
+    data: { temaId: null },
+  });
+
+  revalidateStaff("/settings/materias");
+  revalidateStaff("/asignaturas");
+  revalidateStaff("/lessons");
+  revalidatePath("/jugador/learn");
+  return { success: "Lección retirada de la materia" };
+}
+
 export async function deleteTeam(teamId: string) {
   await requireStaff();
 
@@ -515,6 +693,32 @@ export async function deleteTeam(teamId: string) {
 
   revalidateStaff("/teams");
   return { success: "Equipo eliminado" };
+}
+
+export async function updateTeam(input: {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+}) {
+  await requireStaff();
+
+  const name = input.name.trim();
+  const code = input.code.trim();
+  const description = input.description.trim();
+
+  if (!name) return { error: "Escribe el nombre del club" };
+  if (name.length > 80) return { error: "El nombre del club es demasiado largo" };
+  if (!code) return { error: "Escribe la clave del club" };
+
+  await prisma.team.update({
+    where: { id: input.id },
+    data: { name, code, description: description || null },
+  });
+
+  revalidateStaff("/clubs");
+  revalidateStaff("/teams");
+  return { success: "Club actualizado" };
 }
 
 export async function upsertIndicator(

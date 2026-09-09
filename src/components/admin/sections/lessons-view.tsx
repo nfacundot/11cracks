@@ -132,7 +132,7 @@ export async function LessonsView({
   });
 
   const unassignedTemas = await prisma.tema.findMany({
-    where: { claseId: null },
+    where: { clases: { none: {} } },
     orderBy: { order: "asc" },
     include: {
       lessons: {
@@ -289,7 +289,7 @@ export async function LessonsView({
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-100 text-xl dark:bg-amber-950">
                 🗺️
               </span>
-              Temas sin clase
+              Temas sin etapa
             </h3>
             <div className="space-y-3">
               {unassignedTemas.map((tema) => (

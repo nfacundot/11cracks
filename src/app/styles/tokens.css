@@ -28,12 +28,14 @@
 
   --action-energy: oklch(0.86 0.205 125);
   --action-energy-hover: oklch(0.9 0.22 127);
+  --action-lime: var(--status-success);
   --context-progress: oklch(0.75 0.14 220);
   --context-training: oklch(0.81 0.12 82);
   --context-neurocracks: oklch(0.68 0.2 305);
 
   --border-subtle: oklch(0.72 0.052 81 / 0.26);
   --border-strong: oklch(0.78 0.08 82 / 0.58);
+  --line-strong: var(--border-strong);
   --focus-ring: oklch(0.86 0.13 88);
 
   --status-success: oklch(0.72 0.135 145);
@@ -45,6 +47,8 @@
   --club-accent-soft: oklch(0.66 0.16 250 / 0.14);
   --environment-overlay-strong: oklch(0.08 0.006 105 / 0.92);
   --environment-overlay-soft: oklch(0.08 0.006 105 / 0.28);
+  --scene-glass: oklch(0.12 0.008 102 / 0.68);
+  --scene-glass-border: oklch(0.78 0.08 82 / 0.26);
   --login-label-mobile: var(--brand-gold-bright);
 
   --canvas: var(--surface-canvas);
@@ -66,6 +70,12 @@
   --type-xs: 0.75rem;
   --type-sm: 0.875rem;
   --type-base: 1rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-label: 0.8125rem;
+  --text-caption: 0.75rem;
+  --text-meta: 0.8125rem;
+  --text-eyebrow: 0.75rem;
   --type-md: 1.125rem;
   --type-lg: 1.375rem;
   --type-xl: clamp(1.75rem, 3vw, 2.75rem);
@@ -74,6 +84,11 @@
   --shape-control: 0.3125rem;
   --shape-surface: 0.75rem;
   --shape-feature: 1.125rem;
+
+  /* 4pt insets and rhythm used by bordered/glass surfaces. */
+  --inset-compact: var(--space-4);
+  --inset-default: var(--space-5);
+  --inset-feature: var(--space-6);
 
   --shadow-surface: 0 1.5rem 4rem oklch(0.04 0.004 105 / 0.34);
   --shadow-focus: 0 0 0 0.1875rem oklch(0.82 0.11 85 / 0.2);
@@ -88,6 +103,8 @@
   --layout-content-max: 72rem;
   --layout-page-max: 90rem;
   --touch-target-min: 2.75rem;
+  --control-height-primary: 3rem;
+  --control-height-secondary: var(--touch-target-min);
 
   --z-base: 0;
   --z-sticky: 10;
@@ -121,6 +138,9 @@
 :root {
   --font-display: var(--font-barlow);
   --font-display-source: var(--font-barlow);
+  --font-score: var(--font-bebas-neue);
   --font-score-source: var(--font-bebas-neue);
+  --font-ui: var(--font-geist);
   --font-ui-source: var(--font-geist);
+  --shell-mobile-dock-height: 4.75rem;
 }

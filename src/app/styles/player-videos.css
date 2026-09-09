@@ -1,0 +1,42 @@
+.player-videos-page {
+  display: grid;
+  gap: 1rem;
+  max-width: 120rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+.player-videos-page h1, .player-videos-page h2, .player-videos-page p { margin: 0; }
+.player-videos-page__header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); }
+.player-videos-page__eyebrow { color: var(--context-neurocracks); font: 700 0.7rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-videos-page__header h1 { margin: 0.4rem 0 0.3rem; font: 700 clamp(2.8rem, 6vw, 5.5rem) / 0.85 var(--font-display); text-transform: uppercase; }
+.player-videos-page__header p { max-width: 54rem; color: var(--text-secondary); line-height: 1.45; }
+.player-videos-page__summary { display: grid; justify-items: end; color: var(--text-secondary); }
+.player-videos-page__summary strong { color: var(--action-energy); font: 700 2.5rem / 1 var(--font-score); }
+
+.player-videos-page__filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.player-videos-page__filter { padding: 0.45rem 0.85rem; border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary); font: 700 0.68rem var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.player-videos-page__filter[data-active="true"] { border-color: var(--action-energy); color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 8%, transparent); }
+
+.player-videos-page__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+.player-videos-page__card { display: grid; grid-template-rows: auto 1fr; min-width: 0; border: 1px solid var(--border-subtle); background: var(--surface-panel); }
+.player-videos-page__thumb { position: relative; display: grid; min-height: 11rem; place-items: center; overflow: hidden; color: var(--context-neurocracks); background: linear-gradient(135deg, color-mix(in oklch, var(--context-neurocracks) 23%, var(--surface-canvas-deep)), var(--surface-canvas-deep)); font-size: 2rem; }
+.player-videos-page__card[data-status="completed"] .player-videos-page__thumb { color: var(--status-success); background: linear-gradient(135deg, color-mix(in oklch, var(--status-success) 15%, var(--surface-canvas-deep)), var(--surface-canvas-deep)); }
+.player-videos-page__card-body { display: grid; align-content: start; gap: 0.55rem; padding: 1rem; }
+.player-videos-page__card-meta { display: flex; justify-content: space-between; gap: 0.7rem; color: var(--text-muted); font-size: 0.68rem; }
+.player-videos-page__card-meta span:first-child { color: var(--context-neurocracks); font: 700 0.7rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-videos-page__card h3 { margin: 0; color: var(--text-primary); font: 700 1.35rem / 0.95 var(--font-display); text-transform: uppercase; }
+.player-videos-page__card p { margin: 0; color: var(--text-secondary); font-size: 0.78rem; line-height: 1.45; }
+.player-videos-page__card-facts { display: flex; flex-wrap: wrap; gap: 0.35rem 0.7rem; color: var(--text-muted); font-size: 0.68rem; }
+.player-videos-page__card-facts span + span { position: relative; }
+.player-videos-page__card-facts span + span::before { content: "·"; position: absolute; left: -0.45rem; }
+.player-videos-page__card-cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 0.7rem; min-height: 2.7rem; margin-top: 0.2rem; padding: 0 0.75rem; border: 1px solid var(--action-energy); color: var(--action-energy); font: 700 0.68rem var(--font-display); letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
+.player-videos-page__card-cta:hover { background: color-mix(in oklch, var(--action-energy) 10%, transparent); }
+
+@media (max-width: 62rem) { .player-videos-page__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 47.9375rem) {
+  .player-videos-page { padding: 1rem 1rem calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 2rem); }
+  .player-videos-page__header { display: grid; align-items: start; }
+  .player-videos-page__summary { justify-items: start; }
+  .player-videos-page__grid { grid-template-columns: 1fr; }
+  .player-videos-page__thumb { min-height: 10rem; }
+}

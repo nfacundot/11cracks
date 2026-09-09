@@ -184,6 +184,8 @@ function QuestionFields({
   isWord,
   noOptions,
   radioName,
+  isQuizMode,
+  showOptionImages,
 }: {
   value: QuestionDraft;
   onChange: (patch: Partial<QuestionDraft>) => void;
@@ -191,6 +193,8 @@ function QuestionFields({
   isWord: boolean;
   noOptions: boolean;
   radioName: string;
+  isQuizMode: boolean;
+  showOptionImages: boolean;
 }) {
   const setCorrect = (oi: number) =>
     onChange({ options: value.options.map((o, j) => ({ ...o, isCorrect: j === oi })) });
@@ -204,7 +208,7 @@ function QuestionFields({
 
   return (
     <>
-      {!isInfograma && !isWord && (
+      {!isInfograma && !isWord && !isQuizMode && (
         <div className="mb-2">
           <select
             value={value.type}
@@ -238,7 +242,7 @@ function QuestionFields({
           className={`${inputCls} mt-2`}
         />
       )}
-      {!noOptions && (
+      {!noOptions && !isQuizMode && (
         <div className="mt-2 flex items-center gap-2">
           <span className="text-xs font-bold text-zinc-500">Tiempo (seg)</span>
           <input
@@ -252,36 +256,44 @@ function QuestionFields({
       {!noOptions && (
         <div className="mt-3 space-y-2">
           {value.options.map((opt, oi) => (
-            <div key={oi} className="flex items-center gap-2">
-              <input
-                type="radio"
-                name={radioName}
-                checked={opt.isCorrect}
-                onChange={() => setCorrect(oi)}
-                className="h-4 w-4 accent-green-500"
-                title="Marcar como correcta"
-              />
-              <input
-                type="text"
-                value={opt.text}
-                onChange={(e) => updateOpt(oi, { text: e.target.value })}
-                placeholder={`Opción ${oi + 1}`}
-                className={`${inputCls} ${opt.isCorrect ? "border-green-400 ring-1 ring-green-200" : ""}`}
-              />
-              {opt.isCorrect && (
-                <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black text-green-700 dark:bg-green-950 dark:text-green-400">
-                  Correcta
-                </span>
-              )}
-              {!isInfograma && value.options.length > 2 && (
-                <button
-                  type="button"
-                  onClick={() => removeOpt(oi)}
-                  className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40"
-                  aria-label="Eliminar opción"
-                >
-                  <XIcon className="h-4 w-4" />
-                </button>
+            <div key={oi}>
+              <div className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name={radioName}
+                  checked={opt.isCorrect}
+                  onChange={() => setCorrect(oi)}
+                  className="h-4 w-4 accent-green-500"
+                  title="Marcar como correcta"
+                />
+                <input
+                  type="text"
+                  value={opt.text}
+                  onChange={(e) => updateOpt(oi, { text: e.target.value })}
+                  placeholder={`Opción ${oi + 1}`}
+                  className={`${inputCls} ${opt.isCorrect ? "border-green-400 ring-1 ring-green-200" : ""}`}
+                />
+                {opt.isCorrect && (
+                  <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black text-green-700 dark:bg-green-950 dark:text-green-400">
+                    Correcta
+                  </span>
+                )}
+                {!isInfograma && value.options.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => removeOpt(oi)}
+                    className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40"
+                    aria-label="Eliminar opción"
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              {showOptionImages && (
+                <OptionImage
+                  value={opt.imageUrl ?? ""}
+                  onChange={(url) => updateOpt(oi, { imageUrl: url })}
+                />
               )}
             </div>
           ))}
@@ -317,6 +329,7 @@ export function LessonEditor({
   defaultValues,
   questions,
   mode = "lessons",
+  initialType = mode === "games" ? "GAME" : "LESSON",
   onSaved,
 }: {
   clases: {
@@ -326,6 +339,7 @@ export function LessonEditor({
     temas: { id: string; name: string }[];
   }[];
   mode?: "lessons" | "games";
+  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
   onSaved?: () => void;
   defaultValues?: {
     id: string;
@@ -333,11 +347,13 @@ export function LessonEditor({
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
     gameMode?:
       | "ANAGRAM"
       | "INFOGRAMA"
       | null;
+    optionMode?: "TEXT" | "IMAGE" | "BOTH";
+    timeSeconds?: number | null;
     order: number;
     xpReward: number;
     temaId?: string | null;
@@ -353,8 +369,14 @@ export function LessonEditor({
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "⚽");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME">(
-    defaultValues?.type ?? (mode === "games" ? "GAME" : "LESSON")
+  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ">(
+    defaultValues?.type ?? initialType
+  );
+  const [optionMode, setOptionMode] = useState<"TEXT" | "IMAGE" | "BOTH">(
+    defaultValues?.optionMode ?? "TEXT"
+  );
+  const [seconds, setSeconds] = useState(
+    defaultValues?.timeSeconds ?? 10
   );
   const [gameMode, setGameMode] = useState<
     "ANAGRAM" | "INFOGRAMA"
@@ -407,6 +429,22 @@ export function LessonEditor({
     }
   };
 
+  const isQuizMode = type === "PREGUNTADOS" || type === "CONTRARRELOJ";
+
+  const changeType = (next: typeof type) => {
+    setType(next);
+    if (next === "PREGUNTADOS" || next === "CONTRARRELOJ") {
+      setQs((prev) =>
+        prev.map((q) => ({
+          ...q,
+          type: "MULTIPLE_CHOICE",
+          timeSeconds: 0,
+          options: padOptionsTo4(q.options),
+        }))
+      );
+    }
+  };
+
   const updateQ = (qi: number, patch: Partial<QuestionDraft>) => {
     setQs((prev) => prev.map((q, i) => (i === qi ? { ...q, ...patch } : q)));
   };
@@ -430,6 +468,12 @@ export function LessonEditor({
       <input type="hidden" name="color" value={color} />
       <input type="hidden" name="type" value={mode === "games" ? "GAME" : type} />
       <input type="hidden" name="gameMode" value={type === "GAME" ? gameMode : ""} />
+      <input type="hidden" name="optionMode" value={isQuizMode ? optionMode : "TEXT"} />
+      <input
+        type="hidden"
+        name="timeSeconds"
+        value={isQuizMode && type === "CONTRARRELOJ" ? String(seconds) : ""}
+      />
       <input type="hidden" name="temaId" value={temaId} />
       <input type="hidden" name="title" value={title} />
       <input type="hidden" name="description" value={description} />
@@ -503,13 +547,15 @@ export function LessonEditor({
               ) : (
                 <select
                   value={type}
-                  onChange={(e) => setType(e.target.value as typeof type)}
+                  onChange={(e) => changeType(e.target.value as typeof type)}
                   className={inputCls}
                   style={{ width: "auto" }}
                 >
                   <option value="LESSON">Lección</option>
                   <option value="QUIZ">Quiz</option>
                   <option value="GAME">Juego</option>
+                  <option value="PREGUNTADOS">Preguntados (A-D · 3 vidas)</option>
+                  <option value="CONTRARRELOJ">Contrarreloj (A-D · tiempo · 3 vidas)</option>
                 </select>
               )}
             </label>
@@ -527,20 +573,59 @@ export function LessonEditor({
                 </select>
               </label>
             )}
+            {isQuizMode && (
+              <>
+                <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
+                  Opciones
+                  <select
+                    value={optionMode}
+                    onChange={(e) => setOptionMode(e.target.value as typeof optionMode)}
+                    className={inputCls}
+                    style={{ width: "auto" }}
+                  >
+                    <option value="TEXT">Solo texto</option>
+                    <option value="IMAGE">Solo imagen</option>
+                    <option value="BOTH">Texto e imagen</option>
+                  </select>
+                </label>
+                {type === "CONTRARRELOJ" && (
+                  <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
+                    Segundos
+                    <input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={seconds}
+                      onChange={(e) => setSeconds(Math.max(1, Number(e.target.value)))}
+                      className={`${inputCls} w-20`}
+                    />
+                  </label>
+                )}
+              </>
+            )}
             <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
               Tema
-              <select value={temaId} onChange={(e) => setTemaId(e.target.value)} className={inputCls} style={{ width: "auto" }}>
-                <option value="">Sin tema</option>
-                {clases.map((e) => (
-                  <optgroup key={e.id} label={`${e.emoji} ${e.name}`}>
-                    {e.temas.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name}
-                      </option>
+              {(() => {
+                const seen = new Set<string>();
+                return (
+                  <select value={temaId} onChange={(e) => setTemaId(e.target.value)} className={inputCls} style={{ width: "auto" }}>
+                    <option value="">Sin tema</option>
+                    {clases.map((e) => (
+                      <optgroup key={e.id} label={`${e.emoji} ${e.name}`}>
+                        {e.temas.map((m) => {
+                          if (seen.has(m.id)) return null;
+                          seen.add(m.id);
+                          return (
+                            <option key={m.id} value={m.id}>
+                              {m.name}
+                            </option>
+                          );
+                        })}
+                      </optgroup>
                     ))}
-                  </optgroup>
-                ))}
-              </select>
+                  </select>
+                );
+              })()}
             </label>
             <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
               Orden
@@ -627,6 +712,8 @@ export function LessonEditor({
               isWord={isWord}
               noOptions={noOptions}
               radioName={`correct-${qi}`}
+              isQuizMode={isQuizMode}
+              showOptionImages={isQuizMode && optionMode !== "TEXT"}
             />
           </div>
         ))}
@@ -673,6 +760,8 @@ export function LessonEditor({
               isWord={isWord}
               noOptions={noOptions}
               radioName="draft-correct"
+              isQuizMode={isQuizMode}
+              showOptionImages={isQuizMode && optionMode !== "TEXT"}
             />
             <div className="flex gap-3">
               <button

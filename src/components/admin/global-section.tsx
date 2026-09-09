@@ -22,6 +22,18 @@ export function GlobalSection({
   roleText?: string;
   children?: ReactNode;
 }) {
+  const content = children ?? <GlobalClient hero={{ title, subtitle }} />;
+
+  // Bajo /admin el AdminLayout ya envuelve el contenido en AppShell (nav rail,
+  // topbar y dock). Renderizar aquí el shell de GlobalSection duplicaría el menú.
+  if (basePath === "/admin") {
+    return (
+      <main className="px-6 pb-6 max-md:px-4 max-md:pb-28">
+        <div className="mx-auto max-w-5xl">{content}</div>
+      </main>
+    );
+  }
+
   return (
     <div className="relative flex min-h-dvh w-full">
       {/* Global stadium background */}
@@ -39,9 +51,7 @@ export function GlobalSection({
         <GlobalTopBar user={user} title={title} roleText={roleText} />
 
         <main className="flex-1 px-6 pb-6 max-md:px-4 max-md:pb-28">
-          <div className="mx-auto max-w-5xl">
-            {children ?? <GlobalClient hero={{ title, subtitle }} />}
-          </div>
+          <div className="mx-auto max-w-5xl">{content}</div>
         </main>
       </div>
 

@@ -1,38 +1,38 @@
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { ProgressClient } from "@/components/progress-client";
+import { PlayerProgress } from "@/components/player/player-progress";
+import { buildPlayerProgressFixture, type PlayerProgressRacha } from "@/lib/player/progress";
+import { nextMilestoneFromStreak } from "@/lib/player/metrics";
 
 export const metadata = { title: "Mi Progreso" };
-
-const ROLE_LABELS: Record<string, string> = {
-  SUPERADMIN: "Superadministrador",
-  ADMIN: "Administrador",
-  ENTRENADOR: "Entrenador",
-  JUGADOR: "Jugador",
-};
 
 export default async function ProgressPage() {
   const user = await requireUser();
 
-  const [characteristics, indicators] = await Promise.all([
-    prisma.characteristic.findMany({
-      orderBy: { createdAt: "asc" },
-      select: { id: true, name: true, percentage: true },
-    }),
+  const [indicators, lastActive] = await Promise.all([
     prisma.indicator.findMany({
-      orderBy: { createdAt: "asc" },
-      select: { id: true, name: true, category: true, percentage: true },
+      where: { userId: user.id },
+      orderBy: { percentage: "desc" },
+      select: { name: true, percentage: true, category: true },
+    }),
+    prisma.user.findUnique({
+      where: { id: user.id },
+      select: { lastActiveAt: true },
     }),
   ]);
 
-  return (
-    <ProgressClient
-      userName={user.name}
-      userUsername={user.username}
-      avatarUrl={user.avatarUrl ?? null}
-      userRole={ROLE_LABELS[user.role] ?? user.role}
-      characteristics={characteristics}
-      indicators={indicators}
-    />
-  );
+  const racha: PlayerProgressRacha = {
+    state: user.currentStreak > 0 ? "ACTIVA" : "SIN_RACHA",
+    currentStreak: user.currentStreak,
+    bestStreak: user.bestStreak,
+    lastVerifiedActivityDate: lastActive?.lastActiveAt ? lastActive.lastActiveAt.toISOString().slice(0, 10) : undefined,
+    nextMilestone: nextMilestoneFromStreak(user.currentStreak),
+    explanation: user.currentStreak > 0
+      ? `Llevas ${user.currentStreak} días consecutivos de actividad validada.`
+      : "Completa una actividad hoy y comienza tu racha. Cada día suma al hito de 7 días.",
+  };
+
+  const fixture = buildPlayerProgressFixture({ indicators, currentStreak: user.currentStreak, bestStreak: user.bestStreak });
+
+  return <PlayerProgress fixture={fixture} racha={racha} />;
 }

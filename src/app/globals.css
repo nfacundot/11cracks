@@ -3,6 +3,21 @@
 @import "./styles/shell.css";
 @import "./styles/login.css";
 @import "./styles/player-home.css";
+@import "./styles/dashboard-player.css";
+@import "./styles/player-progress.css";
+@import "./styles/player-training.css";
+@import "./styles/player-camino.css";
+@import "./styles/player-videos.css";
+@import "./styles/player-postulations.css";
+@import "./styles/player-alineacion.css";
+@import "./styles/coach-dashboard.css";
+@import "./styles/bilinguisimo.css";
+@import "./styles/el-camino.css";
+@import "./styles/admin-base.css";
+@import "./styles/admin-wallet.css";
+@import "./styles/admin-impact.css";
+@import "./styles/admin-audit.css";
+@import "./styles/admin-payments.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -275,4 +290,74 @@ textarea {
   .hero-stadium::after {
     background: linear-gradient(0deg, #050606 0%, transparent 50%);
   }
+}
+
+/* ─── Document-level overlay root (portado de edtech11 globals.css) ─── */
+#overlay-root {
+  position: fixed;
+  z-index: var(--z-overlay-root);
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+#overlay-root > .overlay-layer {
+  position: absolute;
+  z-index: var(--z-overlay-surface);
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+#overlay-root > .overlay-layer[data-overlay-layer="critical"] {
+  z-index: var(--z-critical);
+}
+
+#overlay-root > .overlay-layer > * {
+  pointer-events: auto;
+}
+
+#overlay-root > .overlay-layer > :where([class*="backdrop"]) {
+  z-index: var(--z-overlay-backdrop);
+}
+
+#overlay-root > .overlay-layer > :where(.player-rpg-dialog, .pet-dialog, .coach-roster-detail, [class$="__overlay"], [class$="__surface"], [class$="__detail"]) {
+  z-index: var(--z-overlay-surface);
+}
+
+/* ─── Progress state chip (portado de edtech11 foundation.css) ─── */
+.progress-state-chip {
+  display: inline-flex;
+  min-height: var(--touch-target-min);
+  align-items: center;
+  gap: .5rem;
+  color: var(--text-secondary);
+  font: 700 var(--text-label)/1.2 var(--font-ui);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.progress-state-chip b {
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font: 700 .85rem/1 var(--font-score);
+}
+
+.progress-state-chip[data-state="COMPLETED"] { color: var(--action-energy); }
+.progress-state-chip[data-state="IN_PROGRESS"] { color: var(--context-progress); }
+.progress-state-chip[data-state="AVAILABLE"] { color: var(--brand-gold-bright); }
+.progress-state-chip[data-state="LOCKED"] { color: var(--text-secondary); }
+
+/* ─── Wrapper del recorrido NeuroCracks (portado de edtech11 video-learning.css) ─── */
+.player-neurocracks-page {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  max-width: 120rem;
+  margin: 0 auto;
 }

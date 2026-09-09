@@ -1,0 +1,85 @@
+.player-training-page {
+  width: min(100%, 90rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 4rem) 5rem;
+}
+
+.player-training-page h1,
+.player-training-page h2,
+.player-training-page p,
+.player-training-page blockquote { margin: 0; }
+.player-training-page__header { margin-bottom: clamp(1.25rem, 3vw, 2rem); }
+.player-training-page__eyebrow { color: var(--context-training); font-family: var(--font-display); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+.player-training-page__header h1 { margin-top: 0.35rem; font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 0.86; letter-spacing: -0.04em; text-transform: uppercase; }
+.player-training-page__header p { max-width: 36rem; margin-top: 0.7rem; color: var(--text-secondary); }
+
+.player-training__next { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 0.7fr); gap: 2rem; min-height: 18rem; padding: clamp(1.5rem, 4vw, 3rem); border: 1px solid color-mix(in oklch, var(--context-training) 48%, transparent); background: linear-gradient(120deg, oklch(0.13 0.018 82 / 0.86), oklch(0.055 0.006 105 / 0.62)); box-shadow: 0 1.5rem 3.5rem oklch(0.02 0.003 105 / 0.34); }
+.player-training__next-copy { display: grid; align-content: center; gap: 0.45rem; }
+.player-training__next-copy h2 { max-width: 24ch; margin-top: 0.3rem; color: var(--text-primary); font-family: var(--font-display); font-size: clamp(2.4rem, 5vw, 5rem); line-height: 0.88; text-transform: uppercase; }
+.player-training__next-copy p { color: var(--text-secondary); font-size: 1.1rem; }
+.player-training__next-copy strong { margin-top: 1.1rem; color: var(--brand-gold-bright); font-family: var(--font-display); font-size: 1.25rem; text-transform: uppercase; }
+.player-training__next-copy time { color: var(--text-primary); font-family: var(--font-score); font-size: clamp(2.2rem, 4vw, 3.7rem); line-height: 0.85; }
+.player-training__next-meta { display: grid; align-content: end; justify-items: start; gap: 0.65rem; border-left: 1px solid var(--border-subtle); padding-left: 1.5rem; color: var(--text-secondary); }
+.player-training__next-meta span:not(.player-training__status) { color: var(--text-primary); font-family: var(--font-display); font-size: 1.15rem; text-transform: uppercase; }
+.player-training__next-meta small { font-size: 0.75rem; }
+.player-training__next-empty { display: grid; align-content: center; gap: .65rem; min-height: 12rem; }
+.player-training__next-empty h2 { max-width: 20ch; color: var(--text-primary); font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3.8rem); line-height: .9; text-transform: uppercase; }
+.player-training__next-empty p { color: var(--text-secondary); }
+
+.player-training__top-grid, .player-training__bottom-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; margin-top: 0.8rem; }
+.player-training-panel { min-width: 0; padding: clamp(1rem, 2vw, 1.5rem); border: 1px solid var(--border-subtle); background: color-mix(in oklch, var(--surface-panel) 64%, transparent); }
+.player-training-panel h2 { margin-top: 0.35rem; font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 0.9; text-transform: uppercase; }
+.player-training__coach blockquote { margin-top: 1.25rem; color: var(--text-primary); font-family: var(--font-display); font-size: clamp(1.25rem, 2.3vw, 2rem); line-height: 0.98; }
+.player-training__coach p { margin-top: 0.8rem; color: var(--text-secondary); font-size: 0.78rem; }
+.player-training__coach > strong { display: inline-block; margin-top: 0.8rem; color: var(--context-training); font-family: var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-training__recommendation { display: grid; align-content: start; gap: 0.65rem; }
+.player-training__recommendation > strong { margin-top: 1.1rem; color: var(--text-primary); font-family: var(--font-display); font-size: 1.5rem; text-transform: uppercase; }
+.player-training__recommendation p { color: var(--text-secondary); font-size: 0.86rem; }
+.player-training__recommendation a { display: inline-flex; gap: 0.5rem; margin-top: 0.35rem; color: var(--brand-gold-bright); font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
+
+.player-training__week { margin-top: 0.8rem; }
+.player-training-panel__heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+.player-training-panel__heading > span { color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; }
+.player-training__week-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; margin-top: 1.25rem; }
+.player-training__week-list > div { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; min-height: 6.6rem; padding: 0.9rem; border-top: 2px solid var(--border-subtle); background: color-mix(in oklch, var(--surface-panel) 48%, transparent); }
+.player-training__week-list > div[data-status="upcoming"] { border-color: var(--context-training); }
+.player-training__week-list time { color: var(--brand-gold-bright); font-family: var(--font-display); font-size: 0.78rem; font-weight: 700; }
+.player-training__week-list time small { display: block; margin-top: 0.25rem; color: var(--text-muted); font-size: 0.63rem; }
+.player-training__week-list strong { display: block; color: var(--text-primary); font-family: var(--font-display); font-size: 0.85rem; text-transform: uppercase; }
+.player-training__week-list span { display: block; margin-top: 0.4rem; color: var(--text-secondary); font-size: 0.7rem; }
+
+.player-training__session { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.8rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border-subtle); }
+.player-training__session time { color: var(--brand-gold-bright); font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; }
+.player-training__session strong { display: block; color: var(--text-primary); font-family: var(--font-display); font-size: 0.85rem; text-transform: uppercase; }
+.player-training__session span:not(.player-training__status) { display: block; margin-top: 0.25rem; color: var(--text-secondary); font-size: 0.7rem; }
+.player-training__status { display: inline-flex; width: fit-content; padding: 0.3rem 0.45rem; border: 1px solid var(--border-subtle); color: var(--text-secondary); font-family: var(--font-display); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.player-training__status[data-tone="success"] { border-color: color-mix(in oklch, var(--status-success) 55%, transparent); color: var(--status-success); }
+.player-training__status[data-tone="warning"] { border-color: color-mix(in oklch, var(--status-warning) 55%, transparent); color: var(--status-warning); }
+.player-training__hours h2 { margin-bottom: 1.1rem; }
+.player-training__hours-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
+.player-training__hours-stats div { display: grid; gap: 0.35rem; padding: 0.7rem; border-left: 2px solid var(--context-training); background: color-mix(in oklch, var(--context-training) 7%, transparent); }
+.player-training__hours-stats strong { color: var(--text-primary); font-family: var(--font-score); font-size: 1.7rem; line-height: 0.85; }
+.player-training__hours-stats span { color: var(--text-secondary); font-size: 0.65rem; text-transform: uppercase; }
+.player-training__hours p { margin-top: 1rem; color: var(--text-secondary); font-size: 0.75rem; }
+.player-training__hours a { display: inline-flex; gap: 0.5rem; margin-top: 1rem; color: var(--brand-gold-bright); font-family: var(--font-display); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
+
+.player-training-page__header { min-height: 15rem; display: grid; align-content: center; }
+@media (min-width: 48rem) and (max-width: 63.9375rem) { .player-training-page__header { min-height: 13rem; } }
+@media (max-width: 47.9375rem) { .player-training-page__header { min-height: 9.5rem; align-content: end; } }
+
+@media (max-width: 47.9375rem) {
+  .player-training-page { padding: 1.25rem 1rem calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 2rem); }
+  .player-training-panel { scroll-margin-bottom: calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 1.5rem); }
+  .player-training-page__header h1 { font-size: 3.25rem; }
+  .player-training__next { grid-template-columns: 1fr; gap: 0.9rem; min-height: 0; padding: 1rem; }
+  .player-training__next-copy h2 { font-size: 2.35rem; }
+  .player-training__next-copy strong { margin-top: 0.75rem; }
+  .player-training__next-meta { border-top: 1px solid var(--border-subtle); border-left: 0; padding-top: 0.7rem; padding-left: 0; }
+  .player-training__top-grid, .player-training__bottom-grid { grid-template-columns: 1fr; }
+  .player-training__week-list { grid-template-columns: 1fr; gap: 0.45rem; }
+  .player-training__week-list > div { min-height: 0; }
+  .player-training__hours-stats { grid-template-columns: 1fr 1fr 1fr; }
+  .player-training__hours-stats strong { font-size: 1.35rem; }
+  .player-training__session { grid-template-columns: auto 1fr; }
+  .player-training__session > .player-training__status { grid-column: 2; justify-self: start; }
+}

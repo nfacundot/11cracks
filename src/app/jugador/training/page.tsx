@@ -1,7 +1,11 @@
-import { notFound } from "next/navigation";
+import { requireUser } from "@/lib/auth";
+import { buildPlayerTrainingFixture } from "@/lib/player/training";
+import { PlayerTraining } from "@/components/player/player-training";
 
-export const metadata = { title: "Entrenamiento" };
+export const metadata = { title: "Entrenamiento · 11Cracks" };
 
 export default async function TrainingPage() {
-  notFound();
+  await requireUser();
+  const fixture = buildPlayerTrainingFixture();
+  return <PlayerTraining fixture={fixture} />;
 }

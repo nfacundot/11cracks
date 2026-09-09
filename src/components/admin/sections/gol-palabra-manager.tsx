@@ -1,0 +1,454 @@
+"use client";
+
+import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  deleteGolPalabraWord,
+  saveGolPalabraWord,
+  toggleGolPalabraWord,
+  type GolState,
+} from "@/actions/gol";
+import { PlusIcon, XIcon } from "@/components/icons";
+import { ConfirmDialog } from "@/components/shared/dialog";
+
+const inputCls =
+  "w-full rounded-xl border-2 border-green-100 bg-white/60 backdrop-blur-xl px-3 py-2 text-sm font-semibold text-emerald-950 outline-none transition focus:border-green-400 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-white";
+
+const LANGUAGES = [
+  { code: "en", label: "Inglés (en-US)" },
+  { code: "pt", label: "Portugués (pt-BR)" },
+  { code: "es", label: "Español (es-ES)" },
+];
+
+type OptionDraft = { id?: string; label: string; isCorrect: boolean };
+type WordDraft = {
+  id?: string;
+  word: string;
+  meaning: string;
+  language: string;
+  options: OptionDraft[];
+};
+
+const emptyOption = (): OptionDraft => ({ label: "", isCorrect: false });
+
+function WordForm({
+  initial,
+  gameId,
+  onDone,
+}: {
+  initial: WordDraft | null;
+  gameId: string;
+  onDone: () => void;
+}) {
+  const [state, formAction, pending] = useActionState<GolState, FormData>(saveGolPalabraWord, undefined);
+  const [draft, setDraft] = useState<WordDraft>(() =>
+    initial
+      ? {
+          id: initial.id,
+          word: initial.word,
+          meaning: initial.meaning,
+          language: initial.language,
+          options: initial.options.map((o) => ({
+            id: o.id,
+            label: o.label,
+            isCorrect: o.isCorrect,
+          })),
+        }
+      : {
+          word: "",
+          meaning: "",
+          language: "en",
+          options: [emptyOption(), emptyOption(), emptyOption(), emptyOption()],
+        }
+  );
+
+  useEffect(() => {
+    if (state?.success) {
+      onDone();
+    }
+  }, [state, onDone]);
+
+  const setOption = (index: number, patch: Partial<OptionDraft>) => {
+    setDraft((d) => ({
+      ...d,
+      options: d.options.map((o, i) => (i === index ? { ...o, ...patch } : o)),
+    }));
+  };
+
+  const setOneCorrect = (index: number) => {
+    setDraft((d) => ({
+      ...d,
+      options: d.options.map((o, i) => ({ ...o, isCorrect: i === index })),
+    }));
+  };
+
+  const updateOptionArray = (list: OptionDraft[]) =>
+    setDraft((d) => ({ ...d, options: list }));
+
+  const addOption = () => updateOptionArray([...draft.options, emptyOption()]);
+
+  const submit = (formData: FormData) => {
+    formData.set("id", draft.id ?? "");
+    formData.set("gameId", gameId);
+    formData.set("word", draft.word);
+    formData.set("meaning", draft.meaning);
+    formData.set("language", draft.language);
+    formData.set("options", JSON.stringify(draft.options));
+    formAction(formData);
+  };
+
+  return (
+    <form
+      action={submit}
+      className="space-y-4 rounded-2xl border border-green-100 bg-white/60 p-5 backdrop-blur-xl dark:border-emerald-800 dark:bg-emerald-950/60"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-black text-emerald-950 dark:text-white">
+          {initial ? "Editar palabra" : "Nueva palabra"}
+        </h3>
+        {state?.success ? (
+          <span className="text-sm font-black text-green-600 dark:text-green-400">{state.success}</span>
+        ) : null}
+        {state?.error ? (
+          <span className="text-sm font-black text-red-500">{state.error}</span>
+        ) : null}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-zinc-400">
+            Palabra a pronunciar
+          </label>
+          <input
+            type="text"
+            value={draft.word}
+            onChange={(e) => setDraft((d) => ({ ...d, word: e.target.value }))}
+            placeholder="Ej: forward"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-zinc-400">
+            Significado correcto
+          </label>
+          <input
+            type="text"
+            value={draft.meaning}
+            onChange={(e) => setDraft((d) => ({ ...d, meaning: e.target.value }))}
+            placeholder="Ej: Delantero"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-zinc-400">
+            Idioma de pronunciación
+          </label>
+          <select
+            value={draft.language}
+            onChange={(e) => setDraft((d) => ({ ...d, language: e.target.value }))}
+            className={inputCls}
+          >
+            {LANGUAGES.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-black text-zinc-500 dark:text-zinc-400">
+            Opciones de significado (el jugador elige la correcta)
+          </p>
+          <button
+            type="button"
+            onClick={addOption}
+            className="flex items-center gap-1 rounded-lg bg-green-500 px-2.5 py-1.5 text-xs font-black text-white transition hover:bg-green-600"
+          >
+            <PlusIcon className="h-3.5 w-3.5" /> Opción
+          </button>
+        </div>
+
+        {draft.options.map((option, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-2 rounded-xl border border-green-100 bg-white/40 p-3 dark:border-emerald-800 dark:bg-emerald-900/40"
+          >
+            <button
+              type="button"
+              onClick={() => setOneCorrect(index)}
+              title={option.isCorrect ? "Es la respuesta correcta" : "Marcar como correcta"}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-sm font-black transition ${
+                option.isCorrect
+                  ? "border-green-500 bg-green-500 text-white"
+                  : "border-zinc-300 text-transparent dark:border-zinc-600"
+              }`}
+            >
+              ✓
+            </button>
+            <input
+              type="text"
+              value={option.label}
+              onChange={(e) => setOption(index, { label: e.target.value })}
+              placeholder={`Significado ${index + 1} (ej: Delantero)`}
+              className={inputCls}
+            />
+            <button
+              type="button"
+              onClick={() => updateOptionArray(draft.options.filter((_, i) => i !== index))}
+              disabled={draft.options.length <= 2}
+              className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:hover:bg-red-950/40"
+              aria-label="Quitar opción"
+            >
+              <XIcon className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-end gap-2">
+        <button
+          type="button"
+          onClick={onDone}
+          className="rounded-xl border-2 border-zinc-200 px-4 py-2.5 text-sm font-black text-zinc-500 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-xl bg-green-500 px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 disabled:opacity-60 dark:shadow-green-950"
+        >
+          {pending ? "Guardando..." : initial ? "Guardar cambios" : "Crear palabra"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+type WordViewModel = {
+  id: string;
+  word: string;
+  meaning: string;
+  language: string;
+  active: boolean;
+  options: { id: string; label: string; isCorrect: boolean; order: number }[];
+};
+
+export function GolPalabraManager({ words, gameId }: { words: WordViewModel[]; gameId: string }) {
+  const router = useRouter();
+  const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<WordViewModel | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; word: WordViewModel | null }>({
+    open: false,
+    word: null,
+  });
+
+  const refresh = () => router.refresh();
+
+  const handleToggle = async (word: WordViewModel) => {
+    await toggleGolPalabraWord(word.id, !word.active);
+    refresh();
+  };
+
+  const handleDelete = (word: WordViewModel) => {
+    setDeleteConfirm({ open: true, word });
+  };
+
+  const handleDeleteConfirm = async (confirmed: boolean) => {
+    if (!confirmed || !deleteConfirm.word) return;
+    await deleteGolPalabraWord(deleteConfirm.word.id);
+    setEditing(null);
+    refresh();
+  };
+
+  const languageLabel = (code: string) =>
+    LANGUAGES.find((l) => l.code === code)?.label ?? code;
+
+  return (
+    <>
+      <div className="space-y-5">
+      {/* Preview del juego */}
+      <div className="rounded-2xl border border-green-100 bg-white/60 p-5 dark:border-emerald-800 dark:bg-emerald-950/60">
+        <h3 className="text-sm font-black uppercase tracking-wide text-zinc-400">
+          Vista previa del juego
+        </h3>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-lime-100 px-3 py-1 text-xs font-black text-lime-700 dark:bg-lime-900 dark:text-lime-300">
+            ⚽ Gol de Palabra
+          </span>
+          <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+            El jugador escucha la palabra y elige su significado.
+          </span>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {words
+            .filter((w) => w.active)
+            .slice(0, 6)
+            .map((w) => {
+              const correct = w.options.find((o) => o.isCorrect);
+              return (
+                <div
+                  key={w.id}
+                  className="rounded-xl border border-white/5 bg-[#080909]/85 p-2"
+                >
+                  <p className="text-[10px] font-black uppercase tracking-widest text-lime-300">
+                    🔊 {w.word}
+                  </p>
+                  <p className="text-[10px] font-medium text-zinc-400">
+                    →
+                    <span className="text-emerald-300">{correct?.label ?? w.meaning}</span>
+                  </p>
+                </div>
+              );
+            })}
+          {words.filter((w) => w.active).length === 0 ? (
+            <p className="text-sm font-bold text-zinc-400">
+              No hay palabras activas. Agrega palabras para que el juego funcione.
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Acciones */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-black text-emerald-950 dark:text-white">
+            Palabras <span className="text-zinc-400">({words.length})</span>
+          </h3>
+          <p className="text-xs font-bold text-zinc-400">
+            Elige cuántas y cuáles palabras aparecen, el audio y los significados.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEditing(null);
+            setCreating((c) => !c);
+          }}
+          className="flex items-center gap-1.5 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 dark:shadow-green-950"
+        >
+          <PlusIcon className="h-4 w-4" /> Nueva palabra
+        </button>
+      </div>
+
+      {(creating || editing) ? (
+        <WordForm
+          key={editing?.id ?? "new"}
+          gameId={gameId}
+          initial={
+            editing
+              ? {
+                  id: editing.id,
+                  word: editing.word,
+                  meaning: editing.meaning,
+                  language: editing.language,
+                  options: editing.options.map((o) => ({
+                    id: o.id,
+                    label: o.label,
+                    isCorrect: o.isCorrect,
+                  })),
+                }
+              : null
+          }
+          onDone={() => {
+            setCreating(false);
+            setEditing(null);
+            refresh();
+          }}
+        />
+      ) : null}
+
+      {/* Lista de palabras */}
+      {words.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-green-200 p-10 text-center dark:border-emerald-800">
+          <p className="text-sm font-bold text-zinc-400">
+            Aún no hay palabras configuradas. Crea la primera para que el juego funcione.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {words.map((word) => {
+            const correct = word.options.find((o) => o.isCorrect);
+            return (
+              <div
+                key={word.id}
+                className="flex flex-wrap items-center gap-3 rounded-2xl border border-green-100 bg-white/60 p-4 backdrop-blur-xl dark:border-emerald-800 dark:bg-emerald-950/60"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-lime-100 text-2xl dark:bg-lime-900">
+                    ⚽
+                  </div>
+                  <div className="min-w-0">
+                    <p className="flex flex-wrap items-center gap-2 font-black text-emerald-950 dark:text-white">
+                      {word.word}
+                      {!word.active ? (
+                        <span className="rounded-full bg-zinc-200 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                          Inactiva
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+                          Activa
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs font-bold text-zinc-400">
+                      {word.meaning} · {languageLabel(word.language)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-green-600 dark:text-green-400">
+                    {word.options.length} opciones · correcta:{" "}
+                    <strong>{correct?.label ?? "?"}</strong>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleToggle(word)}
+                    className="rounded-lg border-2 border-zinc-200 px-2.5 py-1.5 text-xs font-black text-zinc-500 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+                  >
+                    {word.active ? "Desactivar" : "Activar"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreating(false);
+                      setEditing(word);
+                    }}
+                    className="rounded-lg bg-green-500 px-2.5 py-1.5 text-xs font-black text-white transition hover:bg-green-600"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(word)}
+                    className="rounded-lg border-2 border-red-200 px-2.5 py-1.5 text-xs font-black text-red-500 transition hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950/40"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+
+    <ConfirmDialog
+      open={deleteConfirm.open}
+      onClose={handleDeleteConfirm}
+      title="Eliminar palabra"
+      message={`¿Eliminar "${deleteConfirm.word?.word}"?`}
+      confirmLabel="Eliminar"
+      cancelLabel="Cancelar"
+      variant="destructive"
+    />
+    </>
+  );
+}

@@ -1,0 +1,149 @@
+.admin-wallet-page {
+  display: grid;
+  gap: 22px;
+  width: min(100%, 1440px);
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 40px);
+}
+
+.admin-wallet__header,
+.admin-wallet__section-heading,
+.admin-wallet__trace,
+.admin-wallet__movement,
+.admin-wallet__attention-row,
+.admin-wallet__club,
+.admin-wallet__participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-wallet__header { align-items: end; }
+.admin-wallet__header h1, .admin-wallet__section-heading h2, .admin-wallet__overlay-header h2 { margin: 0; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
+.admin-wallet__header h1 { font-size: clamp(42px, 5vw, 72px); line-height: .9; }
+.admin-wallet__header p, .admin-wallet__context small, .admin-wallet__fund-balance span, .admin-wallet__fund-balance small, .admin-wallet__impact p, .admin-wallet__muted, .admin-wallet__empty, .admin-wallet__club p, .admin-wallet__benefit p { margin: 8px 0 0; color: var(--text-secondary); }
+.admin-wallet__eyebrow { color: var(--brand-gold-bright); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.admin-wallet__context { display: grid; justify-items: end; gap: 3px; text-align: right; }
+.admin-wallet__context span { color: var(--brand-gold-bright); font-weight: 700; }
+.admin-wallet__context strong { font-size: 14px; }
+.admin-wallet__summary { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.admin-wallet__metric, .admin-wallet__panel { min-width: 0; border: 1px solid var(--line-subtle); border-radius: 10px; background: var(--surface-panel); box-shadow: 0 16px 36px rgba(0,0,0,.14); }
+.admin-wallet__metric { display: grid; gap: 8px; padding: 17px; }
+.admin-wallet__metric span, .admin-wallet__metric small, .admin-wallet__benefit-counts small { color: var(--text-secondary); font-size: 12px; }
+.admin-wallet__metric strong { color: var(--text-primary); font-family: var(--font-display); font-size: clamp(23px, 2.5vw, 34px); line-height: .95; }
+.admin-wallet__metric[data-tone="gold"] strong { color: var(--brand-gold-bright); }
+.admin-wallet__metric[data-tone="lime"] strong { color: var(--status-success); }
+.admin-wallet__metric[data-tone="cyan"] strong { color: var(--status-info); }
+.admin-wallet__panel { padding: clamp(17px, 2vw, 24px); }
+.admin-wallet__attention { display: grid; gap: 16px; }
+.admin-wallet__section-heading { align-items: start; }
+.admin-wallet__section-heading > span { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
+.admin-wallet__main-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
+.admin-wallet__main-grid > .admin-wallet__panel { align-self: start; }
+.admin-wallet__fund-balance, .admin-wallet__impact { display: grid; gap: 7px; margin: 20px 0; }
+.admin-wallet__fund-balance strong, .admin-wallet__impact strong, .admin-wallet__impact-summary strong { color: var(--brand-gold-bright); font-family: var(--font-display); font-size: clamp(36px, 4vw, 58px); line-height: .9; }
+.admin-wallet__benefit-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 20px 0; }
+.admin-wallet__benefit-overview span, .admin-wallet__benefit-counts span { display: grid; gap: 4px; color: var(--text-secondary); font-size: 12px; }
+.admin-wallet__benefit-overview b, .admin-wallet__benefit-counts b { color: var(--text-primary); font-family: var(--font-display); font-size: 26px; }
+.admin-wallet__text-action, .admin-wallet__filter-row button, .admin-wallet__close { min-height: 44px; padding: 9px 14px; border: 1px solid var(--line-subtle); border-radius: 6px; color: var(--brand-gold-bright); background: rgba(255,255,255,.035); font-weight: 700; cursor: pointer; }
+.admin-wallet__text-action:hover, .admin-wallet__filter-row button:hover, .admin-wallet__close:hover, .admin-wallet__filter-row button.is-active { border-color: var(--brand-gold); background: rgba(212,174,111,.12); }
+.admin-wallet__club-preview, .admin-wallet__trace-list, .admin-wallet__attention-list, .admin-wallet__surface-list, .admin-wallet__participant-list { display: grid; gap: 8px; margin: 18px 0; }
+.admin-wallet__club-preview > div, .admin-wallet__trace, .admin-wallet__attention-row, .admin-wallet__movement, .admin-wallet__participant, .admin-wallet__club { padding: 12px 0; border-top: 1px solid var(--line-subtle); }
+.admin-wallet__club-preview > div, .admin-wallet__club { display: grid; gap: 4px; }
+.admin-wallet__club-preview small, .admin-wallet__trace small, .admin-wallet__attention-row small, .admin-wallet__movement small, .admin-wallet__participant small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
+.admin-wallet__trace > span { display: grid; justify-items: end; gap: 4px; color: var(--text-secondary); font-size: 12px; text-align: right; }
+.admin-wallet__trace b, .admin-wallet__participant b { color: var(--status-success); font-size: 11px; text-transform: uppercase; }
+.admin-wallet__attention-row > span { display: grid; flex: 0 0 30px; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: var(--canvas-deep); background: var(--brand-gold); font-weight: 800; }
+.admin-wallet__attention-row > div { flex: 1; min-width: 0; }
+.admin-wallet__attention-row > b { color: var(--brand-gold-bright); font-size: 11px; text-transform: uppercase; }
+.admin-wallet__movement-mark { flex: 0 0 30px; color: var(--status-success); font-size: 24px; }
+.admin-wallet__movement > div { flex: 1; min-width: 0; }
+.admin-wallet__movement-amount { display: grid; justify-items: end; color: var(--status-success); font-weight: 700; text-align: right; white-space: nowrap; }
+.admin-wallet__movement-amount[data-direction="debit"] { color: var(--status-error); }
+.admin-wallet__movement-amount small { color: var(--text-secondary); font-weight: 400; }
+.admin-wallet__filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.admin-wallet__filter-row button { color: var(--text-secondary); }
+.admin-wallet__benefit { display: grid; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line-subtle); }
+.admin-wallet__benefit h3 { margin: 0; font-family: var(--font-display); font-size: 26px; text-transform: uppercase; }
+.admin-wallet__benefit-counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.admin-wallet__inventory { margin: 0; color: var(--status-info); font-size: 12px; }
+.admin-wallet__participant { border-top: 0; padding: 8px 0; }
+.admin-wallet__participant span { min-width: 0; }
+.admin-wallet__participant b[data-status="ELIGIBLE"] { color: var(--brand-gold-bright); }
+.admin-wallet__club-metrics { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; color: var(--text-secondary); font-size: 12px; text-align: right; }
+.admin-wallet__impact-summary { display: grid; gap: 5px; margin-bottom: 16px; }
+.admin-wallet__overlay-backdrop { position: fixed; inset: 0; z-index: 1000; border: 0; background: rgba(0,0,0,.68); backdrop-filter: blur(4px); cursor: default; }
+.admin-wallet__overlay { position: fixed; z-index: 1001; inset: 5vh 5vw; display: grid; grid-template-rows: auto minmax(0,1fr); overflow: hidden; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--canvas-deep); box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+.admin-wallet__overlay-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line-subtle); }
+.admin-wallet__overlay-header h2 { font-size: clamp(30px, 4vw, 52px); }
+.admin-wallet__overlay-content { min-height: 0; overflow: auto; padding: 22px 24px max(24px, env(safe-area-inset-bottom)); }
+@media (max-width: 1100px) { .admin-wallet__summary { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .admin-wallet-page { gap: 14px; padding: 18px 14px max(100px, calc(84px + env(safe-area-inset-bottom))); }
+  .admin-wallet__header { display: grid; gap: 16px; align-items: start; }
+  .admin-wallet__context { justify-items: start; text-align: left; }
+  .admin-wallet__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .admin-wallet__metric { padding: 13px; }
+  .admin-wallet__metric strong { font-size: 27px; }
+  .admin-wallet__main-grid { grid-template-columns: 1fr; gap: 14px; }
+  .admin-wallet__benefit-overview, .admin-wallet__benefit-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-wallet__overlay { inset: 0; border: 0; border-radius: 0; }
+  .admin-wallet__overlay-header { padding: max(16px, env(safe-area-inset-top)) 16px 16px; }
+  .admin-wallet__overlay-content { padding: 18px 16px max(24px, env(safe-area-inset-bottom)); }
+  .admin-wallet__club { align-items: start; flex-direction: column; }
+  .admin-wallet__club-metrics { justify-content: start; text-align: left; }
+}
+.admin-wallet__operational { display: grid; gap: 16px; border-color: color-mix(in oklch, var(--brand-gold) 45%, var(--line-subtle)); }
+.admin-wallet__operational-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.admin-wallet__operational-grid > div { display: grid; gap: 5px; padding: 14px; border-left: 2px solid var(--brand-gold); background: rgba(255,255,255,.035); }
+.admin-wallet__operational-grid strong { font-family: var(--font-display); font-size: 22px; text-transform: uppercase; }
+.admin-wallet__operational-grid small { color: var(--text-secondary); font-size: 12px; line-height: 1.4; }
+.admin-wallet__operational-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+@media (max-width: 767px) { .admin-wallet__operational-grid { grid-template-columns: 1fr; } }
+
+/* Phase 101: Admin is an operations console; the decision surface leads. */
+.admin-wallet-page{--admin-action:#f0c96c;}
+.admin-wallet__header p,.admin-wallet__muted,.admin-wallet__empty,.admin-wallet__club p,.admin-wallet__benefit p{font-size:14px;line-height:1.5}
+.admin-wallet__metric span,.admin-wallet__metric small,.admin-wallet__benefit-counts small,.admin-wallet__section-heading>span{font-size:13px;line-height:1.35}
+.admin-wallet__summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.admin-wallet__metric{padding:18px;border-color:rgba(255,255,255,.14);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.admin-wallet__metric:first-child{border-color:rgba(240,201,108,.58);background:rgba(240,201,108,.055)}
+.admin-wallet__metric strong{font-size:clamp(26px,2.7vw,36px)}
+.admin-wallet__operational{gap:18px;border-color:rgba(240,201,108,.72);background:linear-gradient(145deg,rgba(23,19,10,.96),rgba(10,10,8,.93));box-shadow:0 18px 44px rgba(0,0,0,.2)}
+.admin-wallet__operational .admin-wallet__section-heading{margin-bottom:0}
+.admin-wallet__operational .admin-wallet__section-heading h2{font-size:30px}
+.admin-wallet__operational-grid{gap:10px}
+.admin-wallet__operational-grid>div{min-height:94px;padding:16px;border-left-color:var(--admin-action);background:rgba(240,201,108,.075)}
+.admin-wallet__operational-grid strong{font-size:24px;line-height:1}
+.admin-wallet__operational-grid small{font-size:13px;line-height:1.42}
+.admin-wallet__operational-actions{align-items:center;gap:10px;padding-top:2px}
+.admin-wallet__operational-actions form{display:flex}
+.admin-wallet__operational-actions .admin-wallet__text-action{min-height:48px;padding-inline:16px;border-color:var(--admin-action);background:var(--admin-action);color:#171108;font-size:14px}
+.admin-wallet__operational-actions .admin-wallet__text-action:hover{border-color:#ffe09a;background:#ffe09a}
+.admin-wallet__operational .admin-wallet__muted{max-width:76ch;margin-top:0;font-size:13px}
+.admin-wallet__attention{border-color:rgba(240,201,108,.5);box-shadow:0 18px 42px rgba(0,0,0,.18)}
+.admin-wallet__attention .admin-wallet__section-heading h2{font-size:30px}
+.admin-wallet__attention-row{min-height:70px;padding:13px 4px;border-top-color:rgba(240,201,108,.3);}
+.admin-wallet__attention-row strong{font-size:15px}
+.admin-wallet__attention-row small{font-size:13px;line-height:1.4}
+.admin-wallet__attention-row>b{font-size:12px}
+.admin-wallet__text-action,.admin-wallet__filter-row button,.admin-wallet__close{font-size:14px}
+.admin-wallet__benefit-overview b,.admin-wallet__benefit-counts b{font-size:29px}
+.admin-wallet__club-preview small,.admin-wallet__trace small,.admin-wallet__movement small,.admin-wallet__participant small{font-size:13px;line-height:1.4}
+.admin-wallet__trace>b,.admin-wallet__participant b{font-size:12px}
+.admin-wallet__text-action:focus-visible,.admin-wallet__filter-row button:focus-visible,.admin-wallet__close:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
+@media(max-width:1100px) and (min-width:768px){.admin-wallet__summary{grid-template-columns:repeat(3,minmax(0,1fr))}.admin-wallet__main-grid{gap:14px}}
+@media(max-width:767px){.admin-wallet__summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-wallet__metric{padding:14px}.admin-wallet__metric span,.admin-wallet__metric small{font-size:12.5px}.admin-wallet__operational{padding:18px}.admin-wallet__operational .admin-wallet__section-heading h2{font-size:27px}.admin-wallet__operational-grid{gap:8px}.admin-wallet__operational-grid>div{min-height:0;padding:13px}.admin-wallet__operational-grid strong{font-size:22px}.admin-wallet__operational-grid small{font-size:13px}.admin-wallet__operational-actions{display:grid;gap:8px}.admin-wallet__operational-actions form,.admin-wallet__operational-actions .admin-wallet__text-action{width:100%}.admin-wallet__operational-actions .admin-wallet__text-action{font-size:14px}.admin-wallet__attention .admin-wallet__section-heading h2{font-size:27px}.admin-wallet__attention-row{min-height:68px;padding:12px 0}.admin-wallet__attention-row strong{font-size:14px}.admin-wallet__attention-row small{font-size:12.5px}.admin-wallet__text-action{font-size:14px}.admin-wallet__section-heading>span{font-size:12px;white-space:normal;text-align:right}}
+.admin-wallet__racha { display: grid; gap: 1rem; border-color: color-mix(in oklch, var(--brand-gold-bright) 45%, transparent); }
+.admin-wallet__racha-intro { max-width: 60rem; margin: 0; color: var(--text-secondary); font-size: .94rem; line-height: 1.5; }
+.admin-wallet__racha-current { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.admin-wallet__racha-current > div { display: grid; gap: .3rem; padding: .85rem; border-left: 3px solid var(--brand-gold-bright); background: color-mix(in oklch, var(--brand-gold-bright) 7%, transparent); }
+.admin-wallet__racha-current strong, .admin-wallet__racha-templates > strong { font-family: var(--font-display); font-size: .86rem; letter-spacing: .06em; text-transform: uppercase; }
+.admin-wallet__racha-current span { color: var(--text-secondary); font-size: .84rem; line-height: 1.4; }
+.admin-wallet__racha-form { display: grid; grid-template-columns: .6fr 1fr 1.5fr auto; align-items: end; gap: .75rem; }
+.admin-wallet__racha-form input, .admin-wallet__racha-form select { min-height: 2.8rem; padding: .65rem; border: 1px solid var(--line-subtle); color: var(--text-primary); background: var(--surface-canvas-deep); }
+.admin-wallet__racha-form button { min-height: 2.8rem; }
+.admin-wallet__racha-templates { display: flex; flex-wrap: wrap; gap: .5rem .8rem; align-items: center; padding-top: .5rem; border-top: 1px solid var(--line-subtle); }
+.admin-wallet__racha-templates span { padding: .35rem .5rem; color: var(--text-secondary); background: color-mix(in oklch, var(--text-primary) 6%, transparent); font-size: .8rem; }
+@media(max-width:767px){.admin-wallet__racha-current,.admin-wallet__racha-form{grid-template-columns:1fr}.admin-wallet__racha-form button{width:100%}.admin-wallet__racha-templates{display:grid;align-items:start}}

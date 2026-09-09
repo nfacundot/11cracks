@@ -11,11 +11,26 @@ enum LessonType {
   LESSON
   QUIZ
   GAME
+  PREGUNTADOS
+  CONTRARRELOJ
+}
+
+enum OptionMode {
+  TEXT
+  IMAGE
+  BOTH
 }
 
 enum GameMode {
   ANAGRAM
   INFOGRAMA
+}
+
+enum GameCategory {
+  OIDO
+  GOL
+  LETRAS
+  ALIMENTACION
 }
 
 enum IndicatorCategory {
@@ -158,15 +173,16 @@ model Clase {
   order       Int      @default(0)
   createdAt   DateTime @default(now())
 
-  temas Tema[]
+  temas Tema[] @relation("EtapaMaterias")
+
+  etapaTemas   EtapaTema[]
+  etapaLessons EtapaLesson[]
 
   @@index([order])
 }
 
 model Tema {
   id       String  @id @default(cuid())
-  claseId  String?
-  clase    Clase?  @relation(fields: [claseId], references: [id], onDelete: SetNull)
   name     String
   emoji    String  @default("⭐")
   color    String  @default("#16a34a")
@@ -175,10 +191,37 @@ model Tema {
   posX     Float   @default(50)
   posY     Float   @default(50)
 
-  lessons Lesson[]
+  clases     Clase[]     @relation("EtapaMaterias")
+  lessons    Lesson[]
+  etapaTemas EtapaTema[]
 
   @@index([order])
-  @@index([claseId, order])
+}
+
+model EtapaTema {
+  id      String @id @default(cuid())
+  claseId String
+  temaId  String
+  posX    Float  @default(50)
+  posY    Float  @default(50)
+  clase   Clase  @relation(fields: [claseId], references: [id], onDelete: Cascade)
+  tema    Tema   @relation(fields: [temaId], references: [id], onDelete: Cascade)
+
+  @@unique([claseId, temaId])
+  @@index([temaId])
+}
+
+model EtapaLesson {
+  id       String @id @default(cuid())
+  claseId  String
+  lessonId String
+  posX     Float  @default(50)
+  posY     Float  @default(50)
+  clase    Clase  @relation(fields: [claseId], references: [id], onDelete: Cascade)
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([claseId, lessonId])
+  @@index([lessonId])
 }
 
 model Lesson {
@@ -191,12 +234,20 @@ model Lesson {
   color       String     @default("#16a34a")
   type        LessonType @default(LESSON)
   gameMode    GameMode?
+  optionMode  OptionMode  @default(TEXT)
+  timeSeconds Int?
   order       Int        @default(0)
   xpReward    Int        @default(10)
+  posX        Float      @default(50)
+  posY        Float      @default(50)
   createdAt   DateTime   @default(now())
+
+  gameId    String? @unique
+  game      Game?   @relation(fields: [gameId], references: [id], onDelete: SetNull)
 
   questions Question[]
   progress  LessonProgress[]
+  etapaLessons EtapaLesson[]
 
   @@index([type, order])
   @@index([temaId, order])
@@ -318,4 +369,124 @@ model Characteristic {
   color      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Game {
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  name              String
+  category          GameCategory
+  emoji             String       @default("🎮")
+  color             String       @default("#22c55e")
+  description       String?
+  active            Boolean      @default(true)
+  order             Int          @default(0)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  oidoWords         OidoCrackWord[]
+  golWords          GolPalabraWord[]
+  letrasWords       LetrasCrackWord[]
+  alimentacionWords AlimentacionWord[]
+  lesson            Lesson?
+
+  @@index([category, active, order])
+  @@index([order])
+}
+
+model OidoCrackWord {
+  id       String  @id @default(cuid())
+  gameId   String?
+  game     Game?   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  word     String
+  label    String?
+  language String  @default("en")
+  active   Boolean @default(true)
+  order    Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  options OidoCrackOption[]
+
+  @@index([active, order])
+  @@index([gameId])
+}
+
+model OidoCrackOption {
+  id       String   @id @default(cuid())
+  wordId   String
+  word     OidoCrackWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  label    String
+  imageUrl String
+  isCorrect Boolean @default(false)
+  order    Int      @default(0)
+
+  @@index([wordId])
+}
+
+model GolPalabraWord {
+  id       String  @id @default(cuid())
+  gameId   String?
+  game     Game?   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  word     String
+  meaning  String
+  language String  @default("en")
+  active   Boolean @default(true)
+  order    Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  options GolPalabraOption[]
+
+  @@index([active, order])
+  @@index([gameId])
+}
+
+model GolPalabraOption {
+  id       String   @id @default(cuid())
+  wordId   String
+  word     GolPalabraWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+  label    String
+  isCorrect Boolean @default(false)
+  order    Int      @default(0)
+
+  @@index([wordId])
+}
+
+model LetrasCrackWord {
+  id       String   @id @default(cuid())
+  gameId   String?
+  game     Game?    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  word     String
+  meaning  String
+  imageUrl String
+  language String   @default("en")
+  active   Boolean  @default(true)
+  order    Int      @default(0)
+  letters  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+  @@index([gameId])
+}
+
+model AlimentacionWord {
+  id        String   @id @default(cuid())
+  gameId    String?
+  game      Game?    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  name      String
+  imageUrl  String
+  audioUrl  String?
+  useTts    Boolean  @default(true)
+  ttsVoice  String   @default("female")
+  isHealthy Boolean
+  language  String   @default("es")
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
+  @@index([gameId])
 }

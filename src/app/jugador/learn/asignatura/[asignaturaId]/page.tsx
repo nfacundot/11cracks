@@ -19,7 +19,7 @@ export default async function LearnAsignaturaPage({
   const tema = await prisma.tema.findUnique({
     where: { id: asignaturaId },
     include: {
-      clase: { select: { id: true, name: true, emoji: true, color: true } },
+      clases: { select: { id: true, name: true, emoji: true, color: true } },
       lessons: {
         orderBy: { order: "asc" },
         include: {
@@ -39,7 +39,7 @@ export default async function LearnAsignaturaPage({
   return (
     <div className="fixed inset-x-0 bottom-0 top-0 z-0 mx-auto max-w-md overflow-hidden">
       <Image
-        src="/img/back/backa.png"
+        src="/img/back/backa.webp"
         alt=""
         fill
         priority
@@ -57,9 +57,9 @@ export default async function LearnAsignaturaPage({
         </Link>
 
         <div className="rounded-2xl bg-white/55 backdrop-blur-xl px-4 py-3 shadow-xl ring-2 ring-white/70 dark:bg-emerald-950/55 dark:ring-emerald-800">
-          {tema.clase && (
-            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: tema.clase.color }}>
-              {tema.clase.emoji} {tema.clase.name}
+          {tema.clases[0] && (
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: tema.clases[0].color }}>
+              {tema.clases[0].emoji} {tema.clases[0].name}
             </p>
           )}
           <p className="text-sm font-black text-emerald-950 dark:text-white">

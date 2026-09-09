@@ -87,7 +87,7 @@ export default function LearnStages({
   return (
     <div className="fixed inset-x-0 bottom-0 top-0 z-0 mx-auto max-w-md overflow-hidden">
       <Image
-        src="/img/back/backa.png"
+        src="/img/back/backa.webp"
         alt=""
         fill
         priority
@@ -183,7 +183,7 @@ export default function LearnStages({
           <div className="relative mx-auto mt-4 w-full max-w-md overflow-hidden rounded-2xl shadow-xl ring-2 ring-white/70 dark:ring-emerald-800">
             <div className="relative" style={{ height: canvasHeight }}>
               <Image
-                src="/img/back/backa.png"
+                src="/img/back/backa.webp"
                 alt=""
                 fill
                 sizes="(max-width: 448px) 448px, 448px"

@@ -72,6 +72,7 @@ export default function RootLayout({
         <PwaRegister />
         <LessonLoaderGlobal />
         {children}
+        <div id="overlay-root" />
       </body>
     </html>
   );

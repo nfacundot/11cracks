@@ -1,7 +1,10 @@
-import { redirect } from "next/navigation";
+import { requireSection } from "@/lib/auth";
+import { AdminWorkspace } from "@/components/admin-demo/admin-workspace";
+import { adminIdentity } from "@/lib/admin-demo/state";
 
-export const metadata = { title: "Vista Global | Admin" };
+export const metadata = { title: "Dashboard | Admin" };
 
-export default function AdminIndexPage() {
-  redirect("/admin/dashboard");
+export default async function AdminIndexPage() {
+  await requireSection("ADMIN");
+  return <AdminWorkspace identity={adminIdentity} section="dashboard" />;
 }

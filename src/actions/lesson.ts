@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
 import { notify } from "@/lib/notify";
+import { revalidatePath } from "next/cache";
 
 type ActionResult =
   | { ok: true; correct: boolean; explanation?: string | null; correctOptionId?: string }
@@ -42,6 +43,8 @@ export async function submitAnswer(data: {
       update: { status: "IN_PROGRESS" },
     });
   });
+
+  revalidatePath("/jugador/neurocracks");
 
   return {
     ok: true,
@@ -144,6 +147,8 @@ export async function finishLesson(data: {
       { icon: "🚀", link: "/jugador/learn" }
     );
   }
+
+  revalidatePath("/jugador/neurocracks");
 
   return {
     ok: true,

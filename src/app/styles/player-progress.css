@@ -1,0 +1,199 @@
+.player-progress-page {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 90rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 4rem) 5rem;
+}
+
+.player-progress-page__header { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.player-progress-page__eyebrow { color: var(--context-progress); font-family: var(--font-display); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+.player-progress-page h1, .player-progress-page h2, .player-progress-page h3, .player-progress-page p { margin: 0; }
+.player-progress-page__header h1 { margin-top: 0.3rem; font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 0.86; letter-spacing: -0.04em; text-transform: uppercase; }
+.player-progress-page__header p { max-width: 34rem; margin-top: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
+.player-progress-page__hero { display: grid; grid-template-columns: minmax(14rem, 0.65fr) minmax(26rem, 1.35fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); padding: clamp(1.2rem, 3vw, 2.5rem); border: 1px solid color-mix(in oklch, var(--context-progress) 28%, transparent); background: linear-gradient(120deg, oklch(0.09 0.01 220 / 0.88), oklch(0.07 0.006 105 / 0.62)); box-shadow: 0 1.5rem 3.5rem oklch(0.02 0.003 105 / 0.32); }
+.player-progress-page__hero-copy h2 { margin-top: 0.35rem; font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 5rem); line-height: 0.88; letter-spacing: -0.04em; text-transform: uppercase; }
+.player-progress-page__hero-copy p { max-width: 20rem; margin-top: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+.player-progress-page__tabs { display: inline-flex; gap: 0.15rem; margin-top: 1.5rem; padding: 0.2rem; border: 1px solid var(--border-subtle); background: oklch(0.04 0.004 105 / 0.55); }
+.player-progress-page__tabs button { min-height: var(--touch-target-min); padding: 0.55rem 0.9rem; border: 0; color: var(--text-secondary); background: transparent; font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.player-progress-page__tabs button[aria-pressed="true"] { color: var(--text-on-action); background: var(--context-progress); }
+.player-progress-page[data-mode="neurocracks"] .player-progress-page__tabs button[aria-pressed="true"] { color: var(--text-primary); background: var(--context-neurocracks); }
+
+.player-progress-radar { display: grid; grid-template-columns: minmax(18rem, 1fr) minmax(9rem, 0.42fr); align-items: center; gap: 1rem 1.5rem; }
+.player-progress-radar__chart { position: relative; width: min(100%, 29rem); aspect-ratio: 1; margin-inline: auto; }
+.player-progress-radar__chart svg { width: 100%; height: 100%; overflow: visible; }
+.player-progress-radar__grid polygon { fill: none; stroke: color-mix(in oklch, var(--text-primary) 18%, transparent); stroke-width: 0.8; }
+.player-progress-radar__grid line { stroke: color-mix(in oklch, var(--text-primary) 17%, transparent); stroke-width: 0.7; }
+.player-progress-radar__previous { fill: color-mix(in oklch, var(--text-primary) 5%, transparent); stroke: color-mix(in oklch, var(--text-primary) 55%, transparent); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.player-progress-radar__current { fill: color-mix(in oklch, var(--context-progress) 20%, transparent); stroke: var(--context-progress); stroke-width: 2.2; filter: drop-shadow(0 0 0.35rem color-mix(in oklch, var(--context-progress) 55%, transparent)); }
+.player-progress-radar--violet .player-progress-radar__current { fill: color-mix(in oklch, var(--context-neurocracks) 20%, transparent); stroke: var(--context-neurocracks); filter: drop-shadow(0 0 0.35rem color-mix(in oklch, var(--context-neurocracks) 55%, transparent)); }
+.player-progress-radar__center { fill: var(--text-primary); }
+.player-progress-radar__point { position: absolute; top: var(--point-y); left: var(--point-x); display: grid; width: var(--touch-target-min); height: var(--touch-target-min); place-items: center; transform: translate(-50%, -50%); border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+.player-progress-radar__point::before { content: ""; width: 0.8rem; height: 0.8rem; border: 2px solid var(--context-progress); border-radius: 50%; background: var(--surface-canvas-deep); transition: width var(--motion-press) ease, height var(--motion-press) ease, box-shadow var(--motion-press) ease; }
+.player-progress-radar--violet .player-progress-radar__point::before { border-color: var(--context-neurocracks); }
+.player-progress-radar__point[data-selected="true"]::before, .player-progress-radar__point:hover::before { width: 1.15rem; height: 1.15rem; box-shadow: 0 0 0 0.25rem color-mix(in oklch, var(--context-progress) 22%, transparent); }
+.player-progress-radar--violet .player-progress-radar__point[data-selected="true"]::before, .player-progress-radar--violet .player-progress-radar__point:hover::before { box-shadow: 0 0 0 0.25rem color-mix(in oklch, var(--context-neurocracks) 22%, transparent); }
+.player-progress-radar__point:focus-visible, .player-progress-radar__dimensions button:focus-visible, .player-progress-page__tabs button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+.player-progress-radar__point:focus-visible { outline-color: var(--context-progress); }
+.player-progress-radar--violet .player-progress-radar__point:focus-visible { outline-color: var(--context-neurocracks); }
+.player-progress-radar__legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; grid-column: 1; color: var(--text-secondary); font-size: 0.68rem; }
+.player-progress-radar__legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.player-progress-radar__legend i { width: 1.3rem; border-top: 2px solid var(--context-progress); }
+.player-progress-radar__legend i[data-period="previous"] { border-top-style: dashed; border-color: var(--text-muted); }
+.player-progress-radar--violet .player-progress-radar__legend i[data-period="current"] { border-color: var(--context-neurocracks); }
+.player-progress-radar__detail { display: grid; gap: 0.45rem; padding: 1rem; border-left: 1px solid var(--border-subtle); }
+.player-progress-radar__detail small { color: var(--text-secondary); font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.player-progress-radar__detail div { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; }
+.player-progress-radar__detail strong { font-family: var(--font-score); font-size: 2.2rem; line-height: 0.9; }
+.player-progress-radar__detail span { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
+.player-progress-radar__detail em { color: var(--context-progress); font-size: 0.78rem; font-style: normal; font-weight: 700; }
+.player-progress-radar__detail em[data-positive="false"] { color: var(--status-error); }
+.player-progress-radar--violet .player-progress-radar__detail em[data-positive="true"] { color: var(--context-neurocracks); }
+.player-progress-radar__dimensions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; grid-column: 1 / -1; }
+.player-progress-radar__dimensions button { min-height: 2.25rem; padding: 0.35rem 0.55rem; border: 1px solid var(--border-subtle); color: var(--text-muted); background: transparent; font-size: 0.68rem; cursor: pointer; }
+.player-progress-radar__dimensions button[aria-pressed="true"] { color: var(--text-primary); border-color: var(--context-progress); }
+.player-progress-radar--violet .player-progress-radar__dimensions button[aria-pressed="true"] { border-color: var(--context-neurocracks); }
+
+.player-progress-page__metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-top: 0.8rem; }
+.player-progress-page__metrics > div { display: grid; min-height: 7.5rem; align-content: center; gap: 0.25rem; padding: 1rem; border: 1px solid var(--border-subtle); background: color-mix(in oklch, var(--surface-panel) 70%, transparent); }
+.player-progress-page__metrics small, .player-progress-panel__heading strong { color: var(--text-muted); font-size: 0.67rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.player-progress-page__metrics strong { font-family: var(--font-score); font-size: 2.4rem; line-height: 0.9; }
+.player-progress-page__metrics span { color: var(--text-secondary); font-size: 0.75rem; }
+.player-progress-page__grid { display: grid; gap: 0.8rem; margin-top: 0.8rem; }
+.player-progress-page__grid[data-priority="supporting"] { margin-top: 1.6rem; }
+.player-progress-page__grid[data-priority="supporting"] .player-progress-panel { border-color: color-mix(in oklch, var(--border-subtle) 82%, transparent); }
+.player-progress-page__grid--middle { grid-template-columns: minmax(0, 1.25fr) minmax(19rem, 0.75fr); }
+.player-progress-page__grid--lower { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.player-progress-page__grid--bottom { grid-template-columns: minmax(16rem, 0.7fr) minmax(0, 1.3fr); }
+.player-progress-panel { min-width: 0; padding: clamp(1rem, 2vw, 1.5rem); border: 1px solid var(--border-subtle); background: color-mix(in oklch, var(--surface-panel) 62%, transparent); }
+.player-progress-panel__heading { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.player-progress-panel h2 { margin-top: 0.35rem; font-family: var(--font-display); font-size: 1.8rem; line-height: 0.95; text-transform: uppercase; }
+.player-progress-panel__heading > strong { color: var(--context-progress); font-family: var(--font-score); font-size: 2rem; }
+.player-progress-trend__chart { margin-top: 1.2rem; }
+.player-progress-trend__chart svg { display: block; width: 100%; height: 10rem; overflow: visible; background: repeating-linear-gradient(to bottom, transparent 0 2.4rem, color-mix(in oklch, var(--text-primary) 8%, transparent) 2.45rem 2.5rem); }
+.player-progress-trend__line { fill: none; stroke: none; }
+.player-progress-trend__polyline { fill: none; stroke: var(--context-progress); stroke-width: 2; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 0.4rem color-mix(in oklch, var(--context-progress) 52%, transparent)); }
+.player-progress-trend__chart > div { display: flex; justify-content: space-between; margin-top: 0.35rem; color: var(--text-muted); font-size: 0.7rem; }
+.player-progress-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 0.8rem; }
+.player-progress-list .player-progress-panel__heading, .player-progress-list h3 { grid-column: 1 / -1; }
+.player-progress-list h3 { margin-top: 0.6rem; color: var(--text-secondary); font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.player-progress-list__item { display: grid; grid-template-columns: 1fr auto; gap: 0.1rem 0.5rem; padding: 0.75rem; border-left: 2px solid var(--context-progress); background: color-mix(in oklch, var(--context-progress) 7%, transparent); }
+.player-progress-list__item--improve { border-color: var(--status-warning); background: color-mix(in oklch, var(--status-warning) 6%, transparent); }
+.player-progress-list__item span { font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+.player-progress-list__item strong { color: var(--context-progress); font-family: var(--font-score); font-size: 1.65rem; line-height: 0.8; }
+.player-progress-list__item small { grid-column: 1 / -1; color: var(--text-secondary); font-size: 0.7rem; }
+.player-progress-coach blockquote { margin: 1.4rem 0 0.8rem; color: var(--text-primary); font-family: var(--font-display); font-size: clamp(1.4rem, 2.4vw, 2.2rem); line-height: 0.98; }
+.player-progress-coach p, .player-progress-coach > strong { color: var(--text-secondary); font-size: 0.78rem; }
+.player-progress-coach > strong { display: inline-block; margin-top: 0.8rem; color: var(--context-training); font-family: var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-progress-hours__number { display: flex; align-items: baseline; gap: 0.45rem; margin-top: 1.2rem; }
+.player-progress-hours__number strong { font-family: var(--font-score); font-size: 4.5rem; line-height: 0.8; }
+.player-progress-hours__number span { color: var(--text-secondary); font-family: var(--font-display); font-size: 0.8rem; text-transform: uppercase; }
+.player-progress-hours__bar { height: 0.55rem; margin-top: 1.4rem; overflow: hidden; background: color-mix(in oklch, var(--text-primary) 12%, transparent); }
+.player-progress-hours__bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--context-progress), var(--brand-gold)); }
+.player-progress-hours__meta { display: flex; justify-content: space-between; gap: 0.8rem; margin-top: 0.55rem; color: var(--text-secondary); font-size: 0.72rem; }
+.player-progress-hours__meta strong { color: var(--brand-gold-bright); }
+.player-progress-hours p { margin-top: 1rem; color: var(--text-muted); font-size: 0.75rem; }
+.player-progress-bilingual > div { display: inline-grid; margin: 1.2rem 1.5rem 0 0; }
+.player-progress-history > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.2rem 0.7rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); }
+.player-progress-history > div strong { font-family: var(--font-display); font-size: 0.9rem; text-transform: uppercase; }
+.player-progress-history > div span { color: var(--text-secondary); font-size: 0.72rem; }
+.player-progress-history > div time { grid-row: 1 / span 2; grid-column: 2; color: var(--text-muted); font-size: 0.7rem; }
+.player-progress-racha { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem; align-items: center; margin: 1rem 0; padding: 1rem 1.2rem; border: 1px solid color-mix(in oklch, var(--brand-gold) 35%, transparent); border-radius: 12px; background: color-mix(in oklch, var(--surface-panel) 84%, transparent); }
+.player-progress-racha h2 { margin: 0.3rem 0; font: 700 2rem/0.95 var(--font-display); text-transform: uppercase; }
+.player-progress-racha h2 small { margin-left: 0.5rem; color: var(--action-energy); font: 700 0.68rem var(--font-ui); letter-spacing: 0.08em; vertical-align: middle; }
+.player-progress-racha p { margin: 0; color: var(--text-secondary); font-size: 0.78rem; line-height: 1.45; }
+.player-progress-racha dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; margin: 0; }
+.player-progress-racha dl div { min-width: 0; padding: 0.7rem; border-left: 1px solid var(--border-subtle); }
+.player-progress-racha dt { color: var(--text-muted); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.player-progress-racha dd { margin: 0.35rem 0 0; color: var(--text-primary); font: 700 1.05rem var(--font-score); overflow-wrap: anywhere; }
+.player-progress-language-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.player-progress-language-grid p { grid-column: 1 / -1; color: var(--text-muted); font-size: 0.78rem; }
+
+.data-viz-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 63.9375rem) {
+  .player-progress-page__hero { grid-template-columns: 1fr; }
+  .player-progress-radar { grid-template-columns: minmax(17rem, 1fr) minmax(8rem, 0.42fr); }
+}
+
+@media (max-width: 47.9375rem) {
+  .player-progress-page { padding: 1.25rem 1rem calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 2rem); }
+  .player-progress-page__header { display: grid; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .player-progress-page__header h1 { font-size: 3rem; }
+  .player-progress-page__hero { gap: 0.55rem; padding: 0.75rem; }
+  .player-progress-page__hero-copy h2 { font-size: 2.8rem; }
+  .player-progress-page__hero-copy p { margin-top: 0.55rem; line-height: 1.35; }
+  .player-progress-page__tabs { margin-top: 0.8rem; }
+  .player-progress-radar { grid-template-columns: 1fr; gap: 0.25rem; }
+  .player-progress-radar__chart { width: min(100%, 16rem); }
+  .player-progress-radar__legend, .player-progress-radar__detail { grid-column: 1; }
+  .player-progress-radar__detail { grid-template-columns: 1fr auto auto auto; align-items: center; border-top: 1px solid var(--border-subtle); border-left: 0; scroll-margin-bottom: calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 1.5rem); }
+  .player-progress-radar__detail small { grid-column: 1 / -1; }
+  .player-progress-radar__dimensions { scroll-margin-bottom: calc(var(--shell-mobile-dock-height) + env(safe-area-inset-bottom) + 1.5rem); }
+  .player-progress-page__metrics { grid-template-columns: 1fr 1fr; }
+  .player-progress-page__metrics > div { min-height: 6.5rem; }
+  .player-progress-page__grid--middle, .player-progress-page__grid--lower, .player-progress-page__grid--bottom { grid-template-columns: 1fr; }
+  .player-progress-list { grid-template-columns: 1fr 1fr; }
+  .player-progress-hours__meta { display: grid; }
+  .player-progress-racha { grid-template-columns: 1fr; padding: 1rem; }
+  .player-progress-racha dl { grid-template-columns: 1fr 1fr; }
+  .player-progress-racha dl div { border-left: 0; border-top: 1px solid var(--border-subtle); }
+  .player-progress-language-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-progress-radar__point, .player-progress-trend__polyline { transition: none; }
+}
+
+.player-progress-radar__dimensions button { min-height: var(--touch-target-min); }
+
+.player-progress-page__header { min-height: 15rem; display: grid; align-content: center; }
+@media (min-width: 48rem) and (max-width: 63.9375rem) { .player-progress-page__header { min-height: 13rem; } }
+@media (max-width: 47.9375rem) { .player-progress-page__header { min-height: 9.5rem; align-content: end; } }
+
+.player-rpg-progress-modules { display: grid; gap: 1rem; margin: 1.15rem 0; }
+.player-rpg-quests, .player-rpg-next-reward { padding: 1.35rem; border: 1px solid color-mix(in oklch, var(--text-primary) 16%, var(--border-subtle)); background: linear-gradient(145deg, color-mix(in oklch, var(--surface-panel) 82%, transparent), color-mix(in oklch, var(--canvas-deep) 58%, transparent)); }
+.player-rpg__label { color: var(--brand-gold-bright); font: 700 0.72rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-rpg__section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.15rem; }
+.player-rpg__section-heading h2 { margin: 0.3rem 0; font: 700 clamp(1.8rem, 3vw, 2.7rem)/0.92 var(--font-display); text-transform: uppercase; }
+.player-rpg__section-heading p { max-width: 43rem; margin: 0; color: var(--text-secondary); font-size: 0.96rem; line-height: 1.5; }
+.player-rpg__section-heading > span { color: var(--text-muted); font-size: 0.82rem; text-align: right; }
+.player-rpg__progress-wrap { display: grid; gap: 0.25rem; }
+.player-rpg__progress-wrap small { color: var(--text-secondary); font-size: 0.7rem; }
+.player-rpg__progress { height: 0.42rem; overflow: hidden; background: color-mix(in oklch, var(--text-primary) 13%, transparent); }
+.player-rpg__progress span { display: block; height: 100%; background: var(--context-neurocracks); transition: none; }
+.player-rpg-quest { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(11rem, 0.65fr); gap: 1.2rem; padding: 1.05rem 0.25rem; border-bottom: 1px solid color-mix(in oklch, var(--text-primary) 14%, transparent); }
+.player-rpg-quest:last-child { border-bottom: 0; }
+.player-rpg-quest__objective { display: flex; min-width: 0; align-items: flex-start; gap: 0.8rem; }
+.player-rpg-quest__objective > div { display: grid; min-width: 0; gap: 0.25rem; }
+.player-rpg-quest__icon { display: grid; width: 2.7rem; height: 2.7rem; flex: 0 0 auto; place-items: center; border: 1px solid color-mix(in oklch, var(--context-neurocracks) 60%, transparent); color: var(--context-neurocracks); background: color-mix(in oklch, var(--context-neurocracks) 10%, transparent); transform: rotate(45deg); }
+.player-rpg-quest__icon svg { width: 1.2rem; height: 1.2rem; transform: rotate(-45deg); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+.player-rpg-quest[data-state="VERIFIED"] .player-rpg-quest__icon { border-color: var(--action-energy); color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 12%, transparent); }
+.player-rpg-quest__eyebrow { color: var(--brand-gold-bright); font: 700 0.72rem var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.player-rpg-quest strong { font-size: 1.15rem; line-height: 1.05; }
+.player-rpg-quest span:not(.player-rpg-quest__icon):not(.player-rpg-quest__eyebrow) { font-size: 0.86rem; }
+.player-rpg-quest small { font-size: 0.9rem; line-height: 1.45; }
+.player-rpg-quest__progress { display: grid; align-content: center; gap: 0.45rem; }
+.player-rpg-quest__count { color: var(--text-primary); font: 700 1rem var(--font-display); }
+.player-rpg-quest__progress .player-rpg__progress { height: 0.55rem; }
+.player-rpg-quest b { font-size: 0.75rem; letter-spacing: 0.08em; }
+.player-rpg-next-reward { position: relative; overflow: hidden; background: radial-gradient(circle at 100% 0, color-mix(in oklch, var(--brand-gold) 16%, transparent), transparent 48%), linear-gradient(145deg, color-mix(in oklch, var(--surface-panel) 92%, transparent), color-mix(in oklch, var(--context-neurocracks) 10%, transparent)); }
+.player-rpg-next-reward::after { position: absolute; right: -3rem; bottom: -4rem; width: 12rem; height: 12rem; border: 1px solid color-mix(in oklch, var(--brand-gold-bright) 25%, transparent); border-radius: 50%; content: ""; opacity: 0.45; }
+.player-rpg-next-reward h2 { font-size: clamp(1.9rem, 3vw, 2.65rem); line-height: 0.9; }
+.player-rpg-next-reward > strong { font-size: 0.92rem; letter-spacing: 0.05em; }
+.player-rpg-next-reward p, .player-rpg-next-reward > small { font-size: 0.9rem; line-height: 1.5; }
+
+@media (max-width: 47.9375rem) {
+  .player-rpg-progress-modules { grid-template-columns: 1fr; }
+  .player-rpg__section-heading { display: grid; }
+  .player-rpg__section-heading > span { text-align: left; }
+  .player-rpg-quests, .player-rpg-next-reward { padding: 1.15rem; }
+  .player-rpg-quest { grid-template-columns: 1fr; gap: 0.9rem; padding: 1rem 0; }
+  .player-rpg-quest b { text-align: left; }
+  .player-rpg-quest strong { font-size: 1.1rem; }
+  .player-rpg-quest small { font-size: 0.92rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-rpg-next-reward::after { display: none; }
+}

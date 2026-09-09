@@ -47,7 +47,7 @@ export default async function LessonPage({
     prompt: q.prompt,
     explanation: q.explanation,
     timeSeconds: q.timeSeconds,
-    options: shuffle(q.options.map((o) => ({ id: o.id, text: o.text }))),
+    options: shuffle(q.options.map((o) => ({ id: o.id, text: o.text, imageUrl: o.imageUrl }))),
   }));
 
   const playerLesson = {
@@ -55,6 +55,9 @@ export default async function LessonPage({
     title: lesson.title,
     emoji: lesson.emoji,
     xpReward: lesson.xpReward,
+    type: lesson.type,
+    optionMode: lesson.optionMode,
+    timeSeconds: lesson.timeSeconds,
   };
 
   return (

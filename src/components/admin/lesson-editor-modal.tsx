@@ -21,6 +21,7 @@ export function LessonEditorModal({
   label,
   title,
   className,
+  initialType,
 }: {
   clases: EditorClase[];
   mode: "lessons" | "games";
@@ -28,6 +29,7 @@ export function LessonEditorModal({
   label: React.ReactNode;
   title: string;
   className?: string;
+  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,6 +74,7 @@ export function LessonEditorModal({
           <LessonEditor
             clases={clases}
             mode={mode}
+            initialType={initialType}
             defaultValues={data?.defaultValues}
             questions={data?.questions}
             onSaved={handleSaved}
