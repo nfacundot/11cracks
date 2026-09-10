@@ -348,9 +348,11 @@ export function LessonPlayer({
                 style = "bg-white/50 text-zinc-400 border-zinc-200 dark:bg-emerald-900/50 dark:text-zinc-500 dark:border-zinc-700";
               }
 
-              const isImageMode = lesson.optionMode === "IMAGE";
-              const showImage = !!option.imageUrl && lesson.optionMode !== "TEXT";
-              const showText = !isImageMode;
+              const mode = lesson.optionMode ?? "TEXT";
+              const hasImage = !!option.imageUrl;
+              const showImage = hasImage && mode !== "TEXT";
+              const showText =
+                mode === "TEXT" || mode === "BOTH" || (mode === "IMAGE" && !hasImage);
 
               return (
                 <button

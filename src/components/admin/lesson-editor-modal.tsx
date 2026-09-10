@@ -22,6 +22,8 @@ export function LessonEditorModal({
   title,
   className,
   initialType,
+  open: openProp,
+  onClose: onCloseProp,
 }: {
   clases: EditorClase[];
   mode: "lessons" | "games";
@@ -30,13 +32,19 @@ export function LessonEditorModal({
   title: string;
   className?: string;
   initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
+  open?: boolean;
+  onClose?: () => void;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<EditableLessonData | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isControlled = openProp !== undefined;
+  const isOpen = isControlled ? openProp : open;
+
   const openModal = async () => {
+    if (isControlled) return;
     setOpen(true);
     if (!lessonId) return;
     setLoading(true);
@@ -49,8 +57,13 @@ export function LessonEditorModal({
   };
 
   const close = () => {
-    setOpen(false);
-    setData(null);
+    if (isControlled) {
+      setData(null);
+      onCloseProp?.();
+    } else {
+      setOpen(false);
+      setData(null);
+    }
   };
 
   const handleSaved = () => {
@@ -60,10 +73,12 @@ export function LessonEditorModal({
 
   return (
     <>
-      <button type="button" onClick={() => void openModal()} className={className}>
-        {label}
-      </button>
-      <Modal open={open} onClose={close} title={title} size="xl">
+      {!isControlled ? (
+        <button type="button" onClick={() => void openModal()} className={className}>
+          {label}
+        </button>
+      ) : null}
+      <Modal open={isOpen} onClose={close} title={title} size="xl">
         {lessonId && loading ? (
           <div className="py-16 text-center text-sm font-bold text-zinc-400">Cargando…</div>
         ) : lessonId && !data ? (

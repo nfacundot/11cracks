@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/admin/modal";
 import { PlusIcon, XIcon } from "@/components/icons";
@@ -36,6 +36,14 @@ export function AddLessonToTemaModal({
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
+  const [toast, setToast] = useState<{ msg: string; kind: "ok" | "err" } | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string, kind: "ok" | "err") => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast({ msg, kind });
+    toastTimer.current = setTimeout(() => setToast(null), 2500);
+  };
 
   const available = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -75,8 +83,12 @@ export function AddLessonToTemaModal({
         setError(res.error);
         return;
       }
+      if (res?.success) {
+        showToast(res.success, "ok");
+      }
       setSelected([]);
       setQuery("");
+      setOpen(false);
       router.refresh();
     });
   };
@@ -149,6 +161,16 @@ export function AddLessonToTemaModal({
           )}
 
           {error && <p className="text-sm font-bold text-red-500">{error}</p>}
+
+          {toast && (
+            <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-xl animate-slide-up">
+              {toast.kind === "ok" ? (
+                <span className="bg-green-500">✓ {toast.msg}</span>
+              ) : (
+                <span className="bg-red-500">! {toast.msg}</span>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-between gap-3 border-t border-green-50 pt-3 dark:border-emerald-900">
             <span className="text-xs font-bold text-zinc-400">

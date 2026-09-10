@@ -199,6 +199,7 @@ async function main() {
       title: {
         in: ["Reglas básicas del fútbol", "Las posiciones", "El fuera de juego", "Faltas y tarjetas", "Los grandes torneos", "Estrategia y táctica", "Quiz relámpago", "Crack test", "Técnica: el pase", "Técnica: control y recepción", "Entrenamiento: defensa 1 vs 1", "Quiz: goleadores históricos", "Palabras en juego", "Memoria Táctica", "Palabra a Gol"],
       },
+      temaId: null,
     },
   });
 
@@ -266,9 +267,38 @@ async function main() {
   }
 
   for (const leccion of juegosUnicos()) {
-    await prisma.lesson.deleteMany({ where: { id: leccion.id } });
-    await prisma.lesson.create({
-      data: {
+    const existing = await prisma.lesson.findUnique({ where: { id: leccion.id }, select: { temaId: true } });
+    const preserveTemaId = existing?.temaId ?? null;
+    await prisma.lesson.upsert({
+      where: { id: leccion.id },
+      update: {
+        title: leccion.title,
+        description: leccion.description,
+        emoji: leccion.emoji,
+        color: leccion.color,
+        type: leccion.type,
+        gameMode: leccion.gameMode ?? null,
+        xpReward: leccion.xpReward,
+        order: 100,
+        temaId: preserveTemaId,
+        questions: {
+          deleteMany: {},
+          create: leccion.questions.map((q, qi) => ({
+            type: q.type,
+            prompt: q.prompt,
+            explanation: q.explanation,
+            order: qi,
+            options: {
+              create: q.options.map((o, oi) => ({
+                text: o.text,
+                isCorrect: o.isCorrect ?? false,
+                order: oi,
+              })),
+            },
+          })),
+        },
+      },
+      create: {
         id: leccion.id,
         title: leccion.title,
         description: leccion.description,
@@ -296,7 +326,30 @@ async function main() {
         },
       },
     });
-    console.log(`  ✔ Lección suelta: ${leccion.title} (${leccion.questions.length} preguntas)`);
+    console.log(`  ✔ Lección suelta: ${leccion.title} (${leccion.questions.length} preguntas)${preserveTemaId ? ` ·保留 temaId` : ""}`);
+  }
+
+  // Asignar lecciones sueltas a materias existentes si no tienen temaId
+  const existingMaterias = await prisma.tema.findMany({
+    where: { id: { startsWith: "demo-materia-" } },
+    orderBy: { order: "asc" },
+    select: { id: true, name: true, clases: { select: { id: true } } },
+  });
+  if (existingMaterias.length > 0) {
+    const leccionesSueltas = await prisma.lesson.findMany({
+      where: { id: { in: ["bib-oido-de-crack", "bib-gol-de-palabra", "bib-letras-de-crack"] }, temaId: null },
+      select: { id: true },
+    });
+    if (leccionesSueltas.length > 0) {
+      for (let i = 0; i < leccionesSueltas.length; i++) {
+        const materia = existingMaterias[i % existingMaterias.length];
+        await prisma.lesson.update({
+          where: { id: leccionesSueltas[i].id },
+          data: { temaId: materia.id },
+        });
+        console.log(`  ✔ Lección ${leccionesSueltas[i].id} asignada a materia ${materia.name}`);
+      }
+    }
   }
 
   const admin = await prisma.user.upsert({
@@ -436,28 +489,34 @@ async function main() {
     });
     gameIds[game.category] = saved.id;
 
-    await prisma.lesson.upsert({
-      where: { gameId: saved.id },
-      update: {
-        title: game.name,
-        description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
-        emoji: game.emoji,
-        color: game.color,
-        type: "GAME",
-        xpReward: 25,
-        order: 100,
-      },
-      create: {
-        title: game.name,
-        description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
-        emoji: game.emoji,
-        color: game.color,
-        type: "GAME",
-        xpReward: 25,
-        order: 100,
-        gameId: saved.id,
-      },
-    });
+    const existingGameLesson = await prisma.lesson.findFirst({ where: { gameId: saved.id }, select: { id: true } });
+    if (existingGameLesson) {
+      await prisma.lesson.update({
+        where: { id: existingGameLesson.id },
+        data: {
+          title: game.name,
+          description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
+          emoji: game.emoji,
+          color: game.color,
+          type: "GAME",
+          xpReward: 25,
+          order: 100,
+        },
+      });
+    } else {
+      await prisma.lesson.create({
+        data: {
+          title: game.name,
+          description: game.description ?? `Juego vinculado a la lección "${game.name}".`,
+          emoji: game.emoji,
+          color: game.color,
+          type: "GAME",
+          xpReward: 25,
+          order: 100,
+          gameId: saved.id,
+        },
+      });
+    }
 
     console.log(`✔ Juego (${game.category}): ${game.name} (${game.slug})`);
   }

@@ -55,12 +55,13 @@ function nodeMapPosition(stage: EtapaLeccion, node: NodoLeccion, index: number):
   if (node.posX !== undefined && node.posY !== undefined) return { posX: node.posX, posY: node.posY };
   const base = { posX: stage.posX ?? 50, posY: stage.posY ?? 50 };
   const offsets = [
-    { posX: -11, posY: -7 },
-    { posX: 11, posY: -7 },
-    { posX: 0, posY: 9 },
+    { posX: -15, posY: -10 },
+    { posX: 15, posY: -10 },
+    { posX: 0, posY: 14 },
   ];
   const offset = offsets[index % offsets.length];
-  return { posX: base.posX + offset.posX, posY: base.posY + offset.posY };
+  const clamp = (value: number) => Math.min(94, Math.max(6, value));
+  return { posX: clamp(base.posX + offset.posX), posY: clamp(base.posY + offset.posY) };
 }
 
 function StageLandmark({ stage }: { stage: EtapaLeccion }) {
@@ -139,7 +140,7 @@ export function ElCaminoLecciones({ camino }: { camino: ClaseCamino }) {
   const pathComplete = total > 0 && completed === total;
   const selectedNode = nodes.find((node) => node.id === selectedNodeId) ?? null;
   const freeForm = useFreePositions(camino);
-  const canvasHeight = Math.max(780, camino.stages.length * 300);
+  const canvasHeight = Math.max(1150, camino.stages.length * 460);
 
   useEffect(() => {
     let alive = true;

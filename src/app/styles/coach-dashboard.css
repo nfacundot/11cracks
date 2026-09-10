@@ -4,7 +4,7 @@
 .coach-home__header h1 { margin: 8px 0 4px; font: 700 clamp(40px, 5vw, 68px) / 0.9 var(--font-display); text-transform: uppercase; }
 .coach-home__header p { color: var(--text-secondary); line-height: 1.55; }
 .coach-home__dashboard { display: grid; grid-template-columns: 1.25fr 0.9fr; gap: 16px; max-width: 1080px; }
-.coach-home__panel { margin-top: 16px; padding: 22px; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 12px; background: rgba(7, 10, 9, 0.72); box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18); }
+.coach-home__panel { margin-top: 16px; padding: 22px; border: 81px solid rgba(255, 255, 255, 0.11); border-radius: 12px; background: rgba(7, 10, 9, 0.72); box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18); }
 .coach-home__panel[data-tone="gold"] { border-color: rgba(221, 180, 94, 0.4); }
 .coach-home__panel[data-tone="lime"] { border-color: rgba(176, 236, 107, 0.38); }
 .coach-home__panel:last-child { grid-column: 1 / -1; }

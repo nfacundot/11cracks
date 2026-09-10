@@ -26,7 +26,6 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-emerald-950/60 backdrop-blur-[2px]"
-        onClick={onClose}
       />
       <div
         className={`animate-pop relative w-full overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl shadow-2xl ring-1 ring-green-100 dark:bg-emerald-950/60 dark:backdrop-blur-xl dark:ring-emerald-900 ${maxW}`}

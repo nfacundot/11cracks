@@ -20,12 +20,13 @@ export default async function ElCaminoLessonPage({
 }: {
   params: Promise<{ lessonId: string }>;
 }) {
-  await requireUser();
+  const user = await requireUser();
   const { lessonId } = await params;
 
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
     include: {
+      tema: { select: { id: true, clases: { select: { id: true } } } },
       questions: {
         orderBy: { order: "asc" },
         include: { options: { orderBy: { order: "asc" } } },
@@ -34,6 +35,45 @@ export default async function ElCaminoLessonPage({
   });
 
   if (!lesson) notFound();
+
+  const temaClaseIds = lesson.tema?.clases.map((c) => c.id) ?? [];
+  if (!lesson.tema || temaClaseIds.length === 0) {
+    redirect("/jugador/neurocracks");
+  }
+
+  const clasesPath = await prisma.clase.findMany({
+    where: { id: { in: temaClaseIds } },
+    select: {
+      temas: {
+        orderBy: { order: "asc" },
+        select: {
+          lessons: {
+            orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+            select: { id: true },
+          },
+        },
+      },
+    },
+  });
+
+  const pathLessonIds = [
+    ...new Set(clasesPath.flatMap((c) => c.temas.flatMap((t) => t.lessons.map((l) => l.id)))),
+  ];
+  const progressList = pathLessonIds.length
+    ? await prisma.lessonProgress.findMany({
+        where: { userId: user.id, lessonId: { in: pathLessonIds } },
+        select: { lessonId: true, completed: true },
+      })
+    : [];
+  const completedMap = new Map(progressList.map((p) => [p.lessonId, p.completed]));
+
+  const unlocked = clasesPath.some((clase) => {
+    const ids = clase.temas.flatMap((t) => t.lessons.map((l) => l.id));
+    const firstIncomplete = ids.findIndex((id) => !completedMap.get(id));
+    return completedMap.get(lesson.id) === true || ids.indexOf(lesson.id) === firstIncomplete;
+  });
+
+  if (!unlocked) redirect("/jugador/neurocracks");
 
   if (lesson.gameMode === "INFOGRAMA") {
     redirect("/jugador/game/infograma");

@@ -14,6 +14,7 @@ type CaminoOption = {
   done: boolean;
 };
 
+/*
 const BILINGUAL_OPTION: CaminoOption = {
   id: "bilingual",
   emoji: "🌍",
@@ -22,6 +23,7 @@ const BILINGUAL_OPTION: CaminoOption = {
   progressText: "15 actividades de idioma",
   done: false,
 };
+*/
 
 function buildOption(camino: ClaseCamino): CaminoOption {
   const stats = estadisticasCamino(camino);
@@ -36,15 +38,16 @@ function buildOption(camino: ClaseCamino): CaminoOption {
 }
 
 export function ElCaminoHome({ playerId, caminos }: { playerId: string; caminos: ClaseCamino[] }) {
-  const options: CaminoOption[] = [BILINGUAL_OPTION, ...caminos.map(buildOption)];
-  const [activeId, setActiveId] = useState<string>(options[0]?.id ?? "bilingual");
+  const options: CaminoOption[] = [/* BILINGUAL_OPTION, */ ...caminos.map(buildOption)];
+  const [activeId, setActiveId] = useState<string>(options[0]?.id ?? /* "bilingual" */ "");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const active = options.find((option) => option.id === activeId) ?? BILINGUAL_OPTION;
+  const active = options.find((option) => option.id === activeId) /* ?? BILINGUAL_OPTION */;
   const activeCamino = caminos.find((camino) => camino.id === activeId) ?? null;
 
   return (
     <div className="el-camino-home" data-testid="el-camino-home">
+      {active && (
       <div className="el-camino__paths">
         <span className="el-camino__paths-label">SELECCIONA TU CAMINO</span>
         <div className="el-camino__paths-trigger">
@@ -82,6 +85,7 @@ export function ElCaminoHome({ playerId, caminos }: { playerId: string; caminos:
           ) : null}
         </div>
       </div>
+      )}
 
       {menuOpen ? <button type="button" className="el-camino__paths-backdrop" aria-label="Cerrar selector" onClick={() => setMenuOpen(false)} /> : null}
 

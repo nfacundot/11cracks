@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 import { deleteGame, saveGame, type GameState } from "@/actions/games";
 import { GAME_CATEGORY_META } from "@/lib/games";
 import type { GameCategory } from "@/lib/games";
-import { PlusIcon, XIcon, ChevronDownIcon } from "@/components/icons";
+import { PlusIcon, XIcon, ChevronDownIcon, BoltIcon } from "@/components/icons";
 import { AlertDialog, ConfirmDialog } from "@/components/shared/dialog";
+import { LessonEditorModal } from "@/components/admin/lesson-editor-modal";
+import { DeleteLessonButton } from "@/components/admin/lesson-editor";
+import { Modal } from "@/components/admin/modal";
 
 const GAME_EMOJIS = [
   "🎮", "🎯", "🏆", "🎲", "🃏", "🧩", "🧠", "💡",
@@ -112,6 +115,35 @@ export type GameViewModel = {
   active: boolean;
   wordCount: number;
   lessonXp: number | null;
+};
+
+export type PreguntasLessonViewModel = {
+  id: string;
+  title: string;
+  emoji: string;
+  type: "PREGUNTADOS" | "CONTRARRELOJ";
+  optionMode: "TEXT" | "IMAGE" | "BOTH";
+  timeSeconds: number | null;
+  xpReward: number;
+  questionCount: number;
+};
+
+export type QuizClase = {
+  id: string;
+  name: string;
+  emoji: string;
+  temas: { id: string; name: string }[];
+};
+
+const QUIZ_TYPE_META = {
+  PREGUNTADOS: { label: "Preguntados", className: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" },
+  CONTRARRELOJ: { label: "Contrarreloj", className: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" },
+} as const;
+
+const QUIZ_MODE_LABELS: Record<string, string> = {
+  TEXT: "Solo texto",
+  IMAGE: "Solo imagen",
+  BOTH: "Texto e imagen",
 };
 
 type GameDraft = {
@@ -268,9 +300,19 @@ function GameForm({
   );
 }
 
-export function JuegosManager({ games }: { games: GameViewModel[] }) {
+export function JuegosManager({
+  games,
+  clases,
+  quizzLessons,
+}: {
+  games: GameViewModel[];
+  clases: QuizClase[];
+  quizzLessons: PreguntasLessonViewModel[];
+ }) {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [quizNew, setQuizNew] = useState<"PREGUNTADOS" | "CONTRARRELOJ" | null>(null);
   const [editing, setEditing] = useState<GameViewModel | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; game: GameViewModel | null }>({
     open: false,
@@ -299,28 +341,76 @@ export function JuegosManager({ games }: { games: GameViewModel[] }) {
   return (
     <>
       <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div>
           <h3 className="text-lg font-black text-emerald-950 dark:text-white">
-            Lecciones <span className="text-zinc-400">({games.length})</span>
+            Lecciones <span className="text-zinc-400">({games.length + quizzLessons.length})</span>
           </h3>
           <p className="text-xs font-bold text-zinc-400">
             Cada lección es un juego del camino. Gestiona aquí la lección, sus palabras y su XP.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setEditing(null);
-            setCreating((c) => !c);
-          }}
-          className="flex items-center gap-1.5 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 dark:shadow-green-950"
-        >
-          <PlusIcon className="h-4 w-4" /> Nueva lección
-        </button>
+        <div className="relative w-fit">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            className="flex items-center gap-1.5 rounded-xl bg-green-500 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 dark:shadow-green-950"
+          >
+            <PlusIcon className="h-4 w-4" /> Nueva lección
+            <ChevronDownIcon className={`h-4 w-4 transition ${menuOpen ? "rotate-180" : ""}`} />
+          </button>
+          {menuOpen ? (
+            <div className="absolute left-0 top-full z-30 mt-2 w-80 rounded-2xl border-2 border-green-100 bg-white/95 p-3 shadow-xl backdrop-blur-xl dark:border-emerald-800 dark:bg-emerald-950/95">
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCreating(true);
+                    setMenuOpen(false);
+                  }}
+                  className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-green-100 bg-white px-2 py-3 text-center transition hover:border-green-300 hover:bg-green-50 active:scale-95 dark:border-emerald-800 dark:bg-emerald-900 dark:hover:border-emerald-700 dark:hover:bg-emerald-800/60"
+                >
+                  <PlusIcon className="h-5 w-5 text-green-500" />
+                  <span className="text-xs font-black text-emerald-950 dark:text-white">Nueva lección</span>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => {
+                      setQuizNew("PREGUNTADOS");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full flex-col items-center gap-1.5 rounded-xl border-2 border-sky-100 bg-white px-2 py-3 text-center transition hover:border-sky-300 hover:bg-sky-50 active:scale-95 dark:border-emerald-800 dark:bg-emerald-900 dark:hover:border-sky-700 dark:hover:bg-emerald-800/60"
+                  >
+                    <PlusIcon className="h-5 w-5 text-sky-500" />
+                    <span className="text-xs font-black text-emerald-950 dark:text-white">Preguntados</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuizNew("CONTRARRELOJ");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full flex-col items-center gap-1.5 rounded-xl border-2 border-amber-100 bg-white px-2 py-3 text-center transition hover:border-amber-300 hover:bg-amber-50 active:scale-95 dark:border-emerald-800 dark:bg-emerald-900 dark:hover:border-amber-600 dark:hover:bg-emerald-800/60"
+                  >
+                    <BoltIcon className="h-5 w-5 text-amber-500" />
+                    <span className="text-xs font-black text-emerald-950 dark:text-white">Contrarreloj</span>
+                  </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
 
-      {creating || editing ? (
+      <Modal
+        open={creating || !!editing}
+        onClose={() => {
+          setCreating(false);
+          setEditing(null);
+        }}
+        title={editing ? "Editar lección" : "Nueva lección"}
+        size="lg"
+      >
         <GameForm
           key={editing?.id ?? "new"}
           initial={
@@ -341,9 +431,28 @@ export function JuegosManager({ games }: { games: GameViewModel[] }) {
             refresh();
           }}
         />
-      ) : null}
+      </Modal>
 
-      {games.length === 0 ? (
+      <LessonEditorModal
+        open={quizNew === "PREGUNTADOS"}
+        onClose={() => setQuizNew(null)}
+        clases={clases}
+        mode="lessons"
+        initialType="PREGUNTADOS"
+        label=""
+        title="Nueva lección · Preguntados"
+      />
+      <LessonEditorModal
+        open={quizNew === "CONTRARRELOJ"}
+        onClose={() => setQuizNew(null)}
+        clases={clases}
+        mode="lessons"
+        initialType="CONTRARRELOJ"
+        label=""
+        title="Nueva lección · Contrarreloj"
+      />
+
+      {games.length === 0 && quizzLessons.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-green-200 p-10 text-center dark:border-emerald-800">
           <p className="text-sm font-bold text-zinc-400">
             Aún no hay lecciones creadas. Crea la primera para empezar a configurar sus palabras.
@@ -413,6 +522,45 @@ export function JuegosManager({ games }: { games: GameViewModel[] }) {
                       <XIcon className="h-3 w-3" /> Eliminar
                     </span>
                   </button>
+                </div>
+              </div>
+            );
+          })}
+          {quizzLessons.map((lesson) => {
+            const meta = QUIZ_TYPE_META[lesson.type];
+            return (
+              <div
+                key={lesson.id}
+                className="flex flex-wrap items-center gap-3 rounded-2xl border border-green-100 bg-white/60 p-4 backdrop-blur-xl dark:border-emerald-800 dark:bg-emerald-950/60"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-sm dark:bg-emerald-900">
+                  {lesson.emoji || "❓"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-center gap-2 font-black text-emerald-950 dark:text-white">
+                    {lesson.title}
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${meta.className}`}>
+                      {meta.label}
+                    </span>
+                  </p>
+                  <p className="text-xs font-bold text-zinc-400">
+                    {lesson.questionCount} {lesson.questionCount === 1 ? "pregunta" : "preguntas"} · {QUIZ_MODE_LABELS[lesson.optionMode]}{" "}
+                    {lesson.type === "CONTRARRELOJ" && lesson.timeSeconds ? (
+                      <>· ⏱ {lesson.timeSeconds}s por pregunta</>
+                    ) : null}{" "}
+                    · XP: <strong className="text-emerald-600 dark:text-emerald-300">{lesson.xpReward}</strong>
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <LessonEditorModal
+                    clases={clases}
+                    mode="lessons"
+                    lessonId={lesson.id}
+                    title={`Editar · ${lesson.title}`}
+                    label="Editar"
+                    className="rounded-lg border-2 border-zinc-200 px-2.5 py-1.5 text-xs font-black text-zinc-500 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800/40"
+                  />
+                  <DeleteLessonButton id={lesson.id} />
                 </div>
               </div>
             );

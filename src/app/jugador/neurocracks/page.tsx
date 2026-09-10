@@ -30,7 +30,7 @@ export default async function Page() {
           posX: true,
           posY: true,
           lessons: {
-            orderBy: { order: "asc" },
+            orderBy: [{ order: "asc" }, { createdAt: "asc" }],
             select: {
               id: true,
               title: true,

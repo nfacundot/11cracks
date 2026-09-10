@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireStaff, hasRole, PROTECTED_EMAILS } from "@/lib/auth";
+import { requireStaff, hasRole, PROTECTED_EMAILS, hashPassword } from "@/lib/auth";
 
 export type AdminState = { error?: string; success?: string } | undefined;
 
@@ -149,6 +149,75 @@ export async function deleteUser(userId: string) {
   revalidateStaff("/users");
   revalidateStaff("");
   return { success: "Usuario eliminado" };
+}
+
+export async function createUser(prev: AdminState, formData: FormData): Promise<AdminState> {
+  const me = await requireStaff();
+
+  const displayName = String(formData.get("displayName") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const role = String(formData.get("role") || "player");
+  const position = String(formData.get("position") || "").trim() || null;
+  const teamId = String(formData.get("teamId") || "").trim() || null;
+  const clubId = String(formData.get("clubId") || "").trim() || null;
+  const status = String(formData.get("status") || "pending");
+  const shortName = String(formData.get("shortName") || "").trim();
+  const number = String(formData.get("number") || "0");
+  const category = String(formData.get("category") || "").trim();
+
+  if (!displayName) return { error: "Escribe el nombre completo" };
+  if (!email) return { error: "Escribe el correo electrónico" };
+  if (!teamId) return { error: "Selecciona un equipo" };
+
+  const dbRole = role === "coach" ? "ENTRENADOR" : "JUGADOR";
+
+  const grantsStaffRole = false;
+  if (grantsStaffRole && !hasRole(me.role, "SUPERADMIN")) {
+    return { error: "Solo un superadministrador puede asignar rol de Administrador" };
+  }
+
+  const existsEmail = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+  if (existsEmail) return { error: "Ya existe un usuario con ese correo" };
+
+  let username = email.split("@")[0].toLowerCase().replace(/[^a-z0-9._-]/g, "");
+  if (!username) username = "user-" + Date.now();
+
+  let baseUsername = username;
+  let suffix = 1;
+  while (await prisma.user.findUnique({ where: { username }, select: { id: true } })) {
+    username = `${baseUsername}${suffix}`;
+    suffix++;
+  }
+
+  const password = `${displayName.split(" ")[0].toLowerCase()}${Date.now().toString(36)}`;
+  const hashed = await hashPassword(password);
+
+  const bioParts: string[] = [];
+  if (shortName) bioParts.push(`Roster: ${shortName}`);
+  if (number && number !== "0") bioParts.push(`#${number}`);
+  if (category) bioParts.push(`Cat: ${category}`);
+
+  const user = await prisma.user.create({
+    data: {
+      name: displayName,
+      email,
+      username,
+      password: hashed,
+      role: dbRole as "JUGADOR" | "ENTRENADOR",
+      position,
+      bio: bioParts.length > 0 ? bioParts.join(" · ") : null,
+    },
+  });
+
+  if (teamId) {
+    await prisma.teamMember.create({
+      data: { userId: user.id, teamId },
+    });
+  }
+
+  revalidateStaff("/users");
+  revalidateStaff("");
+  return { success: `Usuario creado. Contraseña temporal: ${password}` };
 }
 
 export async function saveClase(prev: AdminState, formData: FormData): Promise<AdminState> {
@@ -494,9 +563,12 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     }
     if (
       optionMode !== "TEXT" &&
-      questions.some((q) => q.options.some((o) => !o.imageUrl))
+      questions.some((q) => q.options.some((o) => !o.text.trim() && !o.imageUrl))
     ) {
-      return { error: "Con opciones por imagen, cada opción necesita una imagen" };
+      return { error: "Cada opción necesita texto o imagen (o ambas)" };
+    }
+    if (optionMode === "TEXT" && questions.some((q) => q.options.some((o) => !o.text.trim()))) {
+      return { error: "Con opciones solo texto, cada opción necesita su texto" };
     }
     if (optionMode === "TEXT" && questions.some((q) => q.options.some((o) => o.imageUrl))) {
       return { error: "Con opciones solo texto no se permiten imágenes en las opciones" };

@@ -4,6 +4,7 @@ import { Avatar } from "@/components/avatar";
 import { parseAvatarConfig } from "@/lib/avatar";
 import { UserRoleSelect, DeleteUserButton } from "@/components/admin/user-role-select";
 import { UsersIcon } from "@/components/icons";
+import { UsersToolbar } from "@/components/admin/users-toolbar";
 import Link from "next/link";
 
 const ROLE_BADGES: Record<string, string> = {
@@ -26,7 +27,7 @@ export async function UsersView({ viewerIsSuperadmin, page, pageSize }: UsersVie
   const safePageSize = Math.max(1, Math.min(pageSize, 100));
   const skip = (safePage - 1) * safePageSize;
 
-  const [users, total] = await Promise.all([
+  const [users, total, teams] = await Promise.all([
     prisma.user.findMany({
       orderBy: [{ createdAt: "desc" }],
       skip,
@@ -48,6 +49,10 @@ export async function UsersView({ viewerIsSuperadmin, page, pageSize }: UsersVie
       },
     }),
     prisma.user.count(),
+    prisma.team.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
   ]);
 
   const totalPages = Math.ceil(total / safePageSize);
@@ -73,7 +78,7 @@ export async function UsersView({ viewerIsSuperadmin, page, pageSize }: UsersVie
               Usuarios inscritos
             </h2>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             {Object.entries(byRole).map(([role, count]) => (
               <span
                 key={role}
@@ -82,6 +87,7 @@ export async function UsersView({ viewerIsSuperadmin, page, pageSize }: UsersVie
                 {role} · {count}
               </span>
             ))}
+            <UsersToolbar teams={teams} />
           </div>
         </div>
 

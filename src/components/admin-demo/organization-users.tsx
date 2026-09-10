@@ -118,7 +118,7 @@ export function OrganizationUsersExperience({
                   <select aria-label={`Club de ${user.displayName}`} name="clubId" defaultValue={currentClub(user)}>{clubs.map((club) => <option key={club.clubId} value={club.clubId}>{club.name}</option>)}</select>
                   <select aria-label={`Equipo de ${user.displayName}`} name="teamId" defaultValue={currentTeam(user)}>{teams.map((team) => <option key={team.teamId} value={team.teamId}>{team.name}</option>)}</select>
                   <select aria-label={`Acceso de ${user.displayName}`} name="status" defaultValue={user.accessStatus === "suspended" ? "suspended" : user.accessStatus === "active" ? "active" : "pending"}><option value="active">Activar</option><option value="pending">Invitación pendiente</option><option value="suspended">Suspender</option></select>
-                  <button type="submit">Guardar cambio auditado</button>
+                  <button type="submit">Guardar cambio</button>
                 </form>
               </div>
             );

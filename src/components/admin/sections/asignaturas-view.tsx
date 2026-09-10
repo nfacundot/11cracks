@@ -46,6 +46,23 @@ function groupLessons(
   return [...groups.values()];
 }
 
+const ORDINAL = [
+  "primero",
+  "segundo",
+  "tercero",
+  "cuarto",
+  "quinto",
+  "sexto",
+  "séptimo",
+  "octavo",
+  "noveno",
+  "décimo",
+];
+
+function ordenLabel(index: number): string {
+  return `Completar ${ORDINAL[index] ?? `${index + 1}º`}`;
+}
+
 export async function AsignaturasView() {
   const [clases, temas, availableLessons] = await Promise.all([
     prisma.clase.findMany({
@@ -57,7 +74,7 @@ export async function AsignaturasView() {
       include: {
         clases: { select: { id: true, name: true, emoji: true, color: true } },
         lessons: {
-          orderBy: { order: "asc" },
+          orderBy: [{ order: "asc" }, { createdAt: "asc" }],
           select: { id: true, title: true, emoji: true, type: true, xpReward: true },
         },
         _count: { select: { lessons: true } },
@@ -193,12 +210,19 @@ export async function AsignaturasView() {
                       Esta materia aún no tiene lecciones agregadas.
                     </p>
                   ) : (
-                    <ul className="flex flex-col gap-1.5">
-                      {groupLessons(tema.lessons).map((lesson) => (
+                    <>
+                      <p className="mb-1.5 text-[11px] font-black uppercase tracking-wide text-green-600 dark:text-emerald-300">
+                        Se completan de manera obligatoria en orden
+                      </p>
+                      <ul className="flex flex-col gap-1.5">
+                      {groupLessons(tema.lessons).map((lesson, index) => (
                         <li
                           key={lesson.key}
                           className="flex items-center gap-2 rounded-xl bg-white/60 px-3 py-2 ring-1 ring-green-100 dark:bg-emerald-950/60 dark:ring-emerald-900"
                         >
+                          <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-black text-green-700 dark:bg-emerald-900 dark:text-emerald-300">
+                            {ordenLabel(index)}
+                          </span>
                           <span className="text-lg">{lesson.emoji}</span>
                           <span className="min-w-0 flex-1 truncate text-sm font-bold text-emerald-950 dark:text-white">
                             {lesson.title}
@@ -217,7 +241,8 @@ export async function AsignaturasView() {
                           <RemoveLessonsFromTemaButton temaId={tema.id} ids={lesson.ids} />
                         </li>
                       ))}
-                    </ul>
+                      </ul>
+                    </>
                   )}
                 </div>
               </div>

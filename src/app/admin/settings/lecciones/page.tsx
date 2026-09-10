@@ -2,11 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireSection } from "@/lib/auth";
 import { ArrowLeftIcon } from "@/components/icons";
-import { JuegosManager, type GameViewModel } from "@/components/admin/sections/juegos-manager";
-import {
-  PreguntasAbcdManager,
-  type PreguntasLessonViewModel,
-} from "@/components/admin/sections/preguntas-abcd-manager";
+import { JuegosManager, type GameViewModel, type PreguntasLessonViewModel } from "@/components/admin/sections/juegos-manager";
 
 export const metadata = { title: "Configurador de lecciones | Admin" };
 
@@ -91,8 +87,7 @@ export default async function SettingsLeccionesPage() {
           Cada lección es un juego del camino con sus propias palabras y XP.
         </p>
       </div>
-      <JuegosManager games={gamesView} />
-      <PreguntasAbcdManager clases={clases} lessons={quizLessonsView} />
+      <JuegosManager games={gamesView} clases={clases} quizzLessons={quizLessonsView} />
     </div>
   );
 }
