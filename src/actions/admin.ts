@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireStaff, hasRole, PROTECTED_EMAILS, hashPassword } from "@/lib/auth";
 
-export type AdminState = { error?: string; success?: string } | undefined;
+export type AdminState = { error?: string; success?: string; userId?: string; userName?: string } | undefined;
 
 const STAFF_BASES = ["/admin", "/superadmin"] as const;
 
@@ -217,7 +217,7 @@ export async function createUser(prev: AdminState, formData: FormData): Promise<
 
   revalidateStaff("/users");
   revalidateStaff("");
-  return { success: `Usuario creado. Contraseña temporal: ${password}` };
+  return { success: `Usuario creado. Contraseña temporal: ${password}`, userId: user.id, userName: user.name };
 }
 
 export async function saveClase(prev: AdminState, formData: FormData): Promise<AdminState> {

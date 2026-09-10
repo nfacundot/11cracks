@@ -5,6 +5,8 @@ import { preloadLoginAudio, startLoginAmbient, unlockLoginAudio } from "@/lib/au
 
 export function LoginAudioController() {
   useEffect(() => {
+    delete document.documentElement.dataset.loginTransition;
+
     preloadLoginAudio();
     startLoginAmbient();
     let unlocked = false;

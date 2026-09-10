@@ -13,7 +13,7 @@ import {
 } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
 
-export type AuthState = { error?: string } | undefined;
+export type AuthState = { error?: string; success?: string; userId?: string; userName?: string } | undefined;
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres").max(50),
@@ -60,10 +60,9 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
     },
   });
 
-  await setSessionCookie(signToken({ id: user.id }));
   await touchStreak(user.id);
 
-  redirect("/jugador");
+  return { success: "Cuenta creada", userId: user.id, userName: user.name };
 }
 
 const loginSchema = z.object({
@@ -93,6 +92,11 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
   await touchStreak(user.id);
 
   redirect(homeForRole(user.role));
+}
+
+export async function activateAccount(userId: string) {
+  await setSessionCookie(signToken({ id: userId }));
+  redirect(homeForRole("JUGADOR"));
 }
 
 export async function logout() {

@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/auth";
+import { requireUser, requireStaff } from "@/lib/auth";
 import { notify } from "@/lib/notify";
 import { publishTactics } from "@/lib/tactics-bus";
 
@@ -625,4 +625,162 @@ export async function deleteAlignment(
 
   await prisma.alignment.delete({ where: { id: alignmentId } });
   return { success: "Alineación eliminada" };
+}
+
+export type ClubCodeResult = {
+  valid: boolean;
+  team?: { id: string; name: string; logoUrl: string | null; code: string; memberCount: number };
+  error?: string;
+};
+
+export async function validateClubCode(code: string): Promise<ClubCodeResult> {
+  const cleaned = code.trim().toUpperCase();
+  if (cleaned.length < 4) {
+    return { valid: false, error: "El código debe tener al menos 4 caracteres" };
+  }
+
+  const team = await prisma.team.findUnique({
+    where: { code: cleaned },
+    select: {
+      id: true,
+      name: true,
+      logoUrl: true,
+      code: true,
+      _count: { select: { members: true } },
+    },
+  });
+
+  if (!team) {
+    return { valid: false, error: "No encontramos un equipo con ese código" };
+  }
+
+  return {
+    valid: true,
+    team: { id: team.id, name: team.name, logoUrl: team.logoUrl, code: team.code, memberCount: team._count.members },
+  };
+}
+
+export async function createTeamForUser(userId: string, name: string, logoUrl?: string): Promise<TeamState> {
+  const me = await requireStaff();
+
+  const trimmed = name.trim();
+  if (!trimmed || trimmed.length < 2) return { error: "El nombre del equipo debe tener al menos 2 caracteres" };
+  if (trimmed.length > 40) return { error: "El nombre es demasiado largo" };
+
+  let code = generateCode();
+  while (await prisma.team.findUnique({ where: { code } })) {
+    code = generateCode();
+  }
+
+  if (logoUrl && !logoUrl.startsWith("/uploads/")) {
+    return { error: "Logo inválido" };
+  }
+
+  const team = await prisma.team.create({
+    data: {
+      name: trimmed,
+      code,
+      logoUrl: logoUrl || null,
+    },
+  });
+
+  await prisma.teamMember.create({
+    data: { teamId: team.id, userId, role: "COACH" },
+  });
+
+  revalidatePath("/admin/users");
+  return { success: `Equipo "${trimmed}" creado. Código: ${code}` };
+}
+
+export async function joinTeamForUser(userId: string, teamCode: string): Promise<TeamState> {
+  const me = await requireStaff();
+
+  const code = teamCode.trim().toUpperCase();
+  if (code.length < 4) return { error: "Código no válido" };
+
+  const team = await prisma.team.findUnique({ where: { code } });
+  if (!team) return { error: "No encontramos un equipo con ese código" };
+
+  const already = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId: team.id, userId } },
+  });
+  if (already) return { error: "Este usuario ya pertenece a ese equipo" };
+
+  await prisma.teamMember.create({
+    data: { teamId: team.id, userId, role: "PLAYER" },
+  });
+
+  revalidatePath("/admin/users");
+  return { success: `Usuario asignado al equipo "${team.name}"` };
+}
+
+// Self-service actions for registration wizard (no auth required, userId passed directly)
+
+export async function selfSetRole(userId: string, role: "coach" | "player"): Promise<TeamState> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "Usuario no encontrado" };
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { role: role === "coach" ? "ENTRENADOR" : "JUGADOR" },
+  });
+
+  revalidatePath("/admin/users");
+  return { success: role === "coach" ? "Rol de entrenador asignado" : "Rol de jugador asignado" };
+}
+
+export async function selfCreateTeam(userId: string, name: string, logoUrl?: string): Promise<TeamState> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "Usuario no encontrado" };
+
+  const trimmed = name.trim();
+  if (!trimmed || trimmed.length < 2) return { error: "El nombre del equipo debe tener al menos 2 caracteres" };
+  if (trimmed.length > 40) return { error: "El nombre es demasiado largo" };
+
+  let code = generateCode();
+  while (await prisma.team.findUnique({ where: { code } })) {
+    code = generateCode();
+  }
+
+  if (logoUrl && !logoUrl.startsWith("/uploads/")) {
+    return { error: "Logo inválido" };
+  }
+
+  const team = await prisma.team.create({
+    data: {
+      name: trimmed,
+      code,
+      logoUrl: logoUrl || null,
+    },
+  });
+
+  await prisma.teamMember.create({
+    data: { teamId: team.id, userId, role: "COACH" },
+  });
+
+  revalidatePath("/admin/users");
+  return { success: `Equipo "${trimmed}" creado. Código: ${code}` };
+}
+
+export async function selfJoinTeam(userId: string, teamCode: string): Promise<TeamState> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return { error: "Usuario no encontrado" };
+
+  const code = teamCode.trim().toUpperCase();
+  if (code.length < 4) return { error: "Código no válido" };
+
+  const team = await prisma.team.findUnique({ where: { code } });
+  if (!team) return { error: "No encontramos un equipo con ese código" };
+
+  const already = await prisma.teamMember.findUnique({
+    where: { teamId_userId: { teamId: team.id, userId } },
+  });
+  if (already) return { error: "Este usuario ya pertenece a ese equipo" };
+
+  await prisma.teamMember.create({
+    data: { teamId: team.id, userId, role: "PLAYER" },
+  });
+
+  revalidatePath("/admin/users");
+  return { success: `Usuario asignado al equipo "${team.name}"` };
 }

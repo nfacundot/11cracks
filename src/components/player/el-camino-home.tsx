@@ -14,7 +14,6 @@ type CaminoOption = {
   done: boolean;
 };
 
-/*
 const BILINGUAL_OPTION: CaminoOption = {
   id: "bilingual",
   emoji: "🌍",
@@ -23,7 +22,6 @@ const BILINGUAL_OPTION: CaminoOption = {
   progressText: "15 actividades de idioma",
   done: false,
 };
-*/
 
 function buildOption(camino: ClaseCamino): CaminoOption {
   const stats = estadisticasCamino(camino);
@@ -38,12 +36,12 @@ function buildOption(camino: ClaseCamino): CaminoOption {
 }
 
 export function ElCaminoHome({ playerId, caminos }: { playerId: string; caminos: ClaseCamino[] }) {
-  const options: CaminoOption[] = [/* BILINGUAL_OPTION, */ ...caminos.map(buildOption)];
-  const [activeId, setActiveId] = useState<string>(options[0]?.id ?? /* "bilingual" */ "");
+  const options: CaminoOption[] = caminos.map(buildOption);
+  const [activeId, setActiveId] = useState<string>(options[0]?.id ?? "");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const active = options.find((option) => option.id === activeId) /* ?? BILINGUAL_OPTION */;
-  const activeCamino = caminos.find((camino) => camino.id === activeId) ?? null;
+  const active = options.find((option) => option.id === activeId) ?? options[0] ?? null;
+  const activeCamino = caminos.find((camino) => camino.id === activeId) ?? caminos[0] ?? null;
 
   return (
     <div className="el-camino-home" data-testid="el-camino-home">

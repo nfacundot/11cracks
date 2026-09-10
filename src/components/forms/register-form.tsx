@@ -2,8 +2,9 @@
 
 import { useActionState, useEffect, useState, type FormEvent, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
-import { register, type AuthState } from "@/actions/auth";
+import { register, activateAccount, type AuthState } from "@/actions/auth";
 import { playLoginAudio } from "@/lib/audio/audio-manager";
+import { UserSetupWizard } from "@/components/admin/user-setup-wizard";
 
 function MailIcon() {
   return (
@@ -57,11 +58,21 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  const createdUserId = state?.userId ?? "";
+  const createdUserName = state?.userName ?? "";
 
   useEffect(() => {
     if (!state?.error) return;
     playLoginAudio("ui.error");
   }, [state?.error]);
+
+  useEffect(() => {
+    if (state?.success && state.userId) {
+      setWizardOpen(true);
+    }
+  }, [state]);
 
   function handlePointerEnter(event: PointerEvent<HTMLElement>) {
     if (event.pointerType === "mouse") playLoginAudio("ui.hover");
@@ -75,6 +86,9 @@ export function RegisterForm() {
     trace?.classList.add("is-active");
     playLoginAudio("ui.confirm");
     document.documentElement.dataset.loginTransition = "leaving";
+    window.setTimeout(() => {
+      delete document.documentElement.dataset.loginTransition;
+    }, 600);
   }
 
   const errorModal =
@@ -100,102 +114,113 @@ export function RegisterForm() {
       : null;
 
   return (
-    <form action={action} className="login-form" onSubmit={handleSubmit}>
-      {errorModal}
+    <>
+      <form action={action} className="login-form" onSubmit={handleSubmit}>
+        {errorModal}
 
-      <div className="field-group">
-        <label htmlFor="name">Nombre</label>
-        <div className="input-shell">
-          <span className="input-shell__icon"><UserIcon /></span>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            minLength={2}
-            autoComplete="name"
-            placeholder="Tu nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            disabled={pending}
-            onPointerEnter={handlePointerEnter}
-          />
+        <div className="field-group">
+          <label htmlFor="name">Nombre</label>
+          <div className="input-shell">
+            <span className="input-shell__icon"><UserIcon /></span>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              minLength={2}
+              autoComplete="name"
+              placeholder="Tu nombre"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={pending}
+              onPointerEnter={handlePointerEnter}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="field-group">
-        <label htmlFor="username">Usuario</label>
-        <div className="input-shell">
-          <span className="input-shell__icon"><UserIcon /></span>
-          <input
-            id="username"
-            name="username"
-            type="text"
-            required
-            minLength={3}
-            autoComplete="username"
-            placeholder="Usuario (ej: crack10)"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={pending}
-            onPointerEnter={handlePointerEnter}
-          />
+        <div className="field-group">
+          <label htmlFor="username">Usuario</label>
+          <div className="input-shell">
+            <span className="input-shell__icon"><UserIcon /></span>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              minLength={3}
+              autoComplete="username"
+              placeholder="Usuario (ej: crack10)"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={pending}
+              onPointerEnter={handlePointerEnter}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="field-group">
-        <label htmlFor="email">Correo electrónico</label>
-        <div className="input-shell">
-          <span className="input-shell__icon"><MailIcon /></span>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            inputMode="email"
-            placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={pending}
-            onPointerEnter={handlePointerEnter}
-          />
+        <div className="field-group">
+          <label htmlFor="email">Correo electrónico</label>
+          <div className="input-shell">
+            <span className="input-shell__icon"><MailIcon /></span>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={pending}
+              onPointerEnter={handlePointerEnter}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="field-group">
-        <label htmlFor="password">Contraseña</label>
-        <div className="input-shell">
-          <span className="input-shell__icon"><LockIcon /></span>
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            required
-            minLength={6}
-            autoComplete="new-password"
-            placeholder="Mínimo 6 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={pending}
-          />
-          <button
-            className="password-toggle"
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            aria-pressed={showPassword}
-            onPointerEnter={handlePointerEnter}
-          >
-            <EyeIcon open={showPassword} />
-          </button>
+        <div className="field-group">
+          <label htmlFor="password">Contraseña</label>
+          <div className="input-shell">
+            <span className="input-shell__icon"><LockIcon /></span>
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={6}
+              autoComplete="new-password"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={pending}
+            />
+            <button
+              className="password-toggle"
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              aria-pressed={showPassword}
+              onPointerEnter={handlePointerEnter}
+            >
+              <EyeIcon open={showPassword} />
+            </button>
+          </div>
         </div>
-      </div>
 
-      <button className="login-submit" type="submit" disabled={pending} onPointerEnter={handlePointerEnter}>
-        <span>{pending ? "Creando cuenta" : "Crear cuenta"}</span>
-        {pending ? <span className="login-spinner" aria-hidden="true" /> : <ArrowIcon />}
-      </button>
-    </form>
+        <button className="login-submit" type="submit" disabled={pending} onPointerEnter={handlePointerEnter}>
+          <span>{pending ? "Creando cuenta" : "Crear cuenta"}</span>
+          {pending ? <span className="login-spinner" aria-hidden="true" /> : <ArrowIcon />}
+        </button>
+      </form>
+
+      {wizardOpen && (
+        <UserSetupWizard
+          open={wizardOpen}
+          onClose={() => { activateAccount(createdUserId); }}
+          userId={createdUserId}
+          userName={createdUserName}
+        />
+      )}
+    </>
   );
 }

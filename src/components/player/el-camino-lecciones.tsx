@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,32 +35,6 @@ function stageState(camino: ClaseCamino, stage: EtapaLeccion): "locked" | "activ
   if (nodes.every((node) => node.estado === "COMPLETED")) return "completed";
   if (nodes.some((node) => node.estado !== "LOCKED")) return "active";
   return "locked";
-}
-
-function useFreePositions(camino: ClaseCamino): boolean {
-  const editable = camino.stages.filter((stage) => stage.posX !== undefined && stage.posY !== undefined);
-  const editableLessons = camino.stages.some((stage) =>
-    stage.nodes.some((node) => node.posX !== undefined && node.posY !== undefined)
-  );
-  if (editable.length === 0 && !editableLessons) return false;
-  const stagesOff = editable.some((stage) => Math.abs(stage.posX! - 50) > 2 || Math.abs(stage.posY! - 50) > 2);
-  const lessonsOff = camino.stages.some((stage) =>
-    stage.nodes.some((node) => node.posX !== undefined && node.posY !== undefined && (Math.abs(node.posX! - 50) > 2 || Math.abs(node.posY! - 50) > 2))
-  );
-  return stagesOff || lessonsOff;
-}
-
-function nodeMapPosition(stage: EtapaLeccion, node: NodoLeccion, index: number): { posX: number; posY: number } {
-  if (node.posX !== undefined && node.posY !== undefined) return { posX: node.posX, posY: node.posY };
-  const base = { posX: stage.posX ?? 50, posY: stage.posY ?? 50 };
-  const offsets = [
-    { posX: -15, posY: -10 },
-    { posX: 15, posY: -10 },
-    { posX: 0, posY: 14 },
-  ];
-  const offset = offsets[index % offsets.length];
-  const clamp = (value: number) => Math.min(94, Math.max(6, value));
-  return { posX: clamp(base.posX + offset.posX), posY: clamp(base.posY + offset.posY) };
 }
 
 function StageLandmark({ stage }: { stage: EtapaLeccion }) {
@@ -139,8 +112,6 @@ export function ElCaminoLecciones({ camino }: { camino: ClaseCamino }) {
   const current = nodoActualDelCamino(camino);
   const pathComplete = total > 0 && completed === total;
   const selectedNode = nodes.find((node) => node.id === selectedNodeId) ?? null;
-  const freeForm = useFreePositions(camino);
-  const canvasHeight = Math.max(1150, camino.stages.length * 460);
 
   useEffect(() => {
     let alive = true;
@@ -158,7 +129,7 @@ export function ElCaminoLecciones({ camino }: { camino: ClaseCamino }) {
   }, [router]);
 
   return (
-    <div className={`el-camino el-camino--lecciones${freeForm ? " el-camino--map" : ""}`} data-testid="el-camino-lecciones" data-current-node={current?.id ?? "none"}>
+    <div className="el-camino el-camino--lecciones" data-testid="el-camino-lecciones" data-current-node={current?.id ?? "none"}>
       <header className="el-camino__header">
         <div className="el-camino__header-copy">
           <span className="el-camino__eyebrow">EL CAMINO · MATERIA {camino.order + 1}</span>
@@ -180,55 +151,17 @@ export function ElCaminoLecciones({ camino }: { camino: ClaseCamino }) {
       <section className="el-camino__map" aria-labelledby="el-camino-lecciones-map-title">
         <div className="el-camino__map-heading"><div><span>RUTA ACTUAL</span><h2 id="el-camino-lecciones-map-title">El Camino</h2></div><p>{current ? <>CONTINÚA EN <strong>{current.title}</strong> · LECCIÓN {current.order} DE {total}</> : "No hay una lección disponible todavía."}</p></div>
 
-        {freeForm ? (
-          <div className="el-camino__map-canvas" style={{ height: canvasHeight }} data-testid="el-camino-lecciones-canvas">
-            <Image
-              src="/img/back/backa.webp"
-              alt=""
-              fill
-              priority
-              sizes="(max-width: 78rem) 100vw, 78rem"
-              className="el-camino__map-canvas-bg"
-              draggable={false}
-            />
-            {camino.stages.map((stage) => {
-              const posX = stage.posX ?? 50;
-              const posY = stage.posY ?? 50;
-              return (
-                <div className="el-camino__map-stage" key={stage.id} data-state={stageState(camino, stage)} style={{ left: `${posX}%`, top: `${posY}%` }}>
-                  <StageLandmark stage={stage} />
-                </div>
-              );
-            })}
-            {camino.stages.flatMap((stage) =>
-              stage.nodes.map((node, index) => {
-                const nodePos = nodeMapPosition(stage, node, index);
-                return (
-                  <div
-                    className="el-camino__map-lesson"
-                    key={node.id}
-                    data-stage={stage.id}
-                    style={{ left: `${nodePos.posX}%`, top: `${nodePos.posY}%` }}
-                  >
-                    <NodeButton node={node} current={current?.id === node.id} onSelect={(selected) => setSelectedNodeId(selected.id)} />
-                  </div>
-                );
-              })
-            )}
-          </div>
-        ) : (
-          <div className="el-camino__route" data-testid="el-camino-lecciones-route">
-            {camino.stages.map((stage, index) => (
-              <div className="el-camino__stage-wrap" key={stage.id}>
-                <section className="el-camino__stage" data-stage={stage.id} data-state={stageState(camino, stage)} data-flow={flujoEtapa(index)} aria-labelledby={`leccion-stage-${stage.id}`}>
-                  <StageLandmark stage={stage} />
-                  <div className="el-camino__stage-track"><div className="el-camino__nodes" role="list" data-testid={`el-camino-lecciones-stage-${stage.id}`}>{stage.nodes.map((node) => <div role="listitem" key={node.id}><NodeButton node={node} current={current?.id === node.id} onSelect={(selected) => setSelectedNodeId(selected.id)} /></div>)}</div></div>
-                  <span className="el-camino__stage-caption" id={`leccion-stage-${stage.id}`}>{stageState(camino, stage) === "completed" ? stage.title + " SUPERADA" : index === 0 ? "AQUÍ COMIENZAS" : "SIGUIENTE TEMA"}</span>
-                </section>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="el-camino__route" data-testid="el-camino-lecciones-route">
+          {camino.stages.map((stage, index) => (
+            <div className="el-camino__stage-wrap" key={stage.id}>
+              <section className="el-camino__stage" data-stage={stage.id} data-state={stageState(camino, stage)} data-flow={flujoEtapa(index)} aria-labelledby={`leccion-stage-${stage.id}`}>
+                <StageLandmark stage={stage} />
+                <div className="el-camino__stage-track"><div className="el-camino__nodes" role="list" data-testid={`el-camino-lecciones-stage-${stage.id}`}>{stage.nodes.map((node) => <div role="listitem" key={node.id}><NodeButton node={node} current={current?.id === node.id} onSelect={(selected) => setSelectedNodeId(selected.id)} /></div>)}</div></div>
+                <span className="el-camino__stage-caption" id={`leccion-stage-${stage.id}`}>{stageState(camino, stage) === "completed" ? stage.title + " SUPERADA" : index === 0 ? "AQUÍ COMIENZAS" : "SIGUIENTE TEMA"}</span>
+              </section>
+            </div>
+          ))}
+        </div>
       </section>
 
       <footer className="el-camino__footer"><span>{total} LECCIONES · {camino.stages.length} MATERIAS</span><span>Las lecciones completadas desbloquean el siguiente paso.</span></footer>

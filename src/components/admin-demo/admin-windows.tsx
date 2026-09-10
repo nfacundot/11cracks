@@ -3,7 +3,6 @@ export interface DemoWindowProps {
 }
 
 import Link from "next/link";
-import { ClubRankingPanel } from "@/components/admin-demo/club-ranking-panel";
 
 const labels: Record<string, { group: string; title: string; copy: string }> = {
   wallet: { group: "ADMIN · OPERACIÓN Y CONTROL", title: "Billetera Solidaria", copy: "Operación organizacional de Billetera Solidaria." },
@@ -36,37 +35,13 @@ export async function AdminDemoWindow({ section }: DemoWindowProps) {
 
   return (
     <article className="admin-page">
-      {section === "club-ranking" ? (
-        <header className="admin-club-ranking-header">
-          <div>
-            <p className="admin-club-ranking-kicker">PROGRESIÓN INSTITUCIONAL</p>
-            <h1>RANKING DE CLUBES</h1>
-            <p className="admin-club-ranking-subtitle">Lectura factual de score, logros y oportunidades habilitadas.</p>
-          </div>
-          <div className="admin-club-ranking-periods">
-            <div className="admin-club-ranking-period">
-              <span>ESTE MES</span>
-              <strong>1 club registrado</strong>
-              <small>0 con score disponible</small>
-            </div>
-            <div className="admin-club-ranking-period">
-              <span>ESTE MES · TOTALES DE ORIGEN</span>
-              <strong>520 h</strong>
-              <small>objetivo de certificación</small>
-            </div>
-          </div>
-        </header>
-      ) : (
-        <header className="admin-page__header">
-          <span>{headerMeta.group}</span>
-          <h1>{headerMeta.title}</h1>
-          <p>{headerMeta.copy}</p>
-        </header>
-      )}
+      <header className="admin-page__header">
+        <span>{headerMeta.group}</span>
+        <h1>{headerMeta.title}</h1>
+        <p>{headerMeta.copy}</p>
+      </header>
 
-      {section === "club-ranking" ? (
-        <ClubRankingPanel />
-      ) : section === "wallet" ? (
+      {section === "wallet" ? (
         <div className="admin-wallet-page">
           <section className="admin-wallet-hero">
             <div>
@@ -330,13 +305,6 @@ export async function AdminDemoWindow({ section }: DemoWindowProps) {
                   <small>Configura las lecciones, los juegos de aprendizaje y las palabras de cada juego del software.</small>
                 </div>
                 <Link href="/admin/settings/lecciones" className="admin-panel__link">Configurar lecciones →</Link>
-              </div>
-              <div className="admin-record">
-                <div>
-                  <strong>Configuración de Camino</strong>
-                  <small>Configura los caminos y los temas de cada clase ya existentes en versiones anteriores del software.</small>
-                </div>
-                <Link href="/admin/settings/camino" className="admin-panel__link">Configurar camino →</Link>
               </div>
               <div className="admin-record">
                 <div>

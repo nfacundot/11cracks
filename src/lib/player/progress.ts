@@ -71,29 +71,62 @@ export interface BuildPlayerProgressInput {
   indicators: IndicatorRow[];
   currentStreak: number;
   bestStreak: number;
+  evaluations?: { title: string; context: string; at: Date }[];
+  trendPoints?: { label: string; value: number }[];
+  attendancePercent?: number;
+  accuracy?: { correct: number; total: number };
+  completedLessons?: number;
+  lessonTotal?: number;
 }
+
+const DEFAULT_TREND = [
+  { label: "Abr", value: 61 },
+  { label: "May", value: 65 },
+  { label: "Jun", value: 69 },
+  { label: "Jul", value: 73 },
+  { label: "Ago", value: 77 },
+] as const;
+
+const DEFAULT_EVALUATIONS = [
+  { title: "Entrenamiento técnico", dateLabel: "12 ago 2026", context: "Técnica · sesión de campo" },
+  { title: "Evaluación de rendimiento", dateLabel: "29 jul 2026", context: "Deporte · período anterior" },
+  { title: "Revisión NeuroCracks", dateLabel: "15 jul 2026", context: "Atención y decisión" },
+] as const;
 
 export function buildPlayerProgressFixture(input: BuildPlayerProgressInput): PlayerProgressFixture {
   const sport = dimensions(sportLabels, seriesFor("DEPORTE", input.indicators).current, seriesFor("DEPORTE", input.indicators).previous);
   const neurocracks = dimensions(neuroLabels, seriesFor("NEUROCRACKS", input.indicators).current, seriesFor("NEUROCRACKS", input.indicators).previous);
   const validated = 0;
 
+  const evaluations = input.evaluations && input.evaluations.length > 0
+    ? input.evaluations.map((item) => ({
+        title: item.title,
+        context: item.context,
+        dateLabel: new Intl.DateTimeFormat("es-CO", { day: "2-digit", month: "short", year: "numeric" })
+          .format(new Date(`${item.at.getFullYear()}-${item.at.getMonth() + 1}-${item.at.getDate()}`))
+          .replace(".", ""),
+      }))
+    : [...DEFAULT_EVALUATIONS];
+
+  const trend = input.trendPoints && input.trendPoints.length > 0 ? input.trendPoints : [...DEFAULT_TREND];
+  const attendance = input.attendancePercent ?? 92;
+  const accuracyCorrect = input.accuracy?.correct ?? 0;
+  const accuracyTotal = input.accuracy?.total ?? 0;
+  const accuracy = accuracyTotal > 0 ? Math.round((accuracyCorrect / accuracyTotal) * 100) : null;
+  const completedLessons = input.completedLessons ?? 0;
+  const lessonTotal = input.lessonTotal ?? 0;
+
   return {
     sport: { label: "Deporte", accent: "cyan", dimensions: sport },
     neurocracks: { label: "NeuroCracks", accent: "violet", dimensions: neurocracks },
     indicators: [
-      { id: "attendance", label: "Asistencia", value: "92%", detail: "último período" },
+      { id: "attendance", label: "Asistencia", value: `${attendance}%`, detail: "últimos 30 días" },
       { id: "consistency", label: "Consistencia", value: String(input.currentStreak), detail: "días" },
-      { id: "validated-hours", label: "Horas validadas", value: String(validated), detail: `/ ${PLAYER_CERTIFICATION_TARGET_HOURS} h` },
-      { id: "evaluations", label: "Evaluaciones", value: "4", detail: "registradas" },
+      { id: "validated-hours", label: "Lecciones completadas", value: lessonTotal > 0 ? String(completedLessons) : String(validated), detail: lessonTotal > 0 ? `de ${lessonTotal}` : "aún 0 cargadas" },
+      { id: "evaluations", label: "Evaluaciones", value: String(evaluations.length), detail: "registradas" },
+      ...(accuracy !== null ? [{ id: "accuracy", label: "Precisión", value: `${accuracy}%`, detail: `${accuracyCorrect}/${accuracyTotal} respuestas` }] : []),
     ],
-    trend: [
-      { label: "Abr", value: 61 },
-      { label: "May", value: 65 },
-      { label: "Jun", value: 69 },
-      { label: "Jul", value: 73 },
-      { label: "Ago", value: Math.round(sport.reduce((sum, item) => sum + item.current, 0) / sport.length) },
-    ],
+    trend,
     strengths: [
       { label: sport[1].label, value: sport[1].current, note: "Evolución positiva" },
       { label: sport[2].label, value: sport[2].current, note: "Sostienes el ritmo" },
@@ -109,11 +142,7 @@ export function buildPlayerProgressFixture(input: BuildPlayerProgressInput): Pla
       dimension: "Desarrollo técnico",
     },
     hours: { validated, target: PLAYER_CERTIFICATION_TARGET_HOURS, recent: "Acumulado calculado desde sesiones validadas" },
-    evaluations: [
-      { title: "Entrenamiento técnico", dateLabel: "12 ago 2026", context: "Técnica · sesión de campo" },
-      { title: "Evaluación de rendimiento", dateLabel: "29 jul 2026", context: "Deporte · período anterior" },
-      { title: "Revisión NeuroCracks", dateLabel: "15 jul 2026", context: "Atención y decisión" },
-    ],
+    evaluations,
     rpg: {
       nextMilestone: input.currentStreak > 0 ? (Math.floor(input.currentStreak / 5) + 1) * 5 : 5,
       streakCurrent: input.currentStreak,

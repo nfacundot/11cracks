@@ -64,6 +64,9 @@ export function LoginForm() {
     trace?.classList.add("is-active");
     playLoginAudio("ui.confirm");
     document.documentElement.dataset.loginTransition = "leaving";
+    window.setTimeout(() => {
+      delete document.documentElement.dataset.loginTransition;
+    }, 600);
   }
 
   const errorModal =
