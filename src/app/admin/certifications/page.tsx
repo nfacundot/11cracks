@@ -1,10 +1,11 @@
 import { requireSection } from "@/lib/auth";
-import { AdminWorkspace } from "@/components/admin-demo/admin-workspace";
-import { adminIdentity } from "@/lib/admin-demo/state";
+import { getCertificateOperationsView } from "@/lib/certificates/read-model";
+import { CertificateWorkspace } from "@/components/admin-demo/certificate-workspace";
 
 export const metadata = { title: "Certificaciones | Admin" };
 
-export default async function DemoCertificationsPage() {
+export default async function CertificationsPage() {
   await requireSection("ADMIN");
-  return <AdminWorkspace identity={adminIdentity} section="certifications" />;
+  const view = await getCertificateOperationsView();
+  return <CertificateWorkspace view={view} />;
 }

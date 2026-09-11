@@ -12,7 +12,6 @@ import {
   FlameIcon,
   HomeIcon,
   LockIcon,
-  MapIcon,
   SettingsIcon,
   ShieldIcon,
   TimerIcon,
@@ -72,7 +71,6 @@ function groupsFor(base: string): Group[] {
     {
       label: "Plataforma",
       items: [
-        { href: `${base}/catalogos`, label: "Catálogos", short: "Catálogos", icon: <MapIcon className="h-[18px] w-[18px]" /> },
         { href: `${base}/contenido`, label: "Contenido", short: "Contenido", icon: <BookIcon className="h-[18px] w-[18px]" /> },
         { href: `${base}/billetera`, label: "Billetera", short: "Billetera", icon: <CoinIcon className="h-[18px] w-[18px]" /> },
         { href: `${base}/pagos`, label: "Pagos", short: "Pagos", icon: <BarChartIcon className="h-[18px] w-[18px]" /> },

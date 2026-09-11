@@ -115,7 +115,6 @@ export const navigationByRole: Record<ShellRole, NavigationGroup[]> = {
         { id: "democlubs", label: "Clubes", href: "/admin/clubs", icon: "clubs" },
         { id: "club-ranking", label: "Ranking de clubes", href: "/admin/club-ranking", icon: "clubs" },
         { id: "users", label: "Usuarios", href: "/admin/users", icon: "users" },
-        { id: "catalogos", label: "Catálogos", href: "/admin/catalogos", icon: "catalogs" },
         { id: "content", label: "Contenido", href: "/admin/content", icon: "content" },
         { id: "reports", label: "Reportes", href: "/admin/reports", icon: "reports" },
       ],
@@ -137,7 +136,7 @@ export const navigationByRole: Record<ShellRole, NavigationGroup[]> = {
       id: "admin-demo",
       label: "Operación y control",
       items: [
-        { id: "democert", label: "Certificaciones", href: "/admin/certifications", icon: "impact" },
+        { id: "democert", label: "Certificaciones", href: "/admin/certifications", icon: "reports" },
         { id: "demonominations", label: "Postulaciones", href: "/admin/nominations", icon: "reports" },
         { id: "demowallet", label: "Billetera Solidaria", href: "/admin/wallet", icon: "wallet" },
         { id: "demoeconomy", label: "Economía", href: "/admin/economy", icon: "impact" },
@@ -168,7 +167,6 @@ export const navigationByRole: Record<ShellRole, NavigationGroup[]> = {
         { id: "users", label: "Usuarios", href: "/superadmin/users", icon: "users" },
         { id: "teams", label: "Equipos", href: "/superadmin/teams", icon: "clubs" },
         { id: "organizaciones", label: "Organizaciones", href: "/superadmin/organizaciones", icon: "organizations" },
-        { id: "catalogos", label: "Catálogos", href: "/superadmin/catalogos", icon: "catalogs" },
       ],
     },
     {
