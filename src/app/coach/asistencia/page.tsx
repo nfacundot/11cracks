@@ -1,13 +1,15 @@
 import { requireSection } from "@/lib/auth";
-import { AsistenciaView } from "@/components/admin/sections/asistencia-view";
+import { getAttendanceWorkspace } from "@/lib/attendance/service";
+import { AsistenciaWorkspace } from "@/components/coach/asistencia-workspace";
 
 export const metadata = { title: "Asistencia | Coach" };
 
 export default async function Page() {
   const user = await requireSection("ENTRENADOR");
+  const workspace = await getAttendanceWorkspace(user);
   return (
     <div className="space-y-6">
-      <AsistenciaView />
+      <AsistenciaWorkspace workspace={workspace} />
     </div>
   );
 }

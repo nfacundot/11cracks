@@ -490,3 +490,534 @@ model AlimentacionWord {
   @@index([active, order])
   @@index([gameId])
 }
+
+enum EvaluationDimensionGroup {
+  SPORT
+  NEUROCRACKS
+}
+
+enum CoachRubricLevel {
+  NOT_OBSERVED
+  NEEDS_SUPPORT
+  IN_DEVELOPMENT
+  ADEQUATE
+  OUTSTANDING
+  CONSOLIDATED
+}
+
+enum EvaluationStatus {
+  DRAFT
+  PUBLISHED
+  CORRECTED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  PENDING
+}
+
+enum ScoreCalculationStatus {
+  INCOMPLETE
+  PREVIEW
+  FINAL
+}
+
+enum RuleStatus {
+  DRAFT
+  ACTIVE
+  RETIRED
+}
+
+enum PetContributionStatus {
+  COLLECTED
+  PENDING_DISPATCH
+  IN_BATCH
+  CANCELLED
+}
+
+enum PetBatchStatus {
+  DRAFT
+  SENT
+  WEIGHED
+  SETTLED
+  RECONCILED
+  CANCELLED
+}
+
+enum PetSettlementStatus {
+  PENDING
+  SETTLED
+  RECONCILED
+  CANCELLED
+}
+
+enum StreakEvidenceType {
+  ATTENDANCE
+  NEUROCRACKS
+  CHALLENGE
+  PET
+  VALIDATION
+}
+
+enum StreakEvidenceStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  REVERSED
+}
+
+enum CoinSourceType {
+  PET
+  STREAK
+  CORRECTION
+}
+
+enum CoinLedgerStatus {
+  PENDING
+  POSTED
+  REVERSED
+  VOID
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  APPLIED
+}
+
+enum ImportBatchStatus {
+  UPLOADED
+  PARSED
+  VALIDATED
+  READY_TO_APPLY
+  APPLIED
+  FAILED
+  CANCELLED
+}
+
+enum ImportRowStatus {
+  VALID
+  WARNING
+  ERROR
+  CORRECTED
+  APPLIED
+}
+
+model EvaluationDimensionDefinition {
+  id          String                  @id @default(cuid())
+  key         String
+  group       EvaluationDimensionGroup
+  label       String
+  description String?
+  sortOrder   Int
+  active      Boolean                 @default(true)
+  version     String
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  items      CoachEvaluationItem[]
+  neuroScores NeuroDigitalPeriodScore[]
+
+  @@unique([key, version])
+  @@index([group, active])
+}
+
+model CoachEvaluation {
+  id             String           @id @default(cuid())
+  clubId         String
+  playerId       String
+  coachId        String
+  sessionId      String?
+  periodStart    DateTime
+  periodEnd      DateTime
+  status         EvaluationStatus @default(DRAFT)
+  notes          String?
+  ruleVersion    String
+  publishedAt    DateTime?
+  publishedBy    String?
+  supersedesEvaluationId String?
+  supersedesEvaluation   CoachEvaluation? @relation("EvaluationSupersedes", fields: [supersedesEvaluationId], references: [id], onDelete: SetNull)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  items      CoachEvaluationItem[]
+  correctives CoachEvaluation[]   @relation("EvaluationSupersedes")
+
+  @@index([clubId, playerId, periodStart])
+  @@index([coachId, status])
+  @@index([clubId, playerId, periodStart, status])
+}
+
+model CoachEvaluationItem {
+  id             String           @id @default(cuid())
+  evaluationId   String
+  evaluation     CoachEvaluation  @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  dimensionId    String
+  dimension      EvaluationDimensionDefinition @relation(fields: [dimensionId], references: [id])
+  rubricLevel    CoachRubricLevel
+  normalizedValue Int?
+  comment        String?
+  evidenceUrl    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([evaluationId, dimensionId])
+  @@index([dimensionId])
+}
+
+model NeuroDigitalPeriodScore {
+  id            String   @id @default(cuid())
+  clubId        String
+  playerId      String
+  dimensionId   String
+  dimension     EvaluationDimensionDefinition @relation(fields: [dimensionId], references: [id])
+  periodStart   DateTime
+  periodEnd     DateTime
+  score         Decimal  @db.Decimal(5, 2)
+  sourceSummary Json?
+  ruleVersion   String
+  calculatedAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([playerId, dimensionId, periodStart, periodEnd, ruleVersion])
+  @@index([clubId, playerId, periodEnd])
+}
+
+model ScoreFormulaVersion {
+  id             String     @id @default(cuid())
+  version        String
+  sportWeight    Decimal    @db.Decimal(5, 4)
+  neuroWeight    Decimal    @db.Decimal(5, 4)
+  config         Json?
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  status         RuleStatus @default(DRAFT)
+  createdBy      String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  snapshots PlayerScoreSnapshot[]
+
+  @@unique([version])
+  @@index([status, effectiveFrom])
+}
+
+model PlayerScoreSnapshot {
+  id                String                @id @default(cuid())
+  clubId            String
+  playerId          String
+  periodStart       DateTime
+  periodEnd         DateTime
+  formulaVersionId  String
+  formulaVersion    ScoreFormulaVersion   @relation(fields: [formulaVersionId], references: [id])
+  sportScore        Decimal?              @db.Decimal(5, 2)
+  neuroScore        Decimal?              @db.Decimal(5, 2)
+  elevenScore       Decimal?              @db.Decimal(5, 2)
+  calculationStatus ScoreCalculationStatus @default(INCOMPLETE)
+  sourceSummary     Json?
+  calculatedAt      DateTime              @default(now())
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+
+  @@unique([playerId, periodStart, periodEnd, formulaVersionId])
+  @@index([clubId, playerId, periodEnd])
+}
+
+model AttendanceRecord {
+  id            String           @id @default(cuid())
+  clubId        String
+  sessionId     String
+  playerId      String
+  coachId       String
+  status        AttendanceStatus @default(PENDING)
+  markedAt      DateTime?
+  notes         String?
+  correctionId  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([sessionId, playerId])
+  @@index([clubId, playerId, createdAt])
+  @@index([coachId, sessionId])
+}
+
+model StreakRuleVersion {
+  id                    String     @id @default(cuid())
+  version               String
+  attendanceWeight      Decimal    @db.Decimal(5, 4)
+  neurocracksWeight     Decimal    @db.Decimal(5, 4)
+  challengeWeight       Decimal    @db.Decimal(5, 4)
+  petWeight             Decimal    @db.Decimal(5, 4)
+  validationWeight      Decimal    @db.Decimal(5, 4)
+  componentConfig       Json?
+  verifiedWeekThreshold Decimal?   @db.Decimal(5, 2)
+  effectiveFrom         DateTime
+  effectiveTo           DateTime?
+  status                RuleStatus @default(DRAFT)
+  createdBy             String
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  results StreakPeriodResult[]
+
+  @@unique([version])
+  @@index([status, effectiveFrom])
+}
+
+model StreakEvidence {
+  id             String               @id @default(cuid())
+  clubId         String
+  playerId       String
+  sessionId      String?
+  type           StreakEvidenceType
+  sourceId       String
+  status         StreakEvidenceStatus @default(PENDING)
+  occurredAt     DateTime
+  validatedBy    String?
+  validatedAt    DateTime?
+  metadata       Json?
+  idempotencyKey String
+  correctionId   String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([idempotencyKey])
+  @@index([clubId, playerId, occurredAt])
+  @@index([type, sourceId])
+}
+
+model StreakPeriodResult {
+  id                     String                @id @default(cuid())
+  clubId                 String
+  playerId               String
+  periodStart            DateTime
+  periodEnd              DateTime
+  ruleVersionId          String
+  ruleVersion            StreakRuleVersion     @relation(fields: [ruleVersionId], references: [id])
+  attendanceComponent    Decimal?              @db.Decimal(5, 2)
+  neurocracksComponent   Decimal?              @db.Decimal(5, 2)
+  challengeComponent     Decimal?              @db.Decimal(5, 2)
+  petComponent           Decimal?              @db.Decimal(5, 2)
+  validationComponent    Decimal?              @db.Decimal(5, 2)
+  streakScore            Decimal?              @db.Decimal(5, 2)
+  verifiedWeek           Boolean?
+  calculationStatus      ScoreCalculationStatus @default(INCOMPLETE)
+  sourceSummary          Json?
+  manualOverride         Json?
+  calculatedAt           DateTime              @default(now())
+  correctionId           String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  @@unique([playerId, periodStart, periodEnd, ruleVersionId])
+  @@index([clubId, playerId, periodEnd])
+}
+
+model ExchangeRate {
+  id               String    @id @default(cuid())
+  currencyFrom     String
+  currencyTo       String
+  rate             Decimal   @db.Decimal(18, 6)
+  effectiveDate    DateTime
+  source           String
+  retrievedAt      DateTime
+  isManualOverride Boolean   @default(false)
+  overrideReason   String?
+  overriddenBy     String?
+  createdAt        DateTime  @default(now())
+
+  settlements PetSettlement[]
+
+  @@unique([currencyFrom, currencyTo, effectiveDate, source])
+  @@index([effectiveDate])
+}
+
+model PetBatch {
+  id                    String          @id @default(cuid())
+  clubId                String
+  batchCode             String
+  status                PetBatchStatus  @default(DRAFT)
+  dispatchDate          DateTime?
+  dispatchedBy          String?
+  bottlesSent           Int?
+  estimatedKg           Decimal?        @db.Decimal(12, 3)
+  processorName         String?
+  receivedAt            DateTime?
+  realKg                Decimal?        @db.Decimal(12, 3)
+  weighingDocumentUrl   String?
+  closedBy              String?
+  closedAt              DateTime?
+  correctionId          String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  contributions PetContribution[]
+  settlement    PetSettlement?
+
+  @@unique([batchCode])
+  @@index([clubId, status])
+}
+
+model PetContribution {
+  id               String                @id @default(cuid())
+  clubId           String
+  playerId         String?
+  sessionId        String?
+  recordedBy       String
+  recordedAt       DateTime
+  bottlesCount     Int
+  estimatedKg      Decimal?              @db.Decimal(12, 3)
+  batchId          String?
+  batch            PetBatch?             @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  status           PetContributionStatus @default(COLLECTED)
+  notes            String?
+  importBatchId    String?
+  sourceRowNumber  Int?
+  idempotencyKey   String
+  correctionId     String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([idempotencyKey])
+  @@index([clubId, recordedAt])
+  @@index([playerId, recordedAt])
+  @@index([batchId])
+}
+
+model PetSettlement {
+  id                    String               @id @default(cuid())
+  clubId                String
+  batchId               String               @unique
+  batch                 PetBatch             @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  status                PetSettlementStatus  @default(PENDING)
+  settledAt             DateTime?
+  realKg                Decimal              @db.Decimal(12, 3)
+  copPaid               Decimal              @db.Decimal(18, 2)
+  pricePerKg            Decimal?             @db.Decimal(18, 4)
+  exchangeRateId        String?
+  exchangeRate          ExchangeRate?        @relation(fields: [exchangeRateId], references: [id], onDelete: SetNull)
+  usdReference          Decimal?             @db.Decimal(18, 2)
+  paymentReference      String?
+  settlementDocumentUrl String?
+  reconciledAt          DateTime?
+  reconciledBy          String?
+  correctionId          String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@index([clubId, status])
+  @@index([settledAt])
+}
+
+model CoinRuleVersion {
+  id             String         @id @default(cuid())
+  version        String
+  sourceType     CoinSourceType
+  sourceEvent    String?
+  config         Json?
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  status         RuleStatus     @default(DRAFT)
+  createdBy      String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  ledger CrackCoinLedger[]
+
+  @@unique([version, sourceType])
+  @@index([sourceType, status, effectiveFrom])
+}
+
+model CrackCoinLedger {
+  id             String            @id @default(cuid())
+  clubId         String
+  playerId       String
+  occurredAt     DateTime
+  sourceType     CoinSourceType
+  sourceId       String
+  ruleVersionId  String?
+  rule           CoinRuleVersion?  @relation(fields: [ruleVersionId], references: [id], onDelete: SetNull)
+  coinDelta      Int
+  status         CoinLedgerStatus  @default(PENDING)
+  idempotencyKey String
+  reversalOfId   String?
+  reversalOf     CrackCoinLedger?  @relation("CoinReversal", fields: [reversalOfId], references: [id], onDelete: SetNull)
+  createdBy      String
+  correctionId   String?
+  notes          String?
+  createdAt      DateTime          @default(now())
+
+  reversals CrackCoinLedger[] @relation("CoinReversal")
+
+  @@unique([idempotencyKey])
+  @@index([clubId, playerId, occurredAt])
+  @@index([sourceType, sourceId])
+}
+
+model DataCorrection {
+  id                  String           @id @default(cuid())
+  entityType          String
+  entityId            String
+  fieldName           String?
+  originalValue       Json?
+  requestedValue      Json?
+  reason              String
+  requestedBy         String
+  requestedAt         DateTime         @default(now())
+  status              CorrectionStatus @default(PENDING)
+  approvedBy          String?
+  approvedAt          DateTime?
+  appliedAt           DateTime?
+  replacementRecordId String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@index([entityType, entityId])
+  @@index([status, requestedAt])
+}
+
+model ImportBatch {
+  id           String            @id @default(cuid())
+  clubId       String?
+  importType   String
+  fileName     String
+  fileHash     String
+  uploadedBy   String
+  uploadedAt   DateTime          @default(now())
+  status       ImportBatchStatus @default(UPLOADED)
+  totalRows    Int               @default(0)
+  validRows    Int               @default(0)
+  errorRows    Int               @default(0)
+  appliedAt    DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  rowErrors ImportRowError[]
+
+  @@unique([fileHash, importType])
+  @@index([clubId, uploadedAt])
+}
+
+model ImportRowError {
+  id             String         @id @default(cuid())
+  importBatchId  String
+  importBatch    ImportBatch    @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber      Int
+  sourceRowKey   String?
+  rawData        Json
+  errorCode      String
+  errorMessage   String
+  correctedData  Json?
+  status         ImportRowStatus @default(ERROR)
+  correctedBy    String?
+  correctedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([importBatchId, rowNumber])
+  @@index([status])
+}

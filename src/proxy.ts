@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const SECTION_PREFIXES = ["/jugador", "/coach", "/admin", "/superadmin"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // /register no existe como ruta propia (el registro es una pestaña en /login).

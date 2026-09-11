@@ -1,0 +1,53 @@
+export const DOMAIN_RULE_KEYS = {
+  PET_PESO_REF_BOTELLA_G: "PET_PESO_REF_BOTELLA_G",
+  RACHA_PESO_ASISTENCIA: "RACHA_PESO_ASISTENCIA",
+  RACHA_PESO_NEUROCRACKS: "RACHA_PESO_NEUROCRACKS",
+  RACHA_PESO_RETOS: "RACHA_PESO_RETOS",
+  RACHA_PESO_PET: "RACHA_PESO_PET",
+  RACHA_PESO_VALIDACIONES: "RACHA_PESO_VALIDACIONES",
+  RACHA_UMBRAL_VERIFIED_WEEK: "RACHA_UMBRAL_VERIFIED_WEEK",
+  CC_REGLA_PET: "CC_REGLA_PET",
+  CC_REGLA_RACHA: "CC_REGLA_RACHA",
+} as const;
+
+export type DomainRuleKey = (typeof DOMAIN_RULE_KEYS)[keyof typeof DOMAIN_RULE_KEYS];
+
+export const PET_PESO_REF_BOTELLA_G = 18;
+
+export const DOMAIN_RULE_VERSION = "v1";
+
+export const INITIAL_STREAK_WEIGHTS = {
+  attendance: 0.35,
+  neurocracks: 0.25,
+  challenge: 0.15,
+  pet: 0.15,
+  validation: 0.1,
+} as const;
+
+export const INITIAL_STREAK_COMPONENT_CONFIG = {
+  petReferenceBottleGrams: PET_PESO_REF_BOTELLA_G,
+  verifiedWeekThreshold: null,
+} as const;
+
+export const DEFAULT_ELEVEN_WEIGHTS = {
+  sport: 0.5,
+  neuro: 0.5,
+} as const;
+
+export const SPORT_DIMENSION_KEYS = [
+  "OFFENSIVE",
+  "DEFENSIVE",
+  "TECHNIQUE",
+  "SPEED",
+  "GAME_READING",
+  "POLYFUNCTIONALITY",
+] as const;
+
+export const NEURO_DIMENSION_KEYS = [
+  "BILINGUAL_SPORT",
+  "LEADERSHIP",
+  "MINDSET",
+  "SPORTS_FINANCE",
+  "SUSTAINABILITY",
+  "WELLBEING",
+] as const;

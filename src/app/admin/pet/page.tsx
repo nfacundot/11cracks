@@ -1,9 +1,11 @@
 import { requireSection } from "@/lib/auth";
-import { AdminDemoWindow } from "@/components/admin-demo/admin-windows";
+import { getPetWorkspace } from "@/lib/pet/service";
+import { PetWorkspace } from "@/components/admin/pet-workspace";
 
-export const metadata = { title: "Datos de mascota | Admin" };
+export const metadata = { title: "PET | Admin" };
 
 export default async function DemoPetPage() {
-  await requireSection("ADMIN");
-  return <AdminDemoWindow section="pet" />;
+  const user = await requireSection("ADMIN");
+  const view = await getPetWorkspace(user);
+  return <PetWorkspace view={view} />;
 }
