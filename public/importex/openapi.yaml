@@ -1,0 +1,271 @@
+openapi: 3.1.0
+info:
+  title: 11 Cracks Domain API
+  version: 1.0.0
+  description: Coach, Eleven Score, Racha, PET, Crack Coins, importaciones y correcciones.
+servers:
+  - url: /api/v1
+paths:
+  /coach/evaluations:
+    post:
+      summary: Crear evaluación de Coach (borrador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCoachEvaluation'
+      responses:
+        '201': { description: Creada }
+        '403': { description: Fuera de scope/RBAC }
+  /coach/evaluations/{id}/publish:
+    post:
+      summary: Publicar evaluación y crear versión histórica
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Publicada }
+        '409': { description: Evaluación incompleta o ya publicada }
+  /sessions/{sessionId}/attendance:
+    post:
+      summary: Guardar asistencia por lote
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [records]
+              properties:
+                records:
+                  type: array
+                  items:
+                    type: object
+                    required: [playerId, status]
+                    properties:
+                      playerId: { type: string }
+                      status: { enum: [PRESENT, ABSENT, PENDING] }
+                      notes: { type: string, nullable: true }
+      responses:
+        '200': { description: Guardada }
+  /players/{playerId}/score/recalculate:
+    post:
+      summary: Recalcular snapshot Eleven Score
+      parameters:
+        - in: path
+          name: playerId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Snapshot creado o INCOMPLETE }
+  /players/{playerId}/streak:
+    get:
+      summary: Leer resultado de Racha vigente/histórico
+      parameters:
+        - in: path
+          name: playerId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: periodStart
+          schema: { type: string, format: date }
+        - in: query
+          name: periodEnd
+          schema: { type: string, format: date }
+      responses:
+        '200': { description: Resultado }
+  /streak/recalculate:
+    post:
+      summary: Recalcular Racha por jugador/período
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playerId, periodStart, periodEnd]
+              properties:
+                playerId: { type: string }
+                periodStart: { type: string, format: date }
+                periodEnd: { type: string, format: date }
+                closePeriod: { type: boolean, default: false }
+                manualPetComponent:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  nullable: true
+                manualValidationComponent:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                  nullable: true
+                manualOverrideReason:
+                  type: string
+                  nullable: true
+      responses:
+        '200': { description: PREVIEW, FINAL o INCOMPLETE }
+  /pet/contributions:
+    post:
+      summary: Registrar aporte PET
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetContributionInput'
+      responses:
+        '201': { description: Registrado }
+        '409': { description: Idempotency key duplicada }
+  /pet/batches:
+    post:
+      summary: Crear lote PET
+      responses:
+        '201': { description: Lote creado }
+  /pet/batches/{id}/weigh:
+    post:
+      summary: Registrar kg reales y soporte de compactadora
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [realKg, processorName, weighingDocumentUrl, receivedAt]
+              properties:
+                realKg: { type: number, exclusiveMinimum: 0 }
+                processorName: { type: string }
+                weighingDocumentUrl: { type: string }
+                receivedAt: { type: string, format: date-time }
+      responses:
+        '200': { description: WEIGHED }
+  /pet/batches/{id}/settle:
+    post:
+      summary: Registrar liquidación PET real
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [copPaid, settlementDocumentUrl]
+              properties:
+                copPaid: { type: number, minimum: 0 }
+                settlementDocumentUrl: { type: string }
+                exchangeRateId: { type: string, nullable: true }
+                paymentReference: { type: string, nullable: true }
+      responses:
+        '200': { description: SETTLED }
+        '409': { description: Falta kg real validado }
+  /pet/batches/{id}/reconcile:
+    post:
+      summary: Conciliar pago y cerrar lote
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentReference]
+              properties:
+                paymentReference: { type: string }
+      responses:
+        '200': { description: RECONCILED }
+  /players/{playerId}/crack-coins:
+    get:
+      summary: Leer saldo derivado y movimientos
+      parameters:
+        - in: path
+          name: playerId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Balance + ledger }
+  /imports:
+    post:
+      summary: Crear import batch y cargar archivo a staging
+      responses:
+        '202': { description: Batch creado }
+  /imports/{id}/apply:
+    post:
+      summary: Aplicar filas válidas transaccionalmente
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Resultado de aplicación }
+        '409': { description: Existen filas ERROR sin corregir }
+  /corrections:
+    post:
+      summary: Solicitar corrección auditada
+      responses:
+        '201': { description: Solicitud creada }
+  /corrections/{id}/approve:
+    post:
+      summary: Aprobar y aplicar corrección según política de entidad
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Corrección aprobada/aplicada }
+components:
+  schemas:
+    EvaluationItemInput:
+      type: object
+      required: [dimensionKey, rubricLevel]
+      properties:
+        dimensionKey: { type: string }
+        rubricLevel:
+          enum: [NOT_OBSERVED, NEEDS_SUPPORT, IN_DEVELOPMENT, ADEQUATE, OUTSTANDING, CONSOLIDATED]
+        comment: { type: string, nullable: true }
+        evidenceUrl: { type: string, nullable: true }
+    CreateCoachEvaluation:
+      type: object
+      required: [clubId, playerId, periodStart, periodEnd, items]
+      properties:
+        clubId: { type: string }
+        playerId: { type: string }
+        sessionId: { type: string, nullable: true }
+        periodStart: { type: string, format: date-time }
+        periodEnd: { type: string, format: date-time }
+        notes: { type: string, nullable: true }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/EvaluationItemInput' }
+    PetContributionInput:
+      type: object
+      required: [clubId, bottlesCount, recordedAt, idempotencyKey]
+      properties:
+        clubId: { type: string }
+        playerId: { type: string, nullable: true }
+        sessionId: { type: string, nullable: true }
+        bottlesCount: { type: integer, minimum: 0 }
+        recordedAt: { type: string, format: date-time }
+        idempotencyKey: { type: string }
+        notes: { type: string, nullable: true }
