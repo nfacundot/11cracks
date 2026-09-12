@@ -1,3 +1,5 @@
+import type { GameCategory } from "@/lib/games";
+
 export type NodoLeccionEstado = "COMPLETED" | "IN_PROGRESS" | "AVAILABLE" | "LOCKED";
 
 export interface NodoLeccion {
@@ -11,6 +13,9 @@ export interface NodoLeccion {
   description: string | null;
   estado: NodoLeccionEstado;
   bestScore: number;
+  gameSlug?: string | null;
+  gameLabel?: string | null;
+  gameCategory?: GameCategory | null;
   posX?: number;
   posY?: number;
 }

@@ -5,10 +5,61 @@ import { requireUser } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
 import { notify } from "@/lib/notify";
 import { revalidatePath } from "next/cache";
+import { gradePronunciation } from "@/lib/speak-utils";
 
 type ActionResult =
   | { ok: true; correct: boolean; explanation?: string | null; correctOptionId?: string }
   | { ok: false; error: string };
+
+export type SpeakingAnswerResult =
+  | { ok: true; correct: boolean; ratio: number; transcript: string }
+  | { ok: false; error: string };
+
+export async function submitSpeakingAnswer(data: {
+  lessonId: string;
+  questionId: string;
+  transcript: string;
+  confidence: number;
+}): Promise<SpeakingAnswerResult> {
+  const user = await requireUser();
+
+  const question = await prisma.question.findUnique({
+    where: { id: data.questionId },
+    select: { id: true, lessonId: true, prompt: true },
+  });
+
+  if (!question || question.lessonId !== data.lessonId) {
+    return { ok: false, error: "Pregunta no válida" };
+  }
+
+  const safeConfidence = Math.min(1, Math.max(0, Number.isFinite(data.confidence) ? data.confidence : 0));
+  const transcript = String(data.transcript ?? "").trim().slice(0, 200);
+  if (!transcript) return { ok: false, error: "No se detectó ninguna palabra" };
+
+  const { correct, ratio } = gradePronunciation(question.prompt, transcript, safeConfidence);
+  const scorePct = Math.round(ratio * 100);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.answerRecord.create({
+      data: {
+        userId: user.id,
+        questionId: question.id,
+        answerText: transcript,
+        score: scorePct,
+        isCorrect: correct,
+      },
+    });
+    await tx.lessonProgress.upsert({
+      where: { userId_lessonId: { userId: user.id, lessonId: data.lessonId } },
+      create: { userId: user.id, lessonId: data.lessonId, status: "IN_PROGRESS", attempts: 1 },
+      update: { status: "IN_PROGRESS" },
+    });
+  });
+
+  revalidatePath("/jugador/neurocracks");
+
+  return { ok: true, correct, ratio, transcript };
+}
 
 export async function submitAnswer(data: {
   lessonId: string;

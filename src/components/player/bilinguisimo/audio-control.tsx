@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SpeechAudioReference } from "@/lib/bilingual/game-contracts";
+import { pickVoice } from "@/lib/speech";
+import { speakWithTransformers, stopTtsAudio, subscribeTtsProgress, ttsLanguageFor, ttsLanguageLabel, TTS_LOCALE, TtsBlockedError, type TtsLanguage } from "@/lib/tts-engine";
 
 type AudioState = "checking" | "ready" | "playing" | "blocked" | "unavailable";
 
@@ -17,17 +19,35 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
 
 export function AudioControl({
   audio,
+  voiceLanguage,
   onPlayed,
   autoPlay = false,
   onAutoPlayAttempt,
 }: {
   audio: SpeechAudioReference;
+  voiceLanguage?: TtsLanguage;
   onPlayed?: () => void;
   autoPlay?: boolean;
   onAutoPlayAttempt?: () => void;
 }) {
   const [state, setState] = useState<AudioState>("checking");
+  const [ttsProgress, setTtsProgress] = useState<number | null>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const recordedAudio = useRef<HTMLAudioElement | null>(null);
+  const language: TtsLanguage = voiceLanguage ?? ttsLanguageFor(audio.language);
+  const fallbackLocale = TTS_LOCALE[language];
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const load = () => setVoices(window.speechSynthesis.getVoices());
+    load();
+    window.speechSynthesis.addEventListener("voiceschanged", load);
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", load);
+    };
+  }, []);
+
+  useEffect(() => subscribeTtsProgress(language, setTtsProgress), [language]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -35,6 +55,7 @@ export function AudioControl({
     });
     return () => {
       window.cancelAnimationFrame(frame);
+      stopTtsAudio();
       try {
         window.speechSynthesis?.cancel();
       } catch {
@@ -43,7 +64,7 @@ export function AudioControl({
     };
   }, [audio.audioSrc, audio.text]);
 
-  const play = useCallback((automatic = false) => {
+  const play = useCallback(async (automatic = false) => {
     if (audio.audioSrc) {
       const element = recordedAudio.current ?? new Audio(audio.audioSrc);
       recordedAudio.current = element;
@@ -53,6 +74,23 @@ export function AudioControl({
       element.currentTime = 0;
       void element.play().catch(() => setState("unavailable"));
       return;
+    }
+    setState("checking");
+    try {
+      await speakWithTransformers(audio.text, language, {
+        onStart: () => { setState("playing"); onPlayed?.(); },
+        onEnd: () => setState("ready"),
+      });
+      return;
+    } catch (error) {
+      if (error instanceof TtsBlockedError) {
+        // Sin gesto del usuario no se puede reproducir: NO usamos la voz normal,
+        // mostramos "Toca para escuchar" para que al pulsar suene la voz asignada.
+        setState("blocked");
+        return;
+      }
+      // Falla real del motor (sin modelo/red): registramos la causa y caemos al navegador.
+      console.error("[TTS] El motor neuronal fallo:", error);
     }
     if (!("speechSynthesis" in window)) {
       setState("unavailable");
@@ -64,7 +102,9 @@ export function AudioControl({
       // A browser speech implementation may reject cancellation during startup.
     }
     const utterance = new SpeechSynthesisUtterance(audio.text);
-    utterance.lang = audio.language;
+    utterance.lang = fallbackLocale;
+    const selectedVoice = pickVoice(fallbackLocale, "male", voices);
+    if (selectedVoice) utterance.voice = selectedVoice;
     utterance.rate = 0.82;
     utterance.onstart = () => { setState("playing"); onPlayed?.(); };
     utterance.onend = () => setState("ready");
@@ -74,7 +114,7 @@ export function AudioControl({
     } catch {
       setState(automatic ? "blocked" : "unavailable");
     }
-  }, [audio, onPlayed]);
+  }, [audio, fallbackLocale, language, onPlayed, voices]);
 
   useEffect(() => {
     if (!autoPlay || state !== "ready") return;
@@ -89,11 +129,24 @@ export function AudioControl({
       type="button"
       onClick={() => play(false)}
       disabled={state === "checking"}
-      aria-label={state === "playing" ? "Reproduciendo palabra" : state === "blocked" ? "Toca para escuchar la palabra" : "Escuchar palabra. Puedes repetirla"}
+      aria-label={`${state === "playing" ? "Reproduciendo palabra" : state === "blocked" ? "Toca para escuchar la palabra" : "Escuchar palabra. Puedes repetirla"}. Voz en ${ttsLanguageLabel(language)}`}
       data-state={state}
     >
       <span><SpeakerIcon playing={state === "playing"} /></span>
-      <span>{state === "checking" ? "Preparando audio" : state === "unavailable" ? "Reintentar audio" : state === "blocked" ? "Toca para escuchar" : state === "playing" ? "Escuchando…" : "Escuchar otra vez"}</span>
+      <span>
+        {ttsProgress !== null && ttsProgress < 100
+          ? `Descargando voz ${ttsProgress}%`
+          : state === "checking"
+            ? "Preparando audio"
+            : state === "unavailable"
+              ? "Reintentar audio"
+              : state === "blocked"
+                ? "Toca para escuchar"
+                : state === "playing"
+                  ? "Escuchando…"
+                  : "Escuchar otra vez"}
+      </span>
+      <span className="bilingual-audio__voice">Voz: {ttsLanguageLabel(language)}</span>
     </button>
   );
 }

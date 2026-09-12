@@ -38,7 +38,7 @@ export async function DashboardView({ basePath }: { basePath: string }) {
       label: "Juegos",
       value: gameCount,
       icon: <GamepadIcon className="h-5 w-5" />,
-      href: `${basePath}/juegos`,
+      href: basePath === "/admin" ? "/admin/settings/lecciones" : `${basePath}/juegos`,
       color: "bg-orange-500",
     },
     {

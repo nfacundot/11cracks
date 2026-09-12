@@ -115,13 +115,14 @@ export type GameViewModel = {
   active: boolean;
   wordCount: number;
   lessonXp: number | null;
+  lessonCount: number;
 };
 
 export type PreguntasLessonViewModel = {
   id: string;
   title: string;
   emoji: string;
-  type: "PREGUNTADOS" | "CONTRARRELOJ";
+  type: "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
   optionMode: "TEXT" | "IMAGE" | "BOTH";
   timeSeconds: number | null;
   xpReward: number;
@@ -138,6 +139,7 @@ export type QuizClase = {
 const QUIZ_TYPE_META = {
   PREGUNTADOS: { label: "Preguntados", className: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" },
   CONTRARRELOJ: { label: "Contrarreloj", className: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" },
+  SPEAKING: { label: "Habla", className: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300" },
 } as const;
 
 const QUIZ_MODE_LABELS: Record<string, string> = {
@@ -312,7 +314,7 @@ export function JuegosManager({
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [quizNew, setQuizNew] = useState<"PREGUNTADOS" | "CONTRARRELOJ" | null>(null);
+  const [quizNew, setQuizNew] = useState<"PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | null>(null);
   const [editing, setEditing] = useState<GameViewModel | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; game: GameViewModel | null }>({
     open: false,
@@ -396,6 +398,17 @@ export function JuegosManager({
                     <BoltIcon className="h-5 w-5 text-amber-500" />
                     <span className="text-xs font-black text-emerald-950 dark:text-white">Contrarreloj</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuizNew("SPEAKING");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full flex-col items-center gap-1.5 rounded-xl border-2 border-violet-100 bg-white px-2 py-3 text-center transition hover:border-violet-300 hover:bg-violet-50 active:scale-95 dark:border-emerald-800 dark:bg-emerald-900 dark:hover:border-violet-700 dark:hover:bg-emerald-800/60"
+                  >
+                    <span className="text-xl">🎤</span>
+                    <span className="text-xs font-black text-emerald-950 dark:text-white">Habla</span>
+                  </button>
               </div>
             </div>
           ) : null}
@@ -451,6 +464,15 @@ export function JuegosManager({
         label=""
         title="Nueva lección · Contrarreloj"
       />
+      <LessonEditorModal
+        open={quizNew === "SPEAKING"}
+        onClose={() => setQuizNew(null)}
+        clases={clases}
+        mode="lessons"
+        initialType="SPEAKING"
+        label=""
+        title="Nueva lección · Habla (repite con micrófono)"
+      />
 
       {games.length === 0 && quizzLessons.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-green-200 p-10 text-center dark:border-emerald-800">
@@ -490,7 +512,7 @@ export function JuegosManager({
                     )}
                   </p>
                   <p className="text-xs font-bold text-zinc-400">
-                    {game.wordCount} {game.wordCount === 1 ? "palabra" : "palabras"} · {game.description ?? "Sin descripción"} ·{" "}
+                    {game.wordCount} {game.wordCount === 1 ? "palabra" : "palabras"} · {game.lessonCount > 0 ? `${game.lessonCount} ${game.lessonCount === 1 ? "materia/camino" : "materias/caminos"} · ` : "sin camino · "}{game.description ?? "Sin descripción"} ·{" "}
                     {game.lessonXp != null ? <>XP por lección: <strong className="text-emerald-600 dark:text-emerald-300">{game.lessonXp}</strong> · </> : null}
                     <span className="font-mono">{game.slug}</span>
                   </p>

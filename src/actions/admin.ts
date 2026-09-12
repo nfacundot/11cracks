@@ -21,7 +21,7 @@ export type EditableLessonData = {
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
     gameMode?: "ANAGRAM" | "INFOGRAMA" | null;
     optionMode?: "TEXT" | "IMAGE" | "BOTH";
     timeSeconds?: number | null;
@@ -159,8 +159,6 @@ export async function createUser(prev: AdminState, formData: FormData): Promise<
   const role = String(formData.get("role") || "player");
   const position = String(formData.get("position") || "").trim() || null;
   const teamId = String(formData.get("teamId") || "").trim() || null;
-  const clubId = String(formData.get("clubId") || "").trim() || null;
-  const status = String(formData.get("status") || "pending");
   const shortName = String(formData.get("shortName") || "").trim();
   const number = String(formData.get("number") || "0");
   const category = String(formData.get("category") || "").trim();
@@ -182,7 +180,7 @@ export async function createUser(prev: AdminState, formData: FormData): Promise<
   let username = email.split("@")[0].toLowerCase().replace(/[^a-z0-9._-]/g, "");
   if (!username) username = "user-" + Date.now();
 
-  let baseUsername = username;
+  const baseUsername = username;
   let suffix = 1;
   while (await prisma.user.findUnique({ where: { username }, select: { id: true } })) {
     username = `${baseUsername}${suffix}`;
@@ -505,7 +503,8 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     | "QUIZ"
     | "GAME"
     | "PREGUNTADOS"
-    | "CONTRARRELOJ";
+    | "CONTRARRELOJ"
+    | "SPEAKING";
   const gameMode = String(formData.get("gameMode") || "") as
     | ""
     | "ANAGRAM"
@@ -523,7 +522,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   const xpReward = Math.max(0, Math.round(Number(formData.get("xpReward")) || 10));
   const questions = parseQuestions(String(formData.get("questions") || "[]"));
 
-  if (!["LESSON", "QUIZ", "GAME", "PREGUNTADOS", "CONTRARRELOJ"].includes(type)) {
+  if (!["LESSON", "QUIZ", "GAME", "PREGUNTADOS", "CONTRARRELOJ", "SPEAKING"].includes(type)) {
     return { error: "Tipo de lección inválido" };
   }
   if (!["TEXT", "IMAGE", "BOTH"].includes(optionMode)) {
@@ -541,7 +540,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     return { error: "Todas las preguntas necesitan enunciado" };
   }
   const isQuestionsGame = type === "PREGUNTADOS" || type === "CONTRARRELOJ";
-  const needsOptions = isQuestionsGame || gameMode !== "ANAGRAM";
+  const needsOptions = isQuestionsGame || (gameMode !== "ANAGRAM" && type !== "SPEAKING");
   if (
     needsOptions &&
     questions.some(

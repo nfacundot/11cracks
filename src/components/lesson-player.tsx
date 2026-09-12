@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { submitAnswer, finishLesson } from "@/actions/lesson";
+import { submitAnswer, finishLesson, submitSpeakingAnswer } from "@/actions/lesson";
 import { CheckIcon, HeartIcon, XIcon, FlameIcon, BoltIcon, ArrowLeftIcon } from "@/components/icons";
 import { EmoteMascot } from "@/components/emote-mascot";
+import { transcribeAudioBlob, canTranscribeInBrowser, subscribeWhisperProgress } from "@/lib/whisper";
 
 export type PlayerQuestion = {
   id: string;
@@ -27,14 +28,24 @@ export type PlayerLesson = {
 
 const MAX_HEARTS = 3;
 
+function isNativeCapacitor(): boolean {
+  if (typeof window === "undefined") return false;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  return !!cap && typeof cap.isNativePlatform === "function" && cap.isNativePlatform() === true;
+}
+
 export function LessonPlayer({
   lesson,
   questions,
   returnHref = "/jugador/learn",
+  nextHref,
+  language = "es",
 }: {
   lesson: PlayerLesson;
   questions: PlayerQuestion[];
   returnHref?: string;
+  nextHref?: string | null;
+  language?: string;
 }) {
   const [phase, setPhase] = useState<"intro" | "question" | "feedback" | "results">("intro");
   const [qIndex, setQIndex] = useState(0);
@@ -46,11 +57,55 @@ export function LessonPlayer({
   const [result, setResult] = useState<{ earnedXp: number; perfect: boolean; streak: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState("");
+  const [forceTyped, setForceTyped] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [recSecs, setRecSecs] = useState(0);
+  const [lastAudioUrl, setLastAudioUrl] = useState<string | null>(null);
+  const [micLevel, setMicLevel] = useState(0);
+  const [recordStats, setRecordStats] = useState<{ secs: number; bytes: number; peak: number } | null>(null);
+  const [recordedReady, setRecordedReady] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [whisperPct, setWhisperPct] = useState<number | null>(null);
+  const whisperPendingRef = useRef(false);
+  const lastRecordingRef = useRef<Blob | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recChunksRef = useRef<Blob[]>([]);
+  const recTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const levelRafRef = useRef<number>(0);
+  const noisePeakRef = useRef(0);
+  const recordStartRef = useRef(0);
+  const capListenersRef = useRef<{ remove: () => Promise<void> }[]>([]);
+  const capActiveRef = useRef(false);
+  const capFinalRef = useRef("");
 
   const question = questions[qIndex];
   const total = questions.length;
   const isLast = qIndex === total - 1;
   const isPerfect = correctCount === total;
+  const isSpeaking = lesson.type === "SPEAKING";
+  const native = isNativeCapacitor();
+  const secure = typeof window !== "undefined" && window.isSecureContext !== false;
+  const micMode: "native" | "record" | "none" = native
+    ? "native"
+    : !secure
+      ? "none"
+      : canTranscribeInBrowser()
+        ? "record"
+        : "none";
+  const micBlocked = forceTyped || micMode === "none";
+
+  // Idioma de la lección: se usa en el reconocimiento, en Whisper y en la voz
+  // que pronuncia la palabra (ej. "en" para un programa de inglés: Rice).
+  const speechLang = language.startsWith("en")
+    ? "en-US"
+    : language.startsWith("pt")
+      ? "pt-BR"
+      : "es";
 
   const lessonSeconds = useCallback(
     (qi: number) => {
@@ -60,6 +115,29 @@ export function LessonPlayer({
       return null;
     },
     [questions, lesson]
+  );
+
+  useEffect(() => subscribeWhisperProgress((event) => {
+    if (typeof event.progress === "number" && event.progress < 100) {
+      setWhisperPct(Math.round(event.progress));
+    }
+  }), []);
+
+  const transcribeWithTimeout = useCallback(
+    async (blob: Blob, options: { prompt?: string; language?: string }) => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        return await Promise.race([
+          transcribeAudioBlob(blob, options),
+          new Promise<never>((_, reject) => {
+            timer = setTimeout(() => reject(new Error("timeout")), 45000);
+          }),
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    },
+    []
   );
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -74,6 +152,167 @@ export function LessonPlayer({
   useEffect(() => {
     return clearTimer;
   }, [clearTimer]);
+
+  const submitSpoken = useCallback(
+    async (transcript: string, confidence: number) => {
+      if (busy || phase !== "question" || !question) return;
+      clearTimer();
+      setBusy(true);
+      setInterim("");
+      const res = await submitSpeakingAnswer({
+        lessonId: lesson.id,
+        questionId: question.id,
+        transcript,
+        confidence,
+      });
+      if (res.ok) {
+        if (res.correct) setCorrectCount((c) => c + 1);
+        setFeedback({
+          correct: res.correct,
+          explanation: res.correct
+            ? `¡Muy bien! Pronunciaste "${res.transcript}".`
+            : `Escuché "${res.transcript}". La palabra correcta es "${question.prompt}".`,
+        });
+        setPhase("feedback");
+      }
+      setBusy(false);
+    },
+    [busy, phase, question, lesson.id, clearTimer]
+  );
+
+  const stopBrowserRecording = useCallback(() => {
+    if (recTimerRef.current) {
+      clearInterval(recTimerRef.current);
+      recTimerRef.current = null;
+    }
+    if (levelRafRef.current) {
+      cancelAnimationFrame(levelRafRef.current);
+      levelRafRef.current = 0;
+    }
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      try {
+        recorderRef.current.stop();
+      } catch {
+        // Ya se detuvo.
+      }
+    }
+    recorderRef.current = null;
+    if (analyserRef.current) {
+      try {
+        analyserRef.current.disconnect();
+      } catch {
+        // No había conexión.
+      }
+      analyserRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      try {
+        void audioCtxRef.current.close();
+      } catch {
+        // Ya estaba cerrado.
+      }
+      audioCtxRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setMicLevel(0);
+  }, []);
+
+  const startBrowserRecording = useCallback(async () => {
+    if (
+      typeof window === "undefined" ||
+      typeof navigator === "undefined" ||
+      !navigator.mediaDevices?.getUserMedia ||
+      typeof window.MediaRecorder === "undefined"
+    ) {
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!stream.active) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+      streamRef.current = stream;
+      recChunksRef.current = [];
+      noisePeakRef.current = 0;
+      setMicLevel(0);
+      setRecSecs(0);
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (Ctx) {
+        const ctx = new Ctx();
+        audioCtxRef.current = ctx;
+        const source = ctx.createMediaStreamSource(stream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 512;
+        source.connect(analyser);
+        analyserRef.current = analyser;
+        const data = new Uint8Array(analyser.fftSize);
+        const tick = () => {
+          analyser.getByteTimeDomainData(data);
+          let sum = 0;
+          for (const v of data) {
+            const off = Math.abs(v - 128) / 128;
+            sum += off * off;
+          }
+          const rms = Math.sqrt(sum / data.length);
+          const level = Math.min(100, Math.round(rms * 400));
+          noisePeakRef.current = Math.max(noisePeakRef.current, level);
+          setMicLevel(level);
+          levelRafRef.current = requestAnimationFrame(tick);
+        };
+        levelRafRef.current = requestAnimationFrame(tick);
+      }
+      recordStartRef.current = Date.now();
+      const rec = new MediaRecorder(stream);
+      rec.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recChunksRef.current.push(e.data);
+      };
+      rec.onstop = () => {
+        const chunks = recChunksRef.current;
+        recChunksRef.current = [];
+        const secs = Math.max(0, Math.round((Date.now() - recordStartRef.current) / 1000));
+        setRecordStats({
+          secs,
+          bytes: chunks.reduce((acc, b) => acc + b.size, 0),
+          peak: noisePeakRef.current,
+        });
+        if (chunks.length === 0) {
+          if (whisperPendingRef.current) {
+            whisperPendingRef.current = false;
+            setListening(false);
+            setMicError("No se grabó audio. Revisa el permiso del micrófono y vuelve a intentar.");
+          }
+          return;
+        }
+        const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
+        lastRecordingRef.current = blob;
+        setLastAudioUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
+        if (whisperPendingRef.current) {
+          whisperPendingRef.current = false;
+          setListening(false);
+          setRecordedReady(true);
+        }
+      };
+      rec.start(250);
+      recorderRef.current = rec;
+      if (recTimerRef.current) clearInterval(recTimerRef.current);
+      recTimerRef.current = setInterval(() => {
+        setRecSecs((s) => s + 1);
+      }, 1000);
+    } catch {
+      if (whisperPendingRef.current) {
+        whisperPendingRef.current = false;
+        setListening(false);
+        setMicError("No se pudo abrir el micrófono. Revisa los permisos y vuelve a intentar, o escribe la palabra.");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (phase !== "question") return;
@@ -130,6 +369,123 @@ export function LessonPlayer({
     setPhase("feedback");
   };
 
+const finalizeNative = useCallback(() => {
+    if (!capActiveRef.current) return;
+    capActiveRef.current = false;
+    setListening(false);
+    const text = capFinalRef.current;
+    capListenersRef.current.forEach((handle) => {
+      handle.remove().catch(() => {});
+    });
+    capListenersRef.current = [];
+    import("@capacitor-community/speech-recognition")
+      .then(({ SpeechRecognition }) => SpeechRecognition.stop())
+      .catch(() => {});
+    if (text) {
+      void submitSpoken(text, 1);
+    } else {
+      setMicError("No te escuché. Prueba de nuevo o escribe la palabra.");
+    }
+  }, [submitSpoken]);
+
+  const releaseListening = useCallback(() => {
+    if (capActiveRef.current) {
+      finalizeNative();
+      return;
+    }
+    // Al soltar dejamos de grabar: el archivo se analiza en el onstop.
+    stopBrowserRecording();
+  }, [finalizeNative, stopBrowserRecording]);
+
+  const startListening = useCallback(() => {
+    if (busy || phase !== "question" || !question || listening) return;
+    setMicError(null);
+    setInterim("");
+    if (isNativeCapacitor()) {
+      capFinalRef.current = "";
+      capActiveRef.current = true;
+      import("@capacitor-community/speech-recognition")
+        .then(async ({ SpeechRecognition }) => {
+          let permitted = (await SpeechRecognition.checkPermissions()).speechRecognition;
+          if (permitted !== "granted") {
+            permitted = (await SpeechRecognition.requestPermissions()).speechRecognition;
+          }
+          if (permitted !== "granted") {
+            capActiveRef.current = false;
+            setMicError("No tienes permiso de micrófono. Permítelo en los ajustes del celular.");
+            setForceTyped(true);
+            return;
+          }
+          const handles = await Promise.all([
+            SpeechRecognition.addListener("partialResults", (data) => {
+              const matches = data.matches ?? [];
+              const text = (matches.length ? matches[matches.length - 1] : "").trim();
+              if (!text) return;
+              capFinalRef.current = text;
+              setInterim(text);
+            }),
+            SpeechRecognition.addListener("listeningState", (data) => {
+              if (data.status === "started") {
+                setListening(true);
+              } else {
+                finalizeNative();
+              }
+            }),
+          ]);
+          if (!capActiveRef.current) {
+            handles.forEach((handle) => {
+              handle.remove().catch(() => {});
+            });
+            return;
+          }
+          capListenersRef.current = handles;
+          await SpeechRecognition.start({ language: "es", maxResults: 5, partialResults: true });
+          setListening(true);
+        })
+        .catch(() => {
+          capActiveRef.current = false;
+          capListenersRef.current.forEach((handle) => {
+            handle.remove().catch(() => {});
+          });
+          capListenersRef.current = [];
+          setListening(false);
+          setMicError(
+            "No se pudo abrir el micrófono. Reinstala el APK actualizado (npm run android) y permite el acceso al audio."
+          );
+          setForceTyped(true);
+        });
+      return;
+    }
+    if (typeof window !== "undefined" && window.isSecureContext === false) {
+      setForceTyped(true);
+      setMicError("El micrófono necesita una conexión segura (HTTPS o localhost). Escribe la palabra.");
+      return;
+    }
+    if (!canTranscribeInBrowser()) {
+      setForceTyped(true);
+      setMicError("Este navegador no puede grabar audio. Escribe la palabra.");
+      return;
+    }
+    // Flujo único en el navegador: grabar el audio y analizarlo con la palabra.
+    whisperPendingRef.current = true;
+    lastRecordingRef.current = null;
+    setRecordedReady(false);
+    setRecordStats(null);
+    setInterim("");
+    setMicError(null);
+    setListening(true);
+    void startBrowserRecording();
+  }, [busy, phase, question, listening, startBrowserRecording, finalizeNative]);
+
+  const speakWord = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = speechLang;
+    utterance.rate = 0.8;
+    window.speechSynthesis.speak(utterance);
+  }, [speechLang]);
+
   const continueToNext = useCallback(async () => {
     clearTimer();
     setSelectedId(null);
@@ -170,6 +526,41 @@ export function LessonPlayer({
     setPhase("intro");
   }, [clearTimer]);
 
+  const analyzeRecording = useCallback(async () => {
+    const blob = lastRecordingRef.current;
+    if (!blob || busy || transcribing) return;
+    setMicError(null);
+    setTranscribing(true);
+    try {
+      const { text, confidence } = await transcribeWithTimeout(blob, {
+        prompt: question?.prompt ?? undefined,
+        language,
+      });
+      if (!text) {
+        setMicError(
+          noisePeakRef.current < 8
+            ? "No se captó tu voz. Revisa el volumen del micrófono y vuelve a grabar."
+            : "No se entendió tu audio. Vuelve a grabar hablando claro."
+        );
+        return;
+      }
+      await submitSpoken(text, confidence);
+      setRecordedReady(false);
+    } catch {
+      setMicError("No se pudo analizar tu audio. Vuelve a grabar.");
+    } finally {
+      setTranscribing(false);
+      setWhisperPct(null);
+    }
+  }, [busy, transcribing, question, language, submitSpoken, transcribeWithTimeout]);
+
+  const resetRecording = useCallback(() => {
+    lastRecordingRef.current = null;
+    setRecordedReady(false);
+    setRecordStats(null);
+    setMicError(null);
+  }, []);
+
   const progressPct = Math.round((qIndex / total) * 100);
   const timedSeconds = lesson.type === "CONTRARRELOJ" ? Number(lesson.timeSeconds) || 10 : null;
 
@@ -182,7 +573,9 @@ export function LessonPlayer({
         <div>
           <h1 className="text-2xl font-black">{lesson.title}</h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {total} preguntas · {lesson.xpReward} XP · 3 corazones
+            {isSpeaking
+              ? `${total} palabras para pronunciar · ${lesson.xpReward} XP · mantén presionado para hablar`
+              : `${total} preguntas · ${lesson.xpReward} XP · 3 corazones`}
             {timedSeconds ? ` · ⏱ ${timedSeconds}s por pregunta` : ""}
             {lesson.optionMode === "IMAGE"
               ? " · 🖼️ opciones por imagen"
@@ -229,7 +622,9 @@ export function LessonPlayer({
             {hearts === 0 && !isPerfect ? "¡Lo intentaste de nuevo!" : "¡Lección completada!"}
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-            Acertaste {correctCount} de {total} preguntas
+            {isSpeaking
+              ? `Pronunciaste bien ${correctCount} de ${total} palabras`
+              : `Acertaste ${correctCount} de ${total} preguntas`}
           </p>
         </div>
 
@@ -262,10 +657,10 @@ export function LessonPlayer({
             </button>
           ) : (
             <Link
-              href={returnHref}
+              href={nextHref ?? returnHref}
               className="w-full rounded-2xl bg-green-500 py-4 text-center text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95"
             >
-              Continuar
+              {nextHref ? "Siguiente lección" : "Continuar"}
             </Link>
           )}
           <Link
@@ -321,23 +716,28 @@ export function LessonPlayer({
         </div>
       )}
 
-      <div key={qIndex} className="animate-pop flex flex-col gap-4">
+      <div key={qIndex + (isSpeaking ? "-speaking" : "")} className="animate-pop flex flex-col gap-4">
         <EmoteMascot
           state={!isFeedback ? "question" : timedOut ? "timeout" : showCorrect ? "correct" : "wrong"}
           text={
             !isFeedback ? (
-              question.prompt
+              isSpeaking ? (
+                <span className="text-3xl">{question.prompt}</span>
+              ) : (
+                question.prompt
+              )
             ) : timedOut ? (
               "¡Se acabó el tiempo! ⏱️"
             ) : showCorrect ? (
-              "¡Correcto! ✅"
+              isSpeaking ? "¡Pronunciación perfecta! 🎤" : "¡Correcto! ✅"
             ) : (
               "¡Incorrecto! ❌"
             )
           }
           explanation={isFeedback ? feedback?.explanation : undefined}
         >
-          {question.options.map((option, i) => {
+          {!isSpeaking &&
+            question.options.map((option, i) => {
               let style =
                 "bg-white text-zinc-700 hover:bg-green-50 hover:border-green-300 dark:bg-emerald-900 dark:text-zinc-100 dark:hover:bg-green-950/50 dark:hover:border-green-600";
               if (isFeedback && showCorrect && option.id === selectedId) {
@@ -385,6 +785,129 @@ export function LessonPlayer({
               );
             })}
         </EmoteMascot>
+
+        {isSpeaking && !isFeedback && (
+          <div className="flex flex-col gap-3 rounded-2xl border-2 border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-emerald-900">
+            <div className="flex items-center justify-between gap-2 text-sm font-bold text-zinc-500 dark:text-zinc-400">
+              <span>Repite la palabra</span>
+              <button
+                type="button"
+                onClick={() => speakWord(question.prompt)}
+                className="rounded-xl border-2 border-zinc-200 px-3 py-1.5 font-black text-zinc-600 transition hover:bg-zinc-50 active:scale-95 dark:border-zinc-700 dark:text-zinc-300"
+              >
+                🔊 Escuchar
+              </button>
+            </div>
+
+            {micBlocked ? (
+              <p className="rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                {micError ?? "Este navegador no puede grabar audio."}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {recordedReady && !listening ? (
+                  <button
+                    type="button"
+                    onClick={() => void analyzeRecording()}
+                    disabled={busy || transcribing}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-md shadow-black/30 transition hover:bg-green-600 active:translate-y-1 disabled:opacity-50"
+                  >
+                    {transcribing ? (
+                      <>
+                        <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-white/80 border-t-transparent" />
+                        Analizando…
+                      </>
+                    ) : (
+                      "Siguiente"
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => (listening ? releaseListening() : startListening())}
+                    disabled={busy || transcribing}
+                    className={`touch-none select-none flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-lg font-black text-white transition-colors duration-150 disabled:opacity-50 ${
+                      listening
+                        ? "translate-y-1 bg-red-600 shadow-inner shadow-black/40"
+                        : "bg-green-500 shadow-md shadow-black/30 hover:bg-green-600 active:translate-y-1 active:bg-green-700 active:shadow-inner active:shadow-black/40"
+                    }`}
+                  >
+                    {listening ? (
+                      <>
+                        <span className="inline-block h-3 w-3 animate-pulse rounded-full bg-white" />
+                        {micMode === "native"
+                          ? "🎙️ Detener"
+                          : `⏹ Detener ${Math.floor(recSecs / 60)}:${String(recSecs % 60).padStart(2, "0")}`}
+                      </>
+                    ) : micMode === "native" ? (
+                      "🎤 Grabar"
+                    ) : (
+                      "🎤 Grabar"
+                    )}
+                  </button>
+                )}
+
+                {recordedReady && !listening && !transcribing && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetRecording();
+                      startListening();
+                    }}
+                    className="self-center rounded-xl px-3 py-1 text-sm font-black text-zinc-500 transition hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  >
+                    ↺ Volver a grabar
+                  </button>
+                )}
+
+                {micMode === "record" && !listening && !transcribing && !recordedReady && (
+                  <p className="text-center text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
+                    Primera vez: se descarga el analizador de voz (~40 MB) y luego queda guardado.
+                  </p>
+                )}
+                {listening && micMode !== "native" && (
+                  <div className="mx-auto flex h-10 w-full max-w-[200px] items-center justify-center gap-[3px]">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={`w-1 rounded-sm transition-colors duration-75 ${
+                          micLevel > (i * 100) / 24 ? "bg-red-500" : "bg-zinc-200 dark:bg-zinc-700"
+                        }`}
+                        style={{ height: `${Math.max(4, Math.min(36, 4 + i * 1.4))}px` }}
+                      />
+                    ))}
+                  </div>
+                )}
+                <p className="text-center text-xs font-semibold text-zinc-400 dark:text-zinc-500">
+                  Mantén presionado, di la palabra y suelta para enviar.
+                </p>
+              </div>
+            )}
+
+            {micError && (
+              <p className="rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                {micError}
+              </p>
+            )}
+
+            <div className="rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-emerald-950/40">
+              <p className="mb-1 text-center text-[10px] font-black uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500">
+                Lo que dice tu audio
+              </p>
+              <p className="min-h-[1.5rem] text-center text-sm font-black text-zinc-700 dark:text-zinc-100">
+                {transcribing
+                  ? whisperPct !== null
+                    ? `Descargando el analizador de voz… ${whisperPct}%`
+                    : "Analizando tu audio…"
+                  : listening
+                    ? interim || "Grabando… di la palabra"
+                    : recordedReady
+                      ? interim || "Audio listo: pulsa Siguiente para analizarlo"
+                      : interim || "Pulsa grabar, di la palabra y luego Siguiente"}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {failed && (
@@ -401,13 +924,29 @@ export function LessonPlayer({
         </div>
       )}
 
+      {isFeedback && isSpeaking && lastAudioUrl && (
+        <div className="rounded-2xl border-2 border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-emerald-900">
+          <p className="mb-1.5 text-center text-xs font-black uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Tu grabación
+          </p>
+          <audio src={lastAudioUrl} controls className="w-full">
+            Tu navegador no soporta reproducir audio.
+          </audio>
+          {recordStats && (
+            <p className="mt-1.5 text-center text-[11px] font-semibold text-zinc-400 dark:text-zinc-500">
+              Grabado {recordStats.secs}s · {Math.max(1, Math.round(recordStats.bytes / 1024))} KB · nivel máximo {recordStats.peak}%
+            </p>
+          )}
+        </div>
+      )}
+
       {isFeedback && !failed && (
         <button
           onClick={continueToNext}
           disabled={busy}
           className="w-full rounded-2xl bg-green-500 py-4 text-lg font-black text-white shadow-lg shadow-green-200 transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
         >
-          {busy ? "..." : isLast ? "Ver resultados" : "Continuar"}
+          {busy ? "..." : isLast ? "Ver resultados" : isSpeaking ? "Siguiente palabra" : "Continuar"}
         </button>
       )}
     </div>

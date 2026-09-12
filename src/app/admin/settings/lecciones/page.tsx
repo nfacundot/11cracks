@@ -14,9 +14,10 @@ export default async function SettingsLeccionesPage() {
   const games = await prisma.game.findMany({
     orderBy: [{ active: "desc" }, { order: "asc" }],
     include: {
-      lesson: { select: { xpReward: true } },
+      lesson: { orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { xpReward: true }, take: 1 },
       _count: {
         select: {
+          lesson: true,
           oidoWords: true,
           golWords: true,
           letrasWords: true,
@@ -27,7 +28,7 @@ export default async function SettingsLeccionesPage() {
   });
 
   const quizLessons = await prisma.lesson.findMany({
-    where: { type: { in: ["PREGUNTADOS", "CONTRARRELOJ"] } },
+    where: { type: { in: ["PREGUNTADOS", "CONTRARRELOJ", "SPEAKING"] } },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
@@ -56,7 +57,8 @@ export default async function SettingsLeccionesPage() {
     description: game.description,
     active: game.active,
     wordCount: game._count.oidoWords + game._count.golWords + game._count.letrasWords + game._count.alimentacionWords,
-    lessonXp: game.lesson?.xpReward ?? null,
+    lessonXp: game.lesson[0]?.xpReward ?? null,
+    lessonCount: game._count.lesson,
   }));
 
   const quizLessonsView: PreguntasLessonViewModel[] = quizLessons.map((l) => ({

@@ -133,7 +133,8 @@ export const navigationByRole: Record<ShellRole, NavigationGroup[]> = {
         { id: "asignaturas", label: "Asignaturas", href: "/admin/asignaturas", icon: "content" },
         { id: "caminos", label: "Caminos", href: "/admin/caminos", icon: "learning" },
         { id: "lessons", label: "Lecciones", href: "/admin/lessons", icon: "content" },
-        { id: "juegos", label: "Juegos", href: "/admin/juegos", icon: "achievements" },
+        { id: "juegos", label: "Juegos", href: "/admin/settings/lecciones", icon: "achievements" },
+        { id: "videos", label: "Videos", href: "/admin/videos", icon: "content" },
       ],
     },
     {

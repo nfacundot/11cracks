@@ -25,6 +25,7 @@ export default async function LessonPage({
   const lesson = await prisma.lesson.findUnique({
     where: { id },
     include: {
+      game: { select: { slug: true } },
       questions: {
         orderBy: { order: "asc" },
         include: { options: { orderBy: { order: "asc" } } },
@@ -33,6 +34,13 @@ export default async function LessonPage({
   });
 
   if (!lesson) notFound();
+
+  // Si la lección está vinculada a un juego (Game), abre la experiencia del
+  // juego en lugar del reproductor de preguntas. La detección usa SOLO la
+  // relación con `Game`; una lección homónima sin vincular sigue siendo lección.
+  if (lesson.game) {
+    redirect(`/jugador/neurocracks/bilinguismo/${encodeURIComponent(lesson.game.slug)}?lesson=${encodeURIComponent(id)}`);
+  }
 
   if (lesson.gameMode === "INFOGRAMA") {
     redirect("/jugador/game/infograma");

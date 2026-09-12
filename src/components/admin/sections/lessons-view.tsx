@@ -7,6 +7,9 @@ import { LessonEditorModal } from "@/components/admin/lesson-editor-modal";
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
   LESSON: { label: "Lección", icon: <BookIcon className="h-4 w-4" />, color: "bg-blue-500" },
   QUIZ: { label: "Quiz", icon: <BoltIcon className="h-4 w-4" />, color: "bg-purple-500" },
+  SPEAKING: { label: "Habla", icon: <span className="text-sm">🎤</span>, color: "bg-violet-500" },
+  PREGUNTADOS: { label: "Preguntados", icon: <span className="text-sm">🧠</span>, color: "bg-sky-500" },
+  CONTRARRELOJ: { label: "Contrarreloj", icon: <BoltIcon className="h-4 w-4" />, color: "bg-amber-500" },
 };
 
 const GAME_MODE_META: Record<string, { label: string; emoji: string }> = {
@@ -107,12 +110,14 @@ export async function LessonsView({
   basePath: string;
   searchParams: { type?: string; materia?: string };
 }) {
+  const ALL_LESSON_TYPES = ["LESSON", "QUIZ", "SPEAKING", "PREGUNTADOS", "CONTRARRELOJ"] as const;
+type LessonType = (typeof ALL_LESSON_TYPES)[number];
+
   const { type, materia } = searchParams;
-  const filterType =
-    type && ["LESSON", "QUIZ"].includes(type) ? type : null;
+  const filterType = type && (ALL_LESSON_TYPES as readonly string[]).includes(type) ? (type as LessonType) : null;
 
   const claseLessonsWhere = filterType
-    ? { type: filterType as "LESSON" | "QUIZ" }
+    ? { type: filterType }
     : ({ type: { not: "GAME" } } as const);
 
   const clases = await prisma.clase.findMany({
@@ -147,7 +152,7 @@ export async function LessonsView({
     where: {
       temaId: null,
       ...(filterType
-        ? { type: filterType as "LESSON" | "QUIZ" }
+        ? { type: filterType }
         : ({ type: { not: "GAME" } } as const)),
     },
     orderBy: { order: "asc" },
@@ -178,7 +183,7 @@ export async function LessonsView({
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Lecciones, quizzes y entrenamientos de cada tema. Los juegos se gestionan en el
-            panel <Link href={`${basePath}/juegos`} className="font-bold text-orange-500 underline">Juegos</Link>.
+            panel <Link href={basePath === "/admin" ? "/admin/settings/lecciones" : `${basePath}/juegos`} className="font-bold text-orange-500 underline">Juegos</Link>.
           </p>
         </div>
         <LessonEditorModal

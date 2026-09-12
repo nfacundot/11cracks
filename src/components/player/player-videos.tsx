@@ -1,37 +1,85 @@
 "use client";
 
-import Link from "next/link";
+import { useCallback, useMemo, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { markVideoCompletedAction, completeVideoQuizAction } from "@/app/actions/videos";
+import type { PlayerVideoView } from "@/lib/videos/service";
+import { VideoPlayer } from "@/components/player/video-player";
 
-interface VideoItem {
-  id: string;
-  title: string;
-  description: string;
-  context: "training" | "neurocracks";
-  duration: string;
-  completionPercent: number;
-  status: "completed" | "in-progress" | "new";
-  area: string;
-}
+type Filter = "PARA_MI" | "ENTRENAMIENTO" | "NEUROCRACKS" | "COMPLETADOS";
 
-const demoVideos: VideoItem[] = [
-  { id: "v-1", title: "Recepción orientada", description: "Control del balón con apoyo visual y orientación corporal.", context: "training", duration: "6 min", completionPercent: 100, status: "completed", area: "Técnica" },
-  { id: "v-2", title: "Pase en una dirección", description: "Pase preciso con imbalance defensivo.", context: "training", duration: "5 min", completionPercent: 60, status: "in-progress", area: "Táctica" },
-  { id: "v-3", title: "Decisiones rápidas", description: "Ejercicio de velocidad mental para toma de decisión.", context: "neurocracks", duration: "4 min", completionPercent: 0, status: "new", area: "Neuro" },
-  { id: "v-4", title: "Finta y paso", description: "Desplazamiento 1v1 con cambio de ritmo.", context: "training", duration: "7 min", completionPercent: 0, status: "new", area: "Individual" },
-  { id: "v-5", title: "Atención distribuida", description: "Reto cognitivo de seguimiento múltiple.", context: "neurocracks", duration: "3 min", completionPercent: 35, status: "in-progress", area: "Neuro" },
-  { id: "v-6", title: "Visión de juego", description: "Análisis de posicionamiento y reapertura de líneas.", context: "training", duration: "8 min", completionPercent: 100, status: "completed", area: "Colectiva" },
-];
+const CATEGORY_LABEL: Record<string, string> = {
+  PARA_MI: "PARA MÍ",
+  ENTRENAMIENTO: "ENTRENAMIENTO",
+  NEUROCRACKS: "NEUROCRACKS",
+};
 
-type Filter = "all" | "training" | "neurocracks" | "completed";
+export function PlayerVideos({
+  videos,
+  initialFilter,
+}: {
+  videos: PlayerVideoView[];
+  initialFilter?: string;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [activeFilter, setActiveFilter] = useState<Filter>(() => {
+    const value = initialFilter?.toLowerCase();
+    if (value === "training") return "ENTRENAMIENTO";
+    if (value === "completed" || value === "completados") return "COMPLETADOS";
+    if (value === "para_mi" || value === "para-mi" || value === "para mí") return "PARA_MI";
+    return "PARA_MI";
+  });
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [videoEnded, setVideoEnded] = useState(false);
+  const [manualReady, setManualReady] = useState(false);
+  const [justCompleted, setJustCompleted] = useState<Set<string>>(new Set());
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizFeedback, setQuizFeedback] = useState<{ total: number; correct: number } | null>(null);
 
-function actionLabel(v: VideoItem): string {
-  if (v.status === "completed") return "COMPLETADO";
-  if (v.status === "in-progress") return "CONTINUAR";
-  return "EMPEZAR";
-}
+  const completedCount = videos.filter((v) => v.completed || justCompleted.has(v.id)).length;
 
-export function PlayerVideos() {
-  const completed = demoVideos.filter((v) => v.status === "completed").length;
+  const filtered = useMemo(() => {
+    if (activeFilter === "PARA_MI") {
+      return videos.filter((v) => v.category === "PARA_MI" && !(v.completed || justCompleted.has(v.id)));
+    }
+    if (activeFilter === "COMPLETADOS") {
+      return videos.filter((v) => v.completed || justCompleted.has(v.id));
+    }
+    return videos.filter((v) => v.category === activeFilter);
+  }, [videos, activeFilter, justCompleted]);
+
+  const playing = playingId ? videos.find((v) => v.id === playingId) ?? null : null;
+  const playingCompleted = playing ? playing.completed || justCompleted.has(playing.id) : false;
+  const quizQuestions = playing?.quiz ?? [];
+  const allQuizAnswered = quizQuestions.length > 0 && quizQuestions.every((q) => quizAnswers[q.id]);
+
+  function markComplete(videoId: string) {
+    const formData = new FormData();
+    formData.set("videoId", videoId);
+    startTransition(async () => {
+      try {
+        await markVideoCompletedAction(formData);
+        setJustCompleted((prev) => new Set(prev).add(videoId));
+        router.refresh();
+      } catch {
+        // El jugador puede reintentar desde el reproductor.
+      }
+    });
+  }
+
+  function open(videoId: string) {
+    setVideoEnded(false);
+    setManualReady(false);
+    setPlayingId(videoId);
+    setQuizAnswers({});
+    setQuizFeedback(null);
+  }
+
+  const handleEnded = useCallback(() => setVideoEnded(true), []);
+  const handleManualReady = useCallback(() => setManualReady(true), []);
+
   return (
     <article className="player-videos-page">
       <header className="player-videos-page__header">
@@ -41,41 +89,181 @@ export function PlayerVideos() {
           <p>Contenido aprobado para entrenar, aprender y retomar tu recorrido a tu ritmo.</p>
         </div>
         <div className="player-videos-page__summary">
-          <strong>{completed}</strong>
+          <strong>{completedCount}</strong>
           <span>completados</span>
         </div>
       </header>
 
+      {playing
+        ? createPortal(
+            <div className="player-videos-modal">
+              <div className="player-videos-modal__backdrop" />
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Reproductor: ${playing.title}`}
+                className="player-videos-modal__panel"
+              >
+                <div className="player-videos-modal__head">
+                  <div>
+                    <span className="player-videos-player-badge">
+                      {CATEGORY_LABEL[playing.category] ?? playing.category}
+                    </span>
+                    <h2>{playing.title}</h2>
+                  </div>
+                  <button
+                    type="button"
+                    className="player-videos-modal__close"
+                    onClick={() => setPlayingId(null)}
+                    aria-label="Cerrar"
+                  >
+                    CERRAR ✕
+                  </button>
+                </div>
+                {playing.description ? <p className="player-videos-modal__desc">{playing.description}</p> : null}
+                <VideoPlayer url={playing.url} onEnded={handleEnded} onManualReady={handleManualReady} />
+                {!playingCompleted && quizQuestions.length > 0 && (videoEnded || manualReady) ? (
+                  <div className="player-videos-modal__quiz">
+                    <h3 className="player-videos-modal__quiz-title">Cuestionario del video</h3>
+                    <p className="player-videos-modal__quiz-sub">
+                      Responde todas las preguntas sobre el video y luego marca Completar Video.
+                    </p>
+                    {quizQuestions.map((q, qi) => (
+                      <div className="player-videos-modal__quiz-question" key={q.id}>
+                        <p className="player-videos-modal__quiz-prompt">
+                          {qi + 1}. {q.prompt}
+                        </p>
+                        <div className="player-videos-modal__quiz-options">
+                          {q.options.map((option) => (
+                            <label
+                              className="player-videos-modal__quiz-option"
+                              key={option.id}
+                              data-checked={quizAnswers[q.id] === option.id}
+                            >
+                              <input
+                                type="radio"
+                                name={`videoQuizQ${qi}`}
+                                checked={quizAnswers[q.id] === option.id}
+                                onChange={() => setQuizAnswers((prev) => ({ ...prev, [q.id]: option.id }))}
+                              />
+                              <span>{option.text}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {quizFeedback ? (
+                  <p className="player-videos-modal__hint">
+                    Resultado del cuestionario: {quizFeedback.correct} de {quizFeedback.total} correctas ✓
+                  </p>
+                ) : null}
+                <div className="player-videos-modal__actions">
+                  <button
+                    type="button"
+                    className="player-videos-modal__complete"
+                    disabled={
+                      isPending ||
+                      (!videoEnded && !manualReady && !playingCompleted) ||
+                      (quizQuestions.length > 0 && !allQuizAnswered && !playingCompleted)
+                    }
+                    onClick={() => {
+                      if (playingCompleted) return;
+                      if (quizQuestions.length > 0) {
+                        const answers = Object.entries(quizAnswers).map(([questionId, optionId]) => ({ questionId, optionId }));
+                        const formData = new FormData();
+                        formData.set("videoId", playing.id);
+                        formData.set("answers", JSON.stringify(answers));
+                        startTransition(async () => {
+                          try {
+                            const result = await completeVideoQuizAction(formData);
+                            setJustCompleted((prev) => new Set(prev).add(playing.id));
+                            setQuizFeedback(result);
+                            router.refresh();
+                          } catch {
+                            // El jugador puede reintentar desde el reproductor.
+                          }
+                        });
+                      } else {
+                        markComplete(playing.id);
+                        setPlayingId(null);
+                      }
+                    }}
+                  >
+                    {playingCompleted ? "Completado ✓" : isPending ? "Guardando…" : "Completar Video"}
+                  </button>
+                </div>
+                {!videoEnded && manualReady && !playingCompleted ? (
+                    <p className="player-videos-modal__hint">
+                      Cuando termines de ver el video, márcalo como completado con el botón.
+                    </p>
+                  ) : null}
+                  {!videoEnded && !manualReady && !playingCompleted ? (
+                    <p className="player-videos-modal__hint">
+                      Termina de ver el video para activar el botón &ldquo;Completar Video&rdquo;.
+                    </p>
+                  ) : null}
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
+
       <div className="player-videos-page__filters" role="tablist" aria-label="Filtros de videos">
-        <button role="tab" aria-selected="true" className="player-videos-page__filter" data-active="true">PARA MÍ</button>
-        <button role="tab" aria-selected="false" className="player-videos-page__filter">ENTRENAMIENTO</button>
-        <button role="tab" aria-selected="false" className="player-videos-page__filter">NEUROCRACKS</button>
-        <button role="tab" aria-selected="false" className="player-videos-page__filter">COMPLETADOS</button>
+        {(["PARA_MI", "ENTRENAMIENTO", "NEUROCRACKS", "COMPLETADOS"] as Filter[]).map((filter) => (
+          <button
+            key={filter}
+            role="tab"
+            aria-selected={activeFilter === filter}
+            className="player-videos-page__filter"
+            data-active={activeFilter === filter}
+            onClick={() => setActiveFilter(filter)}
+          >
+            {CATEGORY_LABEL[filter] ?? filter}
+          </button>
+        ))}
       </div>
 
       <div className="player-videos-page__grid">
-        {demoVideos.map((v) => (
-          <article className="player-videos-page__card" key={v.id} data-status={v.status}>
-            <div className="player-videos-page__thumb">
-              <span aria-hidden="true">▶</span>
-            </div>
-            <div className="player-videos-page__card-body">
-              <div className="player-videos-page__card-meta">
-                <span>{v.context === "neurocracks" ? "NEUROCRACKS" : "ENTRENAMIENTO"}</span>
-                <span>{v.duration}</span>
+        {filtered.length === 0 ? (
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>
+            {activeFilter === "PARA_MI"
+              ? "No tienes videos PARA MÍ pendientes por ver."
+              : activeFilter === "COMPLETADOS"
+                ? "Aún no has completado videos."
+                : "No hay videos en esta categoría todavía."}
+          </p>
+        ) : null}
+        {filtered.map((v) => {
+          const completed = v.completed || justCompleted.has(v.id);
+          return (
+            <article className="player-videos-page__card" key={v.id} data-status={completed ? "completed" : "new"}>
+              <div className="player-videos-page__thumb">
+                <span aria-hidden="true">{completed ? "✓" : "▶"}</span>
               </div>
-              <h3>{v.title}</h3>
-              <p>{v.description}</p>
-              <div className="player-videos-page__card-facts">
-                <span>{v.area}</span>
-                <span>{v.completionPercent}% completado</span>
+              <div className="player-videos-page__card-body">
+                <div className="player-videos-page__card-meta">
+                  <span>{CATEGORY_LABEL[v.category] ?? v.category}</span>
+                  {completed ? <span>Completado</span> : null}
+                </div>
+                <h3>{v.title}</h3>
+                {v.description ? <p>{v.description}</p> : null}
+                <div className="player-videos-page__card-facts">
+                  <span>{completed ? "100% completado" : "0% completado"}</span>
+                </div>
+                <button
+                  type="button"
+                  className="player-videos-page__card-cta"
+                  disabled={isPending}
+                  onClick={() => (completed ? null : open(v.id))}
+                >
+                  {completed ? "COMPLETADO" : "EMPEZAR"} <span aria-hidden="true">{completed ? "✓" : "→"}</span>
+                </button>
               </div>
-              <Link className="player-videos-page__card-cta" href={`/jugador/videos`}>
-                {actionLabel(v)} <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
     </article>
   );

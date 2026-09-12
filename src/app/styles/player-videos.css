@@ -17,6 +17,31 @@
 .player-videos-page__filter { padding: 0.45rem 0.85rem; border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary); font: 700 0.68rem var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
 .player-videos-page__filter[data-active="true"] { border-color: var(--action-energy); color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 8%, transparent); }
 
+.player-videos-player-badge { color: var(--context-neurocracks); font: 700 0.7rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.player-videos-modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1rem; }
+.player-videos-modal__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(2px); }
+.player-videos-modal__panel { position: relative; display: grid; gap: 0.9rem; width: 100%; max-width: 56rem; max-height: 90vh; overflow: auto; padding: 1.2rem; border: 1px solid var(--border-subtle); background: var(--surface-panel); }
+.player-videos-modal__head { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }
+.player-videos-modal__head h2 { margin: 0.3rem 0 0; color: var(--text-primary); font: 700 1.6rem / 0.95 var(--font-display); text-transform: uppercase; }
+.player-videos-modal__close { border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary); padding: 0.4rem 0.7rem; font: 700 0.72rem var(--font-display); letter-spacing: 0.08em; cursor: pointer; }
+.player-videos-modal__desc { margin: 0; color: var(--text-secondary); font-size: 0.8rem; }
+.player-videos-modal__video { width: 100%; aspect-ratio: 16 / 9; border: 0; background: #000; }
+.player-videos-modal__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.player-videos-modal__complete { width: 100%; min-height: 2.8rem; border: 1px solid var(--status-success); background: transparent; color: var(--status-success); font: 700 0.72rem var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+.player-videos-modal__complete:enabled { background: color-mix(in oklch, var(--status-success) 12%, transparent); }
+.player-videos-modal__complete:disabled { border-color: var(--border-subtle); color: var(--text-muted); cursor: not-allowed; }
+.player-videos-modal__hint { margin: 0; color: var(--text-muted); font-size: 0.72rem; }
+
+.player-videos-modal__quiz { display: grid; gap: 0.8rem; border: 1px solid var(--border-subtle); padding: 0.9rem; background: var(--surface-canvas-deep); }
+.player-videos-modal__quiz-title { margin: 0; color: var(--text-primary); font: 700 0.9rem var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.player-videos-modal__quiz-sub { margin: 0; color: var(--text-muted); font-size: 0.72rem; }
+.player-videos-modal__quiz-question { display: grid; gap: 0.45rem; }
+.player-videos-modal__quiz-prompt { margin: 0; color: var(--text-primary); font-size: 0.85rem; font-weight: 600; }
+.player-videos-modal__quiz-options { display: grid; gap: 0.4rem; }
+.player-videos-modal__quiz-option { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.7rem; border: 1px solid var(--border-subtle); background: var(--surface-panel); color: var(--text-secondary); font-size: 0.82rem; cursor: pointer; }
+.player-videos-modal__quiz-option[data-checked="true"] { border-color: var(--action-energy); color: var(--text-primary); background: color-mix(in oklch, var(--action-energy) 10%, transparent); }
+.player-videos-modal__quiz-option input { accent-color: var(--action-energy); }
+
 .player-videos-page__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
 .player-videos-page__card { display: grid; grid-template-rows: auto 1fr; min-width: 0; border: 1px solid var(--border-subtle); background: var(--surface-panel); }
 .player-videos-page__thumb { position: relative; display: grid; min-height: 11rem; place-items: center; overflow: hidden; color: var(--context-neurocracks); background: linear-gradient(135deg, color-mix(in oklch, var(--context-neurocracks) 23%, var(--surface-canvas-deep)), var(--surface-canvas-deep)); font-size: 2rem; }

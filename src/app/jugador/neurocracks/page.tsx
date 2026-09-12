@@ -40,6 +40,7 @@ export default async function Page() {
               description: true,
               posX: true,
               posY: true,
+              game: { select: { slug: true, name: true, category: true } },
               questions: { select: { id: true }, orderBy: { order: "asc" } },
               progress: { where: { userId: user.id }, select: { status: true, completed: true, bestScore: true } },
             },
@@ -50,6 +51,20 @@ export default async function Page() {
   });
 
   const layouts = await getEtapaLayouts(clasesRaw.map((c) => c.id));
+
+  // Orden estricto GLOBAL: las lecciones de todas las materias forman una sola
+  // lista ordenada (CASA → ENTRENAMIENTO → GASTRONOMÍA → HOTEL → ESTADIO).
+  // Solo hay UNA lección disponible a la vez: la primera incompleta del total.
+  const globalRows = clasesRaw.flatMap((clase) =>
+    clase.temas.flatMap((tema) =>
+      tema.lessons.map((lesson) => ({
+        lessonId: lesson.id,
+        completed: Boolean(lesson.progress[0]?.completed),
+      }))
+    )
+  );
+  const globalFirstIncomplete = globalRows.findIndex((row) => !row.completed);
+  const globalPosByLesson = new Map(globalRows.map((row, index) => [row.lessonId, index]));
 
   const caminos: ClaseCamino[] = clasesRaw.map((clase) => {
     const layout = layouts.get(clase.id);
@@ -63,54 +78,55 @@ export default async function Page() {
         completed: Boolean(lesson.progress[0]?.completed),
       }))
     );
-    const firstIncompleteIndex = rows.findIndex((row) => !row.completed);
 
-    const stages = clase.temas
-      .filter((tema) => tema.lessons.length > 0)
-      .map((tema) => {
-        const nodes = tema.lessons.map((lesson) => {
-          const row = rows.find((candidate) => candidate.lesson.id === lesson.id);
-          if (!row) return null;
-          const position = rows.indexOf(row);
-          let estado: NodoLeccionEstado;
-          if (row.completed) {
-            estado = "COMPLETED";
-          } else if (position === firstIncompleteIndex) {
-            estado = row.progress?.status === "IN_PROGRESS" ? "IN_PROGRESS" : "AVAILABLE";
-          } else if (position < firstIncompleteIndex) {
-            estado = "COMPLETED";
-          } else {
-            estado = "LOCKED";
-          }
-          return {
-            id: lesson.id,
-            order: position + 1,
-            title: lesson.title,
-            emoji: lesson.emoji,
-            color: lesson.color,
-            xpReward: lesson.xpReward,
-            questionCount: lesson.questions.length,
-            description: lesson.description,
-            estado,
-            bestScore: row.progress?.bestScore ?? 0,
-            posX: lessonPos?.get(lesson.id)?.posX ?? lesson.posX,
-            posY: lessonPos?.get(lesson.id)?.posY ?? lesson.posY,
-          };
-        });
-
-        const mPos = temaPos?.get(tema.id) ?? { posX: tema.posX, posY: tema.posY };
+    const stages = clase.temas.map((tema) => {
+      const nodes = tema.lessons.map((lesson) => {
+        const row = rows.find((candidate) => candidate.lesson.id === lesson.id);
+        if (!row) return null;
+        const position = rows.indexOf(row);
+        const globalIndex = globalPosByLesson.get(lesson.id) ?? -1;
+        let estado: NodoLeccionEstado;
+        if (row.completed) {
+          estado = "COMPLETED";
+        } else if (globalIndex === globalFirstIncomplete) {
+          estado = row.progress?.status === "IN_PROGRESS" ? "IN_PROGRESS" : "AVAILABLE";
+        } else if (globalIndex < globalFirstIncomplete) {
+          estado = "COMPLETED";
+        } else {
+          estado = "LOCKED";
+        }
         return {
-          id: tema.id,
-          order: tema.order,
-          title: tema.name,
-          emoji: tema.emoji,
-          color: tema.color,
-          xpReward: tema.xpReward,
-          posX: mPos.posX,
-          posY: mPos.posY,
-          nodes: nodes.filter((node) => node !== null),
+          id: lesson.id,
+          order: position + 1,
+          title: lesson.title,
+          emoji: lesson.emoji,
+          color: lesson.color,
+          xpReward: lesson.xpReward,
+          questionCount: lesson.questions.length,
+          description: lesson.description,
+          estado,
+          bestScore: row.progress?.bestScore ?? 0,
+          gameSlug: lesson.game?.slug ?? null,
+          gameLabel: lesson.game?.name ?? null,
+          gameCategory: lesson.game?.category ?? null,
+          posX: lessonPos?.get(lesson.id)?.posX ?? lesson.posX,
+          posY: lessonPos?.get(lesson.id)?.posY ?? lesson.posY,
         };
       });
+
+      const mPos = temaPos?.get(tema.id) ?? { posX: tema.posX, posY: tema.posY };
+      return {
+        id: tema.id,
+        order: tema.order,
+        title: tema.name,
+        emoji: tema.emoji,
+        color: tema.color,
+        xpReward: tema.xpReward,
+        posX: mPos.posX,
+        posY: mPos.posY,
+        nodes: nodes.filter((node) => node !== null),
+      };
+    });
 
     return {
       id: clase.id,
@@ -119,7 +135,7 @@ export default async function Page() {
       emoji: clase.emoji,
       color: clase.color,
       order: clase.order,
-      stages: stages.filter((stage) => stage.nodes.length > 0),
+      stages,
     };
   });
 

@@ -1065,7 +1065,7 @@ export function CanchaView({
       {/* ─── Modal: Eliminar alineación ─── */}
       <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Eliminar alineación">
           <p className="mb-4 text-[13px]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
-            ¿Seguro que querés eliminar <span className="font-bold text-[#E3C065]">{currentAlignment?.name}</span>? Esta acción no se puede deshacer.
+            ¿Seguro que quieres eliminar <span className="font-bold text-[#E3C065]">{currentAlignment?.name}</span>? Esta acción no se puede deshacer.
           </p>
           <div className="flex justify-end gap-2">
             <button

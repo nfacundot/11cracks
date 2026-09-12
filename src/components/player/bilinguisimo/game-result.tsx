@@ -11,6 +11,7 @@ export function GameResult({
   progress,
   mission,
   reward,
+  nextHref,
   onReview,
   onNext,
   onReplay,
@@ -19,6 +20,7 @@ export function GameResult({
   progress: BilingualSessionProgress;
   mission?: PlayerLearningMissionView | null;
   reward?: { earnedXp: number; perfect: boolean; streak: number } | null;
+  nextHref?: string | null;
   onReview: () => void;
   onNext: () => void;
   onReplay?: () => void;
@@ -50,6 +52,8 @@ export function GameResult({
         {mission?.status === "COMPLETED" ? <div className="bilingual-result__schedule" data-testid="el-camino-schedule-unlocked"><span>PRÓXIMO HORARIO · DESBLOQUEADO</span><strong>{mission.schedule.title}</strong><small>Tu misión desbloqueó este bloque de entrenamiento.</small><Link className="bilingual-action bilingual-action--secondary" href="/jugador/training">Ver entrenamiento</Link></div> : null}
         {pendingReview.length > 0 ? (
           <button className="bilingual-action bilingual-action--primary" type="button" onClick={onReview}>Repasar ahora · {reviewLabel}</button>
+        ) : nextHref ? (
+          <Link className="bilingual-action bilingual-action--primary" href={nextHref}>Siguiente lección</Link>
         ) : nextGame ? (
           <button className="bilingual-action bilingual-action--primary" type="button" onClick={onNext}>Siguiente juego</button>
         ) : null}

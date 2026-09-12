@@ -34,7 +34,7 @@ const NAV_ITEMS: { path: string; label: string; icon: ReactNode }[] = [
   { path: "/asignaturas", label: "Asignaturas", icon: <StarIcon className="h-5 w-5" /> },
   { path: "/caminos", label: "Caminos", icon: <BookIcon className="h-5 w-5" /> },
   { path: "/lessons", label: "Lecciones", icon: <GamepadIcon className="h-5 w-5" /> },
-  { path: "/juegos", label: "Juegos", icon: <JoystickIcon className="h-5 w-5" /> },
+  { path: "/settings/lecciones", label: "Juegos", icon: <JoystickIcon className="h-5 w-5" /> },
   { path: "/teams", label: "Equipos", icon: <ShieldIcon className="h-5 w-5" /> },
 ];
 

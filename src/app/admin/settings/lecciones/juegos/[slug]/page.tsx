@@ -27,7 +27,7 @@ export default async function GamePanelPage({
 
   const game = await prisma.game.findUnique({
     where: { slug },
-    include: { lesson: { select: { id: true, title: true, xpReward: true } } },
+    include: { lesson: { orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { id: true, title: true, xpReward: true, tema: { select: { name: true } } } } },
   });
   if (!game) notFound();
 
@@ -153,13 +153,13 @@ export default async function GamePanelPage({
             >
               {meta.emoji} {meta.label}
             </span>
-            {game.lesson ? (
+            {game.lesson.length > 0 ? (
               <span className="rounded-full bg-green-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-green-700 dark:bg-emerald-900 dark:text-green-300">
-                XP por lección: {game.lesson.xpReward}
+                XP por lección: {game.lesson[0]?.xpReward} · {game.lesson.length} {game.lesson.length === 1 ? "camino" : "caminos"}
               </span>
             ) : (
               <span className="rounded-full bg-zinc-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                Sin lección vinculada
+                Sin camino configurado
               </span>
             )}
           </div>

@@ -68,7 +68,7 @@ export function PlayerTraining({ fixture }: { fixture: PlayerTrainingFixture }) 
           <strong>{safeText(fixture.recommendation.title, "Actividad recomendada")}</strong>
           <p>{safeText(fixture.recommendation.description, "Contenido para continuar tu formación.")} · {safeText(fixture.recommendation.duration, "Duración por confirmar")}</p>
           <StatusPill tone="warning">{fixture.recommendation.status === "pending" ? "Pendiente" : fixture.recommendation.status === "in-progress" ? "En progreso" : "Completado"}</StatusPill>
-          <Link href="/videos?filter=training">Ver videos de entrenamiento <span aria-hidden="true">→</span></Link>
+          <Link href="/jugador/videos?filter=training">Ver videos de entrenamiento <span aria-hidden="true">→</span></Link>
         </section>
       </div>
 

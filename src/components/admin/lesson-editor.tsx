@@ -182,6 +182,7 @@ function QuestionFields({
   onChange,
   isInfograma,
   isWord,
+  isSpeaking,
   noOptions,
   radioName,
   isQuizMode,
@@ -191,6 +192,7 @@ function QuestionFields({
   onChange: (patch: Partial<QuestionDraft>) => void;
   isInfograma: boolean;
   isWord: boolean;
+  isSpeaking: boolean;
   noOptions: boolean;
   radioName: string;
   isQuizMode: boolean;
@@ -208,7 +210,7 @@ function QuestionFields({
 
   return (
     <>
-      {!isInfograma && !isWord && !isQuizMode && (
+      {!isInfograma && !isWord && !isSpeaking && !isQuizMode && (
         <div className="mb-2">
           <select
             value={value.type}
@@ -224,7 +226,7 @@ function QuestionFields({
         type="text"
         value={value.prompt}
         onChange={(e) => onChange({ prompt: e.target.value })}
-        placeholder={isWord ? "Palabra (ej. FÚTBOL)" : "Enunciado de la pregunta"}
+        placeholder={isWord ? "Palabra (ej. FÚTBOL)" : isSpeaking ? "Palabra a pronunciar (ej. PORTERO)" : "Enunciado de la pregunta"}
         className={inputCls}
       />
       {isWord ? (
@@ -339,7 +341,7 @@ export function LessonEditor({
     temas: { id: string; name: string }[];
   }[];
   mode?: "lessons" | "games";
-  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
+  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
   onSaved?: () => void;
   defaultValues?: {
     id: string;
@@ -347,7 +349,7 @@ export function LessonEditor({
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
     gameMode?:
       | "ANAGRAM"
       | "INFOGRAMA"
@@ -369,7 +371,7 @@ export function LessonEditor({
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "⚽");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ">(
+  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING">(
     defaultValues?.type ?? initialType
   );
   const [optionMode, setOptionMode] = useState<"TEXT" | "IMAGE" | "BOTH">(
@@ -418,7 +420,8 @@ export function LessonEditor({
 
   const isInfograma = mode === "games" && gameMode === "INFOGRAMA";
   const isWord = mode === "games" && gameMode === "ANAGRAM";
-  const noOptions = isWord;
+  const isSpeaking = type === "SPEAKING";
+  const noOptions = isWord || isSpeaking;
 
   const changeGameMode = (next: typeof gameMode) => {
     setGameMode(next);
@@ -440,6 +443,15 @@ export function LessonEditor({
           type: "MULTIPLE_CHOICE",
           timeSeconds: 0,
           options: padOptionsTo4(q.options),
+        }))
+      );
+    } else if (next === "SPEAKING") {
+      setQs((prev) =>
+        prev.map((q) => ({
+          ...q,
+          type: "MULTIPLE_CHOICE",
+          timeSeconds: 0,
+          options: [],
         }))
       );
     }
@@ -556,6 +568,7 @@ export function LessonEditor({
                   <option value="GAME">Juego</option>
                   <option value="PREGUNTADOS">Preguntados (A-D · 3 vidas)</option>
                   <option value="CONTRARRELOJ">Contrarreloj (A-D · tiempo · 3 vidas)</option>
+                  <option value="SPEAKING">Habla (repite con micrófono)</option>
                 </select>
               )}
             </label>
@@ -691,6 +704,10 @@ export function LessonEditor({
                 <span className="rounded-full bg-violet-500 px-2.5 py-1 text-[10px] font-black text-white">
                   Palabra a Gol · sin opciones
                 </span>
+              ) : isSpeaking ? (
+                <span className="rounded-full bg-sky-500 px-2.5 py-1 text-[10px] font-black text-white">
+                  Habla · palabra a pronunciar
+                </span>
               ) : null}
               <div className="flex-1" />
               {qs.length > 1 && (
@@ -710,6 +727,7 @@ export function LessonEditor({
               onChange={(patch) => updateQ(qi, patch)}
               isInfograma={isInfograma}
               isWord={isWord}
+              isSpeaking={isSpeaking}
               noOptions={noOptions}
               radioName={`correct-${qi}`}
               isQuizMode={isQuizMode}
@@ -758,6 +776,7 @@ export function LessonEditor({
               onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))}
               isInfograma={isInfograma}
               isWord={isWord}
+              isSpeaking={isSpeaking}
               noOptions={noOptions}
               radioName="draft-correct"
               isQuizMode={isQuizMode}

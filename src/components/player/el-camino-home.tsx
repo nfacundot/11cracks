@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BilinguismoWelcome } from "@/components/player/bilinguisimo/bilinguismo-welcome";
+// import { BilinguismoWelcome } from "@/components/player/bilinguisimo/bilinguismo-welcome"; // Deshabilitado: camino "Rumbo al Estadio" oculto en /jugador/neurocracks
 import { ElCaminoLecciones } from "@/components/player/el-camino-lecciones";
 import { estadisticasCamino, type ClaseCamino } from "@/lib/el-camino/lecciones";
 
@@ -12,8 +12,10 @@ type CaminoOption = {
   name: string;
   progressText: string;
   done: boolean;
+  hasLessons: boolean;
 };
 
+/*
 const BILINGUAL_OPTION: CaminoOption = {
   id: "bilingual",
   emoji: "🌍",
@@ -22,6 +24,7 @@ const BILINGUAL_OPTION: CaminoOption = {
   progressText: "15 actividades de idioma",
   done: false,
 };
+*/
 
 function buildOption(camino: ClaseCamino): CaminoOption {
   const stats = estadisticasCamino(camino);
@@ -32,16 +35,27 @@ function buildOption(camino: ClaseCamino): CaminoOption {
     name: camino.name,
     progressText: stats.total === 0 ? "Sin lecciones todavía" : `${stats.completed}/${stats.total} lecciones`,
     done: stats.total > 0 && stats.completed === stats.total,
+    hasLessons: camino.stages.some((stage) => stage.nodes.length > 0),
   };
 }
 
 export function ElCaminoHome({ playerId, caminos }: { playerId: string; caminos: ClaseCamino[] }) {
+  // Comentado: el camino "Rumbo al Estadio" (Bilingüismo) ya no se ofrece aquí.
+  // const options: CaminoOption[] = [BILINGUAL_OPTION, ...caminos.map(buildOption)];
   const options: CaminoOption[] = caminos.map(buildOption);
-  const [activeId, setActiveId] = useState<string>(options[0]?.id ?? "");
+  // Altera la materia pendiente: la primera con lecciones y sin completar, así no
+  // es necesario saltar entre materias manualmente (orden estricto).
+  const [activeId, setActiveId] = useState<string>(
+    () =>
+      options.find((option) => !option.done && option.hasLessons)?.id ??
+      options.find((option) => !option.done)?.id ??
+      options[0]?.id ??
+      ""
+  );
   const [menuOpen, setMenuOpen] = useState(false);
 
   const active = options.find((option) => option.id === activeId) ?? options[0] ?? null;
-  const activeCamino = caminos.find((camino) => camino.id === activeId) ?? caminos[0] ?? null;
+  const activeCamino = caminos.find((camino) => camino.id === activeId) ?? null;
 
   return (
     <div className="el-camino-home" data-testid="el-camino-home">
@@ -87,7 +101,15 @@ export function ElCaminoHome({ playerId, caminos }: { playerId: string; caminos:
 
       {menuOpen ? <button type="button" className="el-camino__paths-backdrop" aria-label="Cerrar selector" onClick={() => setMenuOpen(false)} /> : null}
 
-      {activeCamino ? <ElCaminoLecciones key={activeCamino.id} camino={activeCamino} /> : <BilinguismoWelcome playerId={playerId} />}
+      {activeCamino ? (
+        <ElCaminoLecciones key={activeCamino.id} camino={activeCamino} playerId={playerId} />
+      ) : null}
+      {/*
+      Camino "Rumbo al Estadio" (Bilingüismo) deshabilitado en /jugador/neurocracks:
+      {activeId === BILINGUAL_OPTION.id ? (
+        <BilinguismoWelcome playerId={playerId} />
+      ) : null}
+      */}
     </div>
   );
 }

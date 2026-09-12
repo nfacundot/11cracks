@@ -33,6 +33,7 @@ import { getBilingualGame } from "@/lib/bilingual/demo-content";
 import { createOverlayPortal } from "@/components/shared/overlay-portal";
 import type { PlayerLearningMissionView } from "@/lib/bilingual/learning-missions";
 import type { ContextualPlacement } from "@/lib/activations/contextual";
+import { preloadTts, ttsLanguageFor } from "@/lib/tts-engine";
 
 function GameProgress({ current, total, review }: { current: number; total: number; review: boolean }) {
   const percent = total === 0 ? 0 : Math.min(100, (current / total) * 100);
@@ -121,12 +122,16 @@ function resolveGoalOutcome(game: BilingualGameConfig, progress: BilingualSessio
   return (["post", "mannequin", "wide"] as const)[index % 3];
 }
 
-export function GameExperience({ playerId, game, registeredGameId, mission, sponsors = [] }: { playerId: string; game: BilingualGameConfig; registeredGameId?: string; mission?: PlayerLearningMissionView | null; sponsors?: readonly ContextualPlacement[] }) {
+export function GameExperience({ playerId, game, registeredGameId, lessonId, nextHref, mission, sponsors = [] }: { playerId: string; game: BilingualGameConfig; registeredGameId?: string; lessonId?: string | null; nextHref?: string | null; mission?: PlayerLearningMissionView | null; sponsors?: readonly ContextualPlacement[] }) {
   const { journey, saveJourney, resetGame } = useBilingualProgress(playerId);
   const router = useRouter();
-  const selectedGame = ["oido-de-crack", "gol-de-palabra", "letras-de-crack"].includes(game.id)
-    ? game
-    : getBilingualGame(game.id, journey?.targetLanguage ?? game.session.targetLanguage) ?? game;
+  const targetLanguage = journey?.targetLanguage ?? game.session.targetLanguage;
+  const selectedGame = getBilingualGame(game.id, targetLanguage) ?? game;
+  const voiceLanguage = ttsLanguageFor(targetLanguage);
+  useEffect(() => {
+    void preloadTts(voiceLanguage);
+  }, [voiceLanguage]);
+
   const [assisted, setAssisted] = useState(false);
   const [teachingObjectiveId, setTeachingObjectiveId] = useState<string | null>(null);
   const [autoPlayedObjectives, setAutoPlayedObjectives] = useState<ReadonlySet<string>>(() => new Set());
@@ -173,6 +178,7 @@ export function GameExperience({ playerId, game, registeredGameId, mission, spon
     submittedLessonRewardRef.current = true;
     void submitBilingualGameResult({
       gameId: registeredGameId ?? selectedGame.id,
+      lessonId: lessonId ?? undefined,
       resolved: progress.resolvedItemCount,
       unresolved: progress.unresolvedItemCount,
     })
@@ -184,7 +190,7 @@ export function GameExperience({ playerId, game, registeredGameId, mission, spon
       .catch(() => {
         submittedLessonRewardRef.current = false;
       });
-  }, [progress, persistenceState, journey, selectedGame, registeredGameId]);
+  }, [progress, persistenceState, journey, selectedGame, registeredGameId, lessonId]);
 
   const handleStart = () => updateProgress(startSession(progress));
 
@@ -312,7 +318,7 @@ export function GameExperience({ playerId, game, registeredGameId, mission, spon
         {progress.phase === "result" && persistenceState === "saving" ? <section className="bilingual-save-state" aria-live="polite" aria-busy="true" aria-labelledby="bilingual-save-title"><div className="bilingual-save-state__panel"><span className="bilingual-save-state__eyebrow">PROGRESIÓN · GUARDADO</span><h1 id="bilingual-save-title">Guardando tu avance</h1><p>Verificando tu misión…</p><div className="bilingual-save-state__progress" role="status" aria-label="Guardando tu avance"><span /></div></div></section> : null}
         {progress.phase === "result" && persistenceState === "error" ? <section className="bilingual-result bilingual-result--saving" role="alert"><h1>No pudimos guardar todavía</h1><p>Tu avance está en este dispositivo. Reintenta para confirmar la finalización.</p><button className="bilingual-action bilingual-action--primary" type="button" onClick={() => updateProgress(progress)}>Reintentar guardado</button></section> : null}
         {progress.phase === "result" && persistenceState !== "saving" && persistenceState !== "error" ? (
-          <GameResult game={selectedGame} progress={progress} mission={mission} reward={lessonReward} onReview={() => updateProgress(beginReview(progress))} onNext={() => updateProgress(showTransition(progress))} onReplay={handleReplay} />
+          <GameResult game={selectedGame} progress={progress} mission={mission} reward={lessonReward} nextHref={nextHref} onReview={() => updateProgress(beginReview(progress))} onNext={() => updateProgress(showTransition(progress))} onReplay={handleReplay} />
         ) : null}
         {persistenceState === "error" && progress.phase !== "result" ? <p role="alert" className="bilingual-persistence-error">No pudimos guardar este avance. Revisa tu conexión e inténtalo de nuevo.</p> : null}
         {progress.phase === "transition" ? <NextChallenge game={selectedGame} /> : null}
@@ -323,6 +329,7 @@ export function GameExperience({ playerId, game, registeredGameId, mission, spon
               <h1 id="challenge-title">{objective.mechanic === "letter-build" ? "Construye la palabra" : selectedGame.id === "gol-de-palabra" ? "¿Qué significa?" : "¿Qué escuchaste?"}</h1>
               <AudioControl
                 audio={objective.audio}
+                voiceLanguage={voiceLanguage}
                 autoPlay={autoPlayObjective}
                 onAutoPlayAttempt={markAutoPlayAttempt}
                 onPlayed={() => objective.mechanic === "letter-build" && setAssisted(true)}

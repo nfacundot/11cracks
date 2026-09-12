@@ -16,6 +16,7 @@ export type SubmitBilingualGameResultResult =
 
 export async function submitBilingualGameResult(data: {
   gameId: string;
+  lessonId?: string | null;
   resolved: number;
   unresolved: number;
 }): Promise<SubmitBilingualGameResultResult> {
@@ -23,13 +24,24 @@ export async function submitBilingualGameResult(data: {
 
   const game = await prisma.game.findFirst({
     where: { OR: [{ id: data.gameId }, { slug: data.gameId }] },
-    select: { lesson: { select: { id: true } } },
+    select: {
+      id: true,
+      _count: { select: { lesson: true } },
+      lesson: {
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+        select: { id: true },
+        take: 1,
+      },
+    },
   });
-  if (!game?.lesson) return { ok: false, error: "Este juego no tiene una lección vinculada." };
+  if (!game || game._count.lesson === 0) return { ok: false, error: "Este juego no tiene una lección vinculada." };
+
+  const lessonId = data.lessonId ?? game.lesson[0]?.id ?? null;
+  if (!lessonId) return { ok: false, error: "Este juego no tiene una lección vinculada." };
 
   const totalCount = data.resolved + data.unresolved;
   const result = await finishLesson({
-    lessonId: game.lesson.id,
+    lessonId,
     correctCount: data.resolved,
     totalCount,
   });

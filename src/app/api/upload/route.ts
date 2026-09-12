@@ -11,13 +11,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const allowedTypes = ["image/", "audio/"];
+    const allowedTypes = ["image/", "audio/", "video/"];
     const isValidType = allowedTypes.some((type) => file.type.startsWith(type));
     if (!isValidType) {
-      return NextResponse.json({ error: "Invalid file type. Only images and audio allowed." }, { status: 400 });
+      return NextResponse.json({ error: "Invalid file type. Only images, audio and video allowed." }, { status: 400 });
     }
 
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = file.type.startsWith("video/") ? 250 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json({ error: "File too large. Max 10MB." }, { status: 400 });
     }

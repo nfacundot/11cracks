@@ -13,6 +13,7 @@ enum LessonType {
   GAME
   PREGUNTADOS
   CONTRARRELOJ
+  SPEAKING
 }
 
 enum OptionMode {
@@ -242,8 +243,8 @@ model Lesson {
   posY        Float      @default(50)
   createdAt   DateTime   @default(now())
 
-  gameId    String? @unique
-  game      Game?   @relation(fields: [gameId], references: [id], onDelete: SetNull)
+  gameId    String?
+  game      Game?    @relation(fields: [gameId], references: [id], onDelete: SetNull)
 
   questions Question[]
   progress  LessonProgress[]
@@ -251,12 +252,15 @@ model Lesson {
 
   @@index([type, order])
   @@index([temaId, order])
+  @@index([gameId])
 }
 
 model Question {
   id          String       @id @default(cuid())
-  lessonId    String
-  lesson      Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    String?
+  lesson      Lesson?      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  videoId     String?
+  video       Video?       @relation(fields: [videoId], references: [id], onDelete: Cascade)
   type        QuestionType @default(MULTIPLE_CHOICE)
   prompt      String
   imageUrl    String?
@@ -268,6 +272,7 @@ model Question {
   answers AnswerRecord[]
 
   @@index([lessonId, order])
+  @@index([videoId, order])
 }
 
 model QuestionOption {
@@ -304,6 +309,8 @@ model AnswerRecord {
   questionId String
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   optionId   String?
+  answerText String?
+  score      Int?
   isCorrect  Boolean
   answeredAt DateTime @default(now())
 
@@ -388,7 +395,7 @@ model Game {
   golWords          GolPalabraWord[]
   letrasWords       LetrasCrackWord[]
   alimentacionWords AlimentacionWord[]
-  lesson            Lesson?
+  lesson            Lesson[]
 
   @@index([category, active, order])
   @@index([order])
@@ -1020,4 +1027,44 @@ model ImportRowError {
 
   @@index([importBatchId, rowNumber])
   @@index([status])
+}
+
+enum VideoCategory {
+  PARA_MI
+  ENTRENAMIENTO
+  NEUROCRACKS
+}
+
+enum VideoSourceType {
+  URL
+  FILE
+}
+
+model Video {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  category    VideoCategory
+  sourceType  VideoSourceType  @default(URL)
+  url         String?
+  filePath    String?
+  createdBy   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  progresses  VideoProgress[]
+  questions   Question[]
+
+  @@index([category])
+}
+
+model VideoProgress {
+  id          String   @id @default(cuid())
+  videoId     String
+  playerId    String
+  completedAt DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([videoId, playerId])
+  @@index([playerId])
 }

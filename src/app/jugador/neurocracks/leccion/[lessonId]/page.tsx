@@ -27,6 +27,7 @@ export default async function ElCaminoLessonPage({
     where: { id: lessonId },
     include: {
       tema: { select: { id: true, clases: { select: { id: true } } } },
+      game: { select: { slug: true } },
       questions: {
         orderBy: { order: "asc" },
         include: { options: { orderBy: { order: "asc" } } },
@@ -75,6 +76,41 @@ export default async function ElCaminoLessonPage({
 
   if (!unlocked) redirect("/jugador/neurocracks");
 
+  // Siguiente lección del recorrido global (todas las materias en orden):
+  // al terminar la última lección de una materia, continúa con la primera
+  // pendiente de la siguiente materia.
+  const globalClases = await prisma.clase.findMany({
+    orderBy: { order: "asc" },
+    select: {
+      temas: {
+        orderBy: { order: "asc" },
+        select: {
+          lessons: { orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { id: true } },
+        },
+      },
+    },
+  });
+  const globalLessonIds = globalClases.flatMap((c) => c.temas.flatMap((t) => t.lessons.map((l) => l.id)));
+  const globalProgress = globalLessonIds.length
+    ? await prisma.lessonProgress.findMany({
+        where: { userId: user.id, lessonId: { in: globalLessonIds } },
+        select: { lessonId: true, completed: true },
+      })
+    : [];
+  const globalCompleted = new Map(globalProgress.map((p) => [p.lessonId, p.completed]));
+  const nextLessonId =
+    globalLessonIds
+      .slice(globalLessonIds.indexOf(lesson.id) + 1)
+      .find((id) => !globalCompleted.get(id)) ?? null;
+  const nextHref = nextLessonId ? `/jugador/neurocracks/leccion/${nextLessonId}` : null;
+
+  // Lección con juego vinculado: abre la experiencia del juego (edtech11) en
+  // lugar del reproductor de preguntas/corazones. Solo se activa por la
+  // relación `game`; el nombre no se usa como señal.
+  if (lesson.game) {
+    redirect(`/jugador/neurocracks/bilinguismo/${encodeURIComponent(lesson.game.slug)}?lesson=${encodeURIComponent(lessonId)}${nextLessonId ? `&nextLesson=${encodeURIComponent(nextLessonId)}` : ""}`);
+  }
+
   if (lesson.gameMode === "INFOGRAMA") {
     redirect("/jugador/game/infograma");
   }
@@ -113,7 +149,7 @@ export default async function ElCaminoLessonPage({
         </Link>
       </header>
       <div className="el-camino-lesson__stage">
-        <LessonPlayer lesson={playerLesson} questions={questions} returnHref="/jugador/neurocracks" />
+        <LessonPlayer lesson={playerLesson} questions={questions} returnHref="/jugador/neurocracks" nextHref={nextHref} />
       </div>
     </div>
   );

@@ -62,25 +62,15 @@ export async function saveGame(prev: GameState, formData: FormData): Promise<Gam
           active: true,
         },
       });
-      await tx.lesson.upsert({
+      await tx.lesson.updateMany({
         where: { gameId: game.id },
-        update: {
+        data: {
           title: name,
           description: description || `Juego vinculado a la lección "${name}".`,
           emoji: emoji || meta.emoji,
           color: meta.color,
           type: "GAME",
           xpReward,
-        },
-        create: {
-          title: name,
-          description: description || `Juego vinculado a la lección "${name}".`,
-          emoji: emoji || meta.emoji,
-          color: meta.color,
-          type: "GAME",
-          xpReward,
-          order: 100,
-          gameId: game.id,
         },
       });
     });
@@ -122,10 +112,7 @@ export async function deleteGame(gameId: string): Promise<{ error?: string; succ
   await requireStaff();
 
   await prisma.$transaction(async (tx) => {
-    const lesson = await tx.lesson.findUnique({ where: { gameId } });
-    if (lesson) {
-      await tx.lesson.delete({ where: { id: lesson.id } });
-    }
+    await tx.lesson.deleteMany({ where: { gameId } });
     await tx.game.delete({ where: { id: gameId } });
   });
 
