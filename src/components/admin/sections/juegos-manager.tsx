@@ -122,11 +122,12 @@ export type PreguntasLessonViewModel = {
   id: string;
   title: string;
   emoji: string;
-  type: "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
+  type: "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING";
   optionMode: "TEXT" | "IMAGE" | "BOTH";
   timeSeconds: number | null;
   xpReward: number;
   questionCount: number;
+  language?: string;
 };
 
 export type QuizClase = {
@@ -140,7 +141,14 @@ const QUIZ_TYPE_META = {
   PREGUNTADOS: { label: "Preguntados", className: "bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" },
   CONTRARRELOJ: { label: "Contrarreloj", className: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" },
   SPEAKING: { label: "Habla", className: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300" },
+  TYPING: { label: "Escribe", className: "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300" },
 } as const;
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  es: "Español",
+  en: "Inglés",
+  pt: "Portugués",
+};
 
 const QUIZ_MODE_LABELS: Record<string, string> = {
   TEXT: "Solo texto",
@@ -314,7 +322,7 @@ export function JuegosManager({
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [quizNew, setQuizNew] = useState<"PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | null>(null);
+  const [quizNew, setQuizNew] = useState<"PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING" | null>(null);
   const [editing, setEditing] = useState<GameViewModel | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; game: GameViewModel | null }>({
     open: false,
@@ -409,6 +417,17 @@ export function JuegosManager({
                     <span className="text-xl">🎤</span>
                     <span className="text-xs font-black text-emerald-950 dark:text-white">Habla</span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuizNew("TYPING");
+                      setMenuOpen(false);
+                    }}
+                    className="flex w-full flex-col items-center gap-1.5 rounded-xl border-2 border-teal-100 bg-white px-2 py-3 text-center transition hover:border-teal-300 hover:bg-teal-50 active:scale-95 dark:border-emerald-800 dark:bg-emerald-900 dark:hover:border-teal-700 dark:hover:bg-emerald-800/60"
+                  >
+                    <span className="text-xl">⌨️</span>
+                    <span className="text-xs font-black text-emerald-950 dark:text-white">Escribe</span>
+                  </button>
               </div>
             </div>
           ) : null}
@@ -472,6 +491,15 @@ export function JuegosManager({
         initialType="SPEAKING"
         label=""
         title="Nueva lección · Habla (repite con micrófono)"
+      />
+      <LessonEditorModal
+        open={quizNew === "TYPING"}
+        onClose={() => setQuizNew(null)}
+        clases={clases}
+        mode="lessons"
+        initialType="TYPING"
+        label=""
+        title="Nueva lección · Escribe (escucha y escribe)"
       />
 
       {games.length === 0 && quizzLessons.length === 0 ? (
@@ -564,6 +592,11 @@ export function JuegosManager({
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${meta.className}`}>
                       {meta.label}
                     </span>
+                    {lesson.type === "SPEAKING" || lesson.type === "TYPING" ? (
+                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                        {LANGUAGE_LABELS[lesson.language ?? "es"] ?? "Español"}
+                      </span>
+                    ) : null}
                   </p>
                   <p className="text-xs font-bold text-zinc-400">
                     {lesson.questionCount} {lesson.questionCount === 1 ? "pregunta" : "preguntas"} · {QUIZ_MODE_LABELS[lesson.optionMode]}{" "}

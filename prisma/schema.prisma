@@ -14,6 +14,7 @@ enum LessonType {
   PREGUNTADOS
   CONTRARRELOJ
   SPEAKING
+  TYPING
 }
 
 enum OptionMode {
@@ -241,6 +242,7 @@ model Lesson {
   xpReward    Int        @default(10)
   posX        Float      @default(50)
   posY        Float      @default(50)
+  language    String     @default("es")
   createdAt   DateTime   @default(now())
 
   gameId    String?

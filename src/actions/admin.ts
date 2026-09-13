@@ -21,13 +21,14 @@ export type EditableLessonData = {
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING";
     gameMode?: "ANAGRAM" | "INFOGRAMA" | null;
     optionMode?: "TEXT" | "IMAGE" | "BOTH";
     timeSeconds?: number | null;
     order: number;
     xpReward: number;
     temaId?: string | null;
+    language?: string | null;
   };
   questions: {
     id: string;
@@ -68,6 +69,7 @@ export async function getEditableLesson(lessonId: string): Promise<EditableLesso
       order: lesson.order,
       xpReward: lesson.xpReward,
       temaId: lesson.temaId,
+      language: lesson.language ?? "es",
     },
     questions: lesson.questions.map((q) => ({
       id: q.id,
@@ -504,7 +506,8 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     | "GAME"
     | "PREGUNTADOS"
     | "CONTRARRELOJ"
-    | "SPEAKING";
+    | "SPEAKING"
+    | "TYPING";
   const gameMode = String(formData.get("gameMode") || "") as
     | ""
     | "ANAGRAM"
@@ -522,7 +525,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
   const xpReward = Math.max(0, Math.round(Number(formData.get("xpReward")) || 10));
   const questions = parseQuestions(String(formData.get("questions") || "[]"));
 
-  if (!["LESSON", "QUIZ", "GAME", "PREGUNTADOS", "CONTRARRELOJ", "SPEAKING"].includes(type)) {
+  if (!["LESSON", "QUIZ", "GAME", "PREGUNTADOS", "CONTRARRELOJ", "SPEAKING", "TYPING"].includes(type)) {
     return { error: "Tipo de lección inválido" };
   }
   if (!["TEXT", "IMAGE", "BOTH"].includes(optionMode)) {
@@ -540,7 +543,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     return { error: "Todas las preguntas necesitan enunciado" };
   }
   const isQuestionsGame = type === "PREGUNTADOS" || type === "CONTRARRELOJ";
-  const needsOptions = isQuestionsGame || (gameMode !== "ANAGRAM" && type !== "SPEAKING");
+  const needsOptions = isQuestionsGame || (gameMode !== "ANAGRAM" && type !== "SPEAKING" && type !== "TYPING");
   if (
     needsOptions &&
     questions.some(
@@ -582,6 +585,9 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     }
   }
 
+  const languageRaw = String(formData.get("language") || "es").toLowerCase();
+  const language = ["es", "en", "pt"].includes(languageRaw) ? languageRaw : "es";
+
   const lessonData = {
     temaId,
     title,
@@ -594,6 +600,7 @@ export async function saveLesson(prev: AdminState, formData: FormData): Promise<
     timeSeconds: isQuestionsGame ? timeSeconds : null,
     order,
     xpReward,
+    language,
   };
 
   let lessonId = id;

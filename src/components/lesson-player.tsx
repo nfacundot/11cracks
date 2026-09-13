@@ -6,6 +6,7 @@ import { submitAnswer, finishLesson, submitSpeakingAnswer } from "@/actions/less
 import { CheckIcon, HeartIcon, XIcon, FlameIcon, BoltIcon, ArrowLeftIcon } from "@/components/icons";
 import { EmoteMascot } from "@/components/emote-mascot";
 import { transcribeAudioBlob, canTranscribeInBrowser, subscribeWhisperProgress } from "@/lib/whisper";
+import { speakWithTransformers, ttsLanguageFor } from "@/lib/tts-engine";
 
 export type PlayerQuestion = {
   id: string;
@@ -59,6 +60,7 @@ export function LessonPlayer({
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
+  const [typedWord, setTypedWord] = useState("");
   const [forceTyped, setForceTyped] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [recSecs, setRecSecs] = useState(0);
@@ -88,6 +90,8 @@ export function LessonPlayer({
   const isLast = qIndex === total - 1;
   const isPerfect = correctCount === total;
   const isSpeaking = lesson.type === "SPEAKING";
+  const isTyping = lesson.type === "TYPING";
+  const isWordMode = isSpeaking || isTyping;
   const native = isNativeCapacitor();
   const secure = typeof window !== "undefined" && window.isSecureContext !== false;
   const micMode: "native" | "record" | "none" = native
@@ -166,18 +170,22 @@ export function LessonPlayer({
         confidence,
       });
       if (res.ok) {
-        if (res.correct) setCorrectCount((c) => c + 1);
+        if (res.correct) {
+          setCorrectCount((c) => c + 1);
+        } else {
+          setHearts((h) => h - 1);
+        }
         setFeedback({
           correct: res.correct,
           explanation: res.correct
-            ? `¡Muy bien! Pronunciaste "${res.transcript}".`
-            : `Escuché "${res.transcript}". La palabra correcta es "${question.prompt}".`,
+            ? `¡Muy bien! ${isTyping ? `Escribiste` : "Pronunciaste"} "${res.transcript}".`
+            : `${isTyping ? "Escribiste" : "Escuché"} "${res.transcript}". La palabra correcta es "${question.prompt}".`,
         });
         setPhase("feedback");
       }
       setBusy(false);
     },
-    [busy, phase, question, lesson.id, clearTimer]
+    [busy, phase, question, lesson.id, clearTimer, isTyping]
   );
 
   const stopBrowserRecording = useCallback(() => {
@@ -478,13 +486,25 @@ const finalizeNative = useCallback(() => {
   }, [busy, phase, question, listening, startBrowserRecording, finalizeNative]);
 
   const speakWord = useCallback((text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = speechLang;
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
-  }, [speechLang]);
+    if (typeof window === "undefined" || !text) return;
+    const ttsLanguage = ttsLanguageFor(language);
+    // Motor TTS del proyecto (MMS por idioma); si falla, usa la voz del navegador.
+    speakWithTransformers(text, ttsLanguage).catch(() => {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = speechLang;
+      utterance.rate = 0.8;
+      window.speechSynthesis.speak(utterance);
+    });
+  }, [language, speechLang]);
+
+  const checkTypedWord = useCallback(async () => {
+    const value = typedWord.trim();
+    if (!value || busy || !question) return;
+    await submitSpoken(value, 1);
+    setTypedWord("");
+  }, [typedWord, busy, question, submitSpoken]);
 
   const continueToNext = useCallback(async () => {
     clearTimer();
@@ -510,6 +530,7 @@ const finalizeNative = useCallback(() => {
 
     setSecondsLeft(lessonSeconds(qIndex + 1));
     setQIndex((i) => i + 1);
+    setTypedWord("");
     setPhase("question");
   }, [clearTimer, isLast, lesson.id, correctCount, total, qIndex, lessonSeconds]);
 
@@ -575,7 +596,9 @@ const finalizeNative = useCallback(() => {
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
             {isSpeaking
               ? `${total} palabras para pronunciar · ${lesson.xpReward} XP · mantén presionado para hablar`
-              : `${total} preguntas · ${lesson.xpReward} XP · 3 corazones`}
+              : isTyping
+                ? `${total} palabras para escribir · ${lesson.xpReward} XP · 3 corazones`
+                : `${total} preguntas · ${lesson.xpReward} XP · 3 corazones`}
             {timedSeconds ? ` · ⏱ ${timedSeconds}s por pregunta` : ""}
             {lesson.optionMode === "IMAGE"
               ? " · 🖼️ opciones por imagen"
@@ -716,18 +739,22 @@ const finalizeNative = useCallback(() => {
         </div>
       )}
 
-      <div key={qIndex + (isSpeaking ? "-speaking" : "")} className="animate-pop flex flex-col gap-4">
+      <div key={qIndex + (isWordMode ? "-word" : "")} className="animate-pop flex flex-col gap-4">
         <EmoteMascot
           state={!isFeedback ? "question" : timedOut ? "timeout" : showCorrect ? "correct" : "wrong"}
           text={
             !isFeedback ? (
-              isSpeaking ? (
+              isTyping ? (
+                "🔊 Escucha y escribe la palabra"
+              ) : isSpeaking ? (
                 <span className="text-3xl">{question.prompt}</span>
               ) : (
                 question.prompt
               )
             ) : timedOut ? (
               "¡Se acabó el tiempo! ⏱️"
+            ) : isTyping ? (
+              <span className="text-3xl">{question.prompt}</span>
             ) : showCorrect ? (
               isSpeaking ? "¡Pronunciación perfecta! 🎤" : "¡Correcto! ✅"
             ) : (
@@ -736,7 +763,7 @@ const finalizeNative = useCallback(() => {
           }
           explanation={isFeedback ? feedback?.explanation : undefined}
         >
-          {!isSpeaking &&
+          {!isWordMode &&
             question.options.map((option, i) => {
               let style =
                 "bg-white text-zinc-700 hover:bg-green-50 hover:border-green-300 dark:bg-emerald-900 dark:text-zinc-100 dark:hover:bg-green-950/50 dark:hover:border-green-600";
@@ -785,6 +812,48 @@ const finalizeNative = useCallback(() => {
               );
             })}
         </EmoteMascot>
+
+        {isTyping && !isFeedback && (
+          <div className="flex flex-col gap-3 rounded-2xl border-2 border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-emerald-900">
+            <div className="flex items-center justify-between gap-2 text-sm font-bold text-zinc-500 dark:text-zinc-400">
+              <span>Escribe lo que escuchas</span>
+              <button
+                type="button"
+                onClick={() => speakWord(question.prompt)}
+                className="rounded-xl border-2 border-zinc-200 px-3 py-1.5 font-black text-zinc-600 transition hover:bg-zinc-50 active:scale-95 dark:border-zinc-700 dark:text-zinc-300"
+              >
+                🔊 Escuchar
+              </button>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                value={typedWord}
+                onChange={(e) => setTypedWord(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void checkTypedWord();
+                }}
+                placeholder="Escribe la palabra…"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                className="w-full rounded-xl border-2 border-zinc-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-green-400 dark:border-zinc-700 dark:bg-emerald-950 dark:text-white"
+              />
+              <button
+                type="button"
+                disabled={busy || !typedWord.trim()}
+                onClick={() => void checkTypedWord()}
+                className="shrink-0 rounded-xl bg-green-500 px-4 text-sm font-black text-white transition hover:bg-green-600 active:scale-95 disabled:opacity-50"
+              >
+                Comprobar
+              </button>
+            </div>
+
+            <p className="text-center text-xs font-semibold text-zinc-400 dark:text-zinc-500">
+              Pulsa 🔊 para escuchar, escribe la palabra y comprueba. Tienes 3 corazones.
+            </p>
+          </div>
+        )}
 
         {isSpeaking && !isFeedback && (
           <div className="flex flex-col gap-3 rounded-2xl border-2 border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-emerald-900">

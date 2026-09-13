@@ -31,7 +31,7 @@ export function LessonEditorModal({
   label: React.ReactNode;
   title: string;
   className?: string;
-  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
+  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING";
   open?: boolean;
   onClose?: () => void;
 }) {

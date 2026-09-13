@@ -28,7 +28,7 @@ export default async function SettingsLeccionesPage() {
   });
 
   const quizLessons = await prisma.lesson.findMany({
-    where: { type: { in: ["PREGUNTADOS", "CONTRARRELOJ", "SPEAKING"] } },
+    where: { type: { in: ["PREGUNTADOS", "CONTRARRELOJ", "SPEAKING", "TYPING"] } },
     orderBy: { createdAt: "asc" },
     select: {
       id: true,
@@ -38,6 +38,7 @@ export default async function SettingsLeccionesPage() {
       optionMode: true,
       timeSeconds: true,
       xpReward: true,
+      language: true,
       _count: { select: { questions: true } },
     },
   });
@@ -70,6 +71,7 @@ export default async function SettingsLeccionesPage() {
     timeSeconds: l.timeSeconds,
     xpReward: l.xpReward,
     questionCount: l._count.questions,
+    language: l.language ?? "es",
   }));
 
   return (

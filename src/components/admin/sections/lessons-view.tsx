@@ -8,6 +8,7 @@ const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: s
   LESSON: { label: "Lección", icon: <BookIcon className="h-4 w-4" />, color: "bg-blue-500" },
   QUIZ: { label: "Quiz", icon: <BoltIcon className="h-4 w-4" />, color: "bg-purple-500" },
   SPEAKING: { label: "Habla", icon: <span className="text-sm">🎤</span>, color: "bg-violet-500" },
+  TYPING: { label: "Escribe", icon: <span className="text-sm">⌨️</span>, color: "bg-teal-500" },
   PREGUNTADOS: { label: "Preguntados", icon: <span className="text-sm">🧠</span>, color: "bg-sky-500" },
   CONTRARRELOJ: { label: "Contrarreloj", icon: <BoltIcon className="h-4 w-4" />, color: "bg-amber-500" },
 };
@@ -110,7 +111,7 @@ export async function LessonsView({
   basePath: string;
   searchParams: { type?: string; materia?: string };
 }) {
-  const ALL_LESSON_TYPES = ["LESSON", "QUIZ", "SPEAKING", "PREGUNTADOS", "CONTRARRELOJ"] as const;
+  const ALL_LESSON_TYPES = ["LESSON", "QUIZ", "SPEAKING", "TYPING", "PREGUNTADOS", "CONTRARRELOJ"] as const;
 type LessonType = (typeof ALL_LESSON_TYPES)[number];
 
   const { type, materia } = searchParams;

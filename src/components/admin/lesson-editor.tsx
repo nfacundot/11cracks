@@ -183,6 +183,7 @@ function QuestionFields({
   isInfograma,
   isWord,
   isSpeaking,
+  isTyping,
   noOptions,
   radioName,
   isQuizMode,
@@ -193,6 +194,7 @@ function QuestionFields({
   isInfograma: boolean;
   isWord: boolean;
   isSpeaking: boolean;
+  isTyping: boolean;
   noOptions: boolean;
   radioName: string;
   isQuizMode: boolean;
@@ -226,7 +228,7 @@ function QuestionFields({
         type="text"
         value={value.prompt}
         onChange={(e) => onChange({ prompt: e.target.value })}
-        placeholder={isWord ? "Palabra (ej. FÚTBOL)" : isSpeaking ? "Palabra a pronunciar (ej. PORTERO)" : "Enunciado de la pregunta"}
+        placeholder={isWord ? "Palabra (ej. FÚTBOL)" : isSpeaking ? "Palabra a pronunciar (ej. PORTERO)" : isTyping ? "Palabra a escribir (ej. PORTERO)" : "Enunciado de la pregunta"}
         className={inputCls}
       />
       {isWord ? (
@@ -341,7 +343,7 @@ export function LessonEditor({
     temas: { id: string; name: string }[];
   }[];
   mode?: "lessons" | "games";
-  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
+  initialType?: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING";
   onSaved?: () => void;
   defaultValues?: {
     id: string;
@@ -349,7 +351,7 @@ export function LessonEditor({
     description: string;
     emoji: string;
     color: string;
-    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING";
+    type: "LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING";
     gameMode?:
       | "ANAGRAM"
       | "INFOGRAMA"
@@ -359,6 +361,7 @@ export function LessonEditor({
     order: number;
     xpReward: number;
     temaId?: string | null;
+    language?: string | null;
   };
   questions?: {
     id: string;
@@ -371,7 +374,7 @@ export function LessonEditor({
 }) {
   const [emoji, setEmoji] = useState(defaultValues?.emoji ?? "⚽");
   const [color, setColor] = useState(defaultValues?.color ?? "#16a34a");
-  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING">(
+  const [type, setType] = useState<"LESSON" | "QUIZ" | "GAME" | "PREGUNTADOS" | "CONTRARRELOJ" | "SPEAKING" | "TYPING">(
     defaultValues?.type ?? initialType
   );
   const [optionMode, setOptionMode] = useState<"TEXT" | "IMAGE" | "BOTH">(
@@ -387,6 +390,8 @@ export function LessonEditor({
   const [title, setTitle] = useState(defaultValues?.title ?? "");
   const [description, setDescription] = useState(defaultValues?.description ?? "");
   const [order, setOrder] = useState(defaultValues?.order ?? 0);
+  const isTypingEarly = type === "TYPING";
+  const [language, setLanguage] = useState(defaultValues?.language ?? "es");
   const [xpReward, setXpReward] = useState(defaultValues?.xpReward ?? 10);
   const initialGameMode =
     defaultValues?.gameMode ?? (mode === "games" ? "INFOGRAMA" : "ANAGRAM");
@@ -421,7 +426,8 @@ export function LessonEditor({
   const isInfograma = mode === "games" && gameMode === "INFOGRAMA";
   const isWord = mode === "games" && gameMode === "ANAGRAM";
   const isSpeaking = type === "SPEAKING";
-  const noOptions = isWord || isSpeaking;
+  const isTyping = type === "TYPING";
+  const noOptions = isWord || isSpeaking || isTyping;
 
   const changeGameMode = (next: typeof gameMode) => {
     setGameMode(next);
@@ -445,7 +451,7 @@ export function LessonEditor({
           options: padOptionsTo4(q.options),
         }))
       );
-    } else if (next === "SPEAKING") {
+    } else if (next === "SPEAKING" || next === "TYPING") {
       setQs((prev) =>
         prev.map((q) => ({
           ...q,
@@ -491,6 +497,7 @@ export function LessonEditor({
       <input type="hidden" name="description" value={description} />
       <input type="hidden" name="order" value={order} />
       <input type="hidden" name="xpReward" value={xpReward} />
+      <input type="hidden" name="language" value={language} />
       <input
         type="hidden"
         name="questions"
@@ -569,6 +576,7 @@ export function LessonEditor({
                   <option value="PREGUNTADOS">Preguntados (A-D · 3 vidas)</option>
                   <option value="CONTRARRELOJ">Contrarreloj (A-D · tiempo · 3 vidas)</option>
                   <option value="SPEAKING">Habla (repite con micrófono)</option>
+                  <option value="TYPING">Escribe (escucha y escribe)</option>
                 </select>
               )}
             </label>
@@ -583,6 +591,21 @@ export function LessonEditor({
                 >
                   <option value="INFOGRAMA">Infograma (4 imágenes A-D)</option>
                   <option value="ANAGRAM">Palabra a Gol (palabras)</option>
+                </select>
+              </label>
+            )}
+            {(isSpeaking || isTypingEarly) && (
+              <label className="flex items-center gap-2 text-xs font-bold text-zinc-500">
+                Idioma de la voz
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className={inputCls}
+                  style={{ width: "auto" }}
+                >
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                  <option value="pt">Portugués</option>
                 </select>
               </label>
             )}
@@ -728,6 +751,7 @@ export function LessonEditor({
               isInfograma={isInfograma}
               isWord={isWord}
               isSpeaking={isSpeaking}
+              isTyping={isTypingEarly}
               noOptions={noOptions}
               radioName={`correct-${qi}`}
               isQuizMode={isQuizMode}
@@ -777,6 +801,7 @@ export function LessonEditor({
               isInfograma={isInfograma}
               isWord={isWord}
               isSpeaking={isSpeaking}
+              isTyping={isTypingEarly}
               noOptions={noOptions}
               radioName="draft-correct"
               isQuizMode={isQuizMode}

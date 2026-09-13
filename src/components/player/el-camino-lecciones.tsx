@@ -222,7 +222,7 @@ export function ElCaminoLecciones({ camino, playerId }: { camino: ClaseCamino; p
             <div className="el-camino__stage-wrap" key={stage.id}>
               <section className="el-camino__stage" data-stage={stage.id} data-state={stageState(camino, stage)} data-flow={flujoEtapa(index)} aria-labelledby={`leccion-stage-${stage.id}`}>
                 <StageLandmark stage={stage} />
-                <div className="el-camino__stage-track"><div className="el-camino__nodes" role="list" data-testid={`el-camino-lecciones-stage-${stage.id}`}>{stage.nodes.map((node) => { const bilingualNode = bilingualByNode.get(node.id) ?? null; const displayState = bilingualNode ? getElCaminoNodeState(bilingualNode, journey) : node.estado; return <div role="listitem" key={node.id}><NodeButton node={node} bilingualNode={bilingualNode} state={displayState} current={current?.id === node.id} onSelect={(selected) => setSelectedNodeId(selected.id)} /></div>; })}</div></div>
+                <div className="el-camino__stage-track"><div className="el-camino__nodes" role="list" data-testid={`el-camino-lecciones-stage-${stage.id}`}>{stage.nodes.map((node) => { const bilingualNode = bilingualByNode.get(node.id) ?? null; const displayState = bilingualNode && node.estado !== "LOCKED" ? getElCaminoNodeState(bilingualNode, journey) : node.estado; return <div role="listitem" key={node.id}><NodeButton node={node} bilingualNode={bilingualNode} state={displayState} current={current?.id === node.id} onSelect={(selected) => setSelectedNodeId(selected.id)} /></div>; })}</div></div>
                 <span className="el-camino__stage-caption" id={`leccion-stage-${stage.id}`}>{stageState(camino, stage) === "completed" ? stage.title + " SUPERADA" : index === 0 ? "AQUÍ COMIENZAS" : "SIGUIENTE TEMA"}</span>
               </section>
             </div>
@@ -234,7 +234,7 @@ export function ElCaminoLecciones({ camino, playerId }: { camino: ClaseCamino; p
 
       {selectedNode ? (
         <div className="el-camino__detail-layer" onClick={(event) => { if (event.target === event.currentTarget) setSelectedNodeId(null); }}>
-          {selectedBilingualNode && selectedBilingualState && selectedBilingualGame ? (
+          {selectedBilingualNode && selectedBilingualState && selectedBilingualGame && selectedNode.estado !== "LOCKED" ? (
             <BilingualActivityDetail
               node={selectedBilingualNode}
               state={selectedBilingualState}

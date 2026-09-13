@@ -135,6 +135,7 @@ export default async function ElCaminoLessonPage({
     type: lesson.type,
     optionMode: lesson.optionMode,
     timeSeconds: lesson.timeSeconds,
+    language: lesson.language ?? "es",
   };
 
   return (
@@ -149,7 +150,7 @@ export default async function ElCaminoLessonPage({
         </Link>
       </header>
       <div className="el-camino-lesson__stage">
-        <LessonPlayer lesson={playerLesson} questions={questions} returnHref="/jugador/neurocracks" nextHref={nextHref} />
+        <LessonPlayer lesson={playerLesson} questions={questions} returnHref="/jugador/neurocracks" nextHref={nextHref} language={playerLesson.language} />
       </div>
     </div>
   );
