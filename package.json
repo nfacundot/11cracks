@@ -17,6 +17,8 @@
     "@capacitor/android": "^8.5.0",
     "@capacitor/cli": "^8.5.0",
     "@capacitor/core": "^8.5.0",
+    "@glinui/tokens": "^0.1.1",
+    "@glinui/ui": "^0.1.1",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@types/use-sync-external-store": "^1.5.0",

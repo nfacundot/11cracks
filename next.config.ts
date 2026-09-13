@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Permite que el dev server responda desde la LAN (app Capacitor en el celular).
+  allowedDevOrigins: ["192.168.18.24", "192.168.*"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**" },

@@ -1,0 +1,431 @@
+/* Rediseño glassmorphism para /jugador (scope [data-role="player"]) usando
+   @glinui/tokens (Apple Liquid Glass spec). Los valores --glass-* replican
+   theme.css de @glinui/tokens pero con alcance al shell del jugador para no
+   alterar el resto de la plataforma. Modo noche = base (html.dark), modo día =
+   html.light (el layout raíz resuelve la clase según el dispositivo o el
+   toggle manual). Solo cambia piel (colores/bordes/radio), nunca layout. */
+
+.app-shell[data-role="player"] {
+  /* ── Tokens Glin UI — modo noche (dark) ── */
+  --glass-base-rgb: 0 0 0;
+  --glass-saturate: 180%;
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-border-strong: rgb(255 255 255 / 0.18);
+  --glass-refraction-top: rgb(255 255 255 / 0.15);
+  --glass-1-surface: rgb(0 0 0 / 0.2);
+  --glass-2-surface: rgb(0 0 0 / 0.3);
+  --glass-3-surface: rgb(0 0 0 / 0.4);
+  --glass-4-surface: rgb(0 0 0 / 0.55);
+  --glass-5-surface: rgb(0 0 0 / 0.7);
+  --glass-1-blur: 8px;
+  --glass-2-blur: 12px;
+  --glass-3-blur: 16px;
+  --glass-4-blur: 24px;
+  --glass-5-blur: 40px;
+  --glass-1-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --glass-2-shadow: 0 8px 24px rgba(0, 0, 0, 0.38), 0 2px 4px rgba(0, 0, 0, 0.24);
+  --glass-3-shadow: 0 16px 44px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.28);
+  --glass-4-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+  --glass-5-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.55);
+
+  /* ── Semánticos locales ── */
+  --jg-text: #f4f4f5;
+  --jg-text-dim: rgba(244, 244, 245, 0.62);
+  --jg-hover-bg: rgba(255, 255, 255, 0.07);
+  --jg-active-bg: rgba(255, 255, 255, 0.1);
+  --jg-tile: rgba(255, 255, 255, 0.1);
+  --jg-track: rgba(255, 255, 255, 0.08);
+  --jg-scrollbar: rgba(255, 255, 255, 0.14);
+  --jg-backdrop: rgba(4, 4, 6, 0.7);
+  --jg-badge: rgba(74, 222, 128, 0.2);
+  --jg-badge-on: #86efac;
+  --jg-radius: 1.5rem;
+  --jg-radius-lg: 1.875rem;
+
+  color: var(--jg-text);
+  background: #0a0a0d;
+}
+
+/* ── Tokens Glin UI — modo día (light) ── */
+html.light .app-shell[data-role="player"] {
+  --glass-base-rgb: 255 255 255;
+  --glass-border: rgb(255 255 255 / 0.45);
+  --glass-border-strong: rgb(255 255 255 / 0.65);
+  --glass-refraction-top: rgb(255 255 255 / 0.85);
+  --glass-1-surface: rgb(255 255 255 / 0.35);
+  --glass-2-surface: rgb(255 255 255 / 0.45);
+  --glass-3-surface: rgb(255 255 255 / 0.55);
+  --glass-4-surface: rgb(255 255 255 / 0.65);
+  --glass-5-surface: rgb(255 255 255 / 0.75);
+  --glass-1-shadow: 0 2px 8px rgba(15, 15, 30, 0.08);
+  --glass-2-shadow: 0 8px 24px rgba(15, 15, 30, 0.12), 0 2px 4px rgba(15, 15, 30, 0.08);
+  --glass-3-shadow: 0 16px 44px rgba(15, 15, 30, 0.14), 0 4px 8px rgba(15, 15, 30, 0.08);
+  --glass-4-shadow: 0 16px 48px rgba(15, 15, 30, 0.16), 0 4px 8px rgba(15, 15, 30, 0.08);
+  --glass-5-shadow: 0 1.25rem 3rem rgba(15, 15, 30, 0.18);
+
+  --jg-text: #1c1c22;
+  --jg-text-dim: rgba(28, 28, 34, 0.6);
+  --jg-hover-bg: rgba(15, 15, 30, 0.05);
+  --jg-active-bg: rgba(255, 255, 255, 0.72);
+  --jg-tile: rgba(255, 255, 255, 0.62);
+  --jg-track: rgba(15, 15, 30, 0.08);
+  --jg-scrollbar: rgba(15, 15, 30, 0.18);
+  --jg-backdrop: rgba(30, 30, 45, 0.35);
+  --jg-badge: rgba(34, 197, 94, 0.85);
+  --jg-badge-on: #ffffff;
+
+  color: var(--jg-text);
+  background: #d7d8e0;
+}
+
+/* ---------- Fondo: degradados difusos monocromos (sin foto de estadio) ---------- */
+
+.app-shell[data-role="player"] .role-atmosphere {
+  background:
+    radial-gradient(58% 44% at 18% 12%, rgba(120, 120, 132, 0.2), transparent 70%),
+    radial-gradient(50% 40% at 86% 8%, rgba(88, 88, 100, 0.16), transparent 72%),
+    radial-gradient(64% 52% at 50% 108%, rgba(140, 140, 152, 0.16), transparent 74%),
+    linear-gradient(168deg, #131316 0%, #0b0b0e 44%, #060608 100%);
+}
+
+html.light .app-shell[data-role="player"] .role-atmosphere {
+  background:
+    radial-gradient(58% 44% at 18% 12%, rgba(255, 255, 255, 0.8), transparent 70%),
+    radial-gradient(50% 40% at 86% 8%, rgba(214, 215, 226, 0.55), transparent 72%),
+    radial-gradient(64% 52% at 50% 108%, rgba(255, 255, 255, 0.65), transparent 74%),
+    linear-gradient(168deg, #ececf2 0%, #d9dbe3 48%, #c6c8d3 100%);
+}
+
+.app-shell[data-role="player"] .role-atmosphere__image,
+.app-shell[data-role="player"] .role-atmosphere__geometry {
+  display: none;
+}
+
+.app-shell[data-role="player"] .role-atmosphere__grade {
+  background:
+    radial-gradient(46% 30% at 82% 78%, rgba(255, 255, 255, 0.05), transparent 70%),
+    linear-gradient(0deg, rgba(5, 5, 7, 0.55), transparent 45%);
+}
+
+html.light .app-shell[data-role="player"] .role-atmosphere__grade {
+  background:
+    radial-gradient(46% 30% at 82% 78%, rgba(255, 255, 255, 0.5), transparent 70%),
+    linear-gradient(0deg, rgba(96, 98, 112, 0.16), transparent 45%);
+}
+
+.app-shell[data-role="player"] .role-atmosphere__vignette {
+  box-shadow: inset 0 0 12rem rgba(0, 0, 0, 0.55);
+}
+
+html.light .app-shell[data-role="player"] .role-atmosphere__vignette {
+  box-shadow: inset 0 0 10rem rgba(70, 70, 90, 0.16);
+}
+
+.app-shell[data-role="player"] .role-atmosphere__light {
+  opacity: 0.22;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+}
+
+html.light .app-shell[data-role="player"] .role-atmosphere__light {
+  opacity: 0.4;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+/* ---------- Rail de escritorio (vidrio) ---------- */
+
+.app-shell[data-role="player"] .shell-rail {
+  border-right: 1px solid var(--glass-border);
+  background: var(--glass-4-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-4-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-4-blur));
+  box-shadow: var(--glass-4-shadow);
+}
+
+.app-shell[data-role="player"] .shell-rail::after { display: none; }
+
+.app-shell[data-role="player"] .shell-brand-context { border-bottom: 1px solid var(--glass-border); }
+
+.app-shell[data-role="player"] .shell-nav__group h2 { color: var(--jg-text-dim); }
+
+.app-shell[data-role="player"] .shell-nav__link {
+  border-radius: 999px;
+  color: var(--jg-text-dim);
+  transition: color var(--motion-ui) ease, background-color var(--motion-ui) ease;
+}
+
+.app-shell[data-role="player"] .shell-nav__link::before { display: none; }
+
+.app-shell[data-role="player"] .shell-nav__link:hover {
+  color: var(--jg-text);
+  background: var(--jg-hover-bg);
+  transform: none;
+}
+
+.app-shell[data-role="player"] .shell-nav__link[data-active="true"] {
+  border-color: var(--glass-border-strong);
+  background: var(--jg-active-bg);
+  color: var(--jg-text);
+  box-shadow: var(--glass-1-shadow);
+}
+
+.app-shell[data-role="player"] .shell-nav__link[data-active="true"] .shell-nav__icon { color: var(--jg-text); filter: none; }
+.app-shell[data-role="player"] .shell-nav__link[data-active="true"] .shell-nav__active-mark { background: var(--jg-text); box-shadow: none; }
+
+.app-shell[data-role="player"] .shell-rail__identity {
+  border-top: 1px solid var(--glass-border);
+  background: transparent;
+}
+
+.app-shell[data-role="player"] .shell-avatar {
+  border-color: var(--glass-border-strong);
+  background: var(--jg-tile);
+  box-shadow: var(--glass-1-shadow);
+}
+
+.app-shell[data-role="player"] .shell-avatar__initials { color: var(--jg-text); }
+
+/* ---------- Cabecera móvil y topbar (vidrio) ---------- */
+
+.app-shell[data-role="player"] .shell-mobile-head {
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+}
+
+.app-shell[data-role="player"] .shell-menu-trigger {
+  border: 1px solid var(--glass-border-strong);
+  border-radius: 999px;
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+}
+
+.app-shell[data-role="player"] .shell-menu-trigger span:last-child { background: var(--jg-text); }
+
+.app-shell[data-role="player"] .shell-topbar {
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+}
+
+.app-shell[data-role="player"] .shell-location span,
+.app-shell[data-role="player"] .shell-scope small { color: var(--jg-text-dim); }
+.app-shell[data-role="player"] .shell-location strong { color: var(--jg-text); }
+
+.app-shell[data-role="player"] .shell-account > .shell-account-actions {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: var(--jg-radius);
+  background: var(--glass-5-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+  box-shadow: var(--glass-4-shadow);
+}
+
+.app-shell[data-role="player"] .shell-account-actions a,
+.app-shell[data-role="player"] .shell-account-actions button { border-radius: 999px; color: var(--jg-text-dim); }
+.app-shell[data-role="player"] .shell-account-actions a:hover,
+.app-shell[data-role="player"] .shell-account-actions button:hover { color: var(--jg-text); background: var(--jg-hover-bg); }
+
+/* ---------- Dock inferior flotante en píldora ---------- */
+
+.app-shell[data-role="player"] .shell-dock {
+  right: max(var(--space-4), env(safe-area-inset-left));
+  left: max(var(--space-4), env(safe-area-inset-right));
+  bottom: calc(max(var(--space-3), env(safe-area-inset-bottom)) + 0.35rem);
+  min-height: 4.5rem;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: 999px;
+  background: var(--glass-5-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+  box-shadow: var(--glass-5-shadow);
+}
+
+.app-shell[data-role="player"] .shell-dock::before { display: none; }
+
+.app-shell[data-role="player"] .shell-dock .shell-nav__link {
+  border-radius: 999px;
+  color: var(--jg-text-dim);
+}
+
+.app-shell[data-role="player"] .shell-dock .shell-nav__link::before {
+  inset: auto 26% 0.3rem;
+  height: 0.2rem;
+  border-radius: 999px;
+  background: var(--jg-text);
+}
+
+.app-shell[data-role="player"] .shell-dock .shell-nav__link + .shell-nav__link,
+.app-shell[data-role="player"] .shell-dock > button { border-left: 0; }
+
+.app-shell[data-role="player"] .shell-dock .shell-nav__link[data-active="true"] {
+  background: var(--jg-active-bg);
+  color: var(--jg-text);
+  box-shadow: var(--glass-1-shadow);
+}
+
+/* ---------- Drawer móvil (vidrio) ---------- */
+
+.app-shell[data-role="player"] .shell-drawer__backdrop { background: var(--jg-backdrop); backdrop-filter: blur(0.4rem); }
+
+.app-shell[data-role="player"] .shell-drawer__panel {
+  border-left: 1px solid var(--glass-border);
+  background: var(--glass-5-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-5-blur));
+}
+
+.app-shell[data-role="player"] .shell-drawer__panel > header { border-bottom: 1px solid var(--glass-border); }
+.app-shell[data-role="player"] .shell-drawer__panel > header button { border: 1px solid var(--glass-border-strong); border-radius: 999px; }
+.app-shell[data-role="player"] .shell-drawer__account { border-top: 1px solid var(--glass-border); background: transparent; }
+.app-shell[data-role="player"] .shell-drawer__panel > .shell-account-actions { border-top: 1px solid var(--glass-border); }
+
+/* ---------- Superficies de contenido: tarjetas Liquid Glass genéricas ---------- */
+
+.app-shell[data-role="player"] .shell-content :is(
+  [class*="__panel"],
+  [class*="__card"],
+  [class*="__hero"],
+  [class*="__stage"],
+  [class*="__milestone"],
+  [class*="__list-item"],
+  [class*="__record"],
+  [class*="__video"],
+  [class*="__roster"],
+  [class*="__summary"],
+  [class*="__next-step"],
+  [class*="__next"],
+  [class*="__quick-access"],
+  [class*="__immediate"],
+  [class*="__utility"],
+  [class*="__training"],
+  [class*="__rpg"],
+  [class*="__insight"]
+) {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-3-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  box-shadow: var(--glass-3-shadow);
+}
+
+/* Los elementos internos de una tarjeta no duplican vidrio. */
+.app-shell[data-role="player"] .shell-content :is([class*="__panel"], [class*="__card"], [class*="__hero"], [class*="__stage"], [class*="__roster"]) :is(
+  [class*="__card"],
+  [class*="__list-item"],
+  [class*="__record"],
+  [class*="__insight"],
+  [class*="__video"]
+) {
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  background: var(--glass-1-surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Escena decorativa del home fuera de juego */
+.app-shell[data-role="player"] .player-home__scene { display: none; }
+
+/* Textos y acentos neutros */
+.app-shell[data-role="player"] .shell-content { color: var(--jg-text); }
+
+.app-shell[data-role="player"] .shell-content :is(h1, h2, h3, strong, th) { color: var(--jg-text); }
+
+.app-shell[data-role="player"] .shell-content :is([class*="__eyebrow"], [class*="eyebrow"], .section-label) {
+  color: var(--jg-text-dim);
+  letter-spacing: 0.16em;
+}
+
+/* Botones y CTAs en píldora de vidrio */
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__cta"],
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__next-action"],
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__action"],
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__toggle"] {
+  border-radius: 999px;
+  border: 1px solid var(--glass-border-strong);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  color: var(--jg-text);
+  box-shadow: var(--glass-1-shadow);
+  transition: background-color var(--motion-ui) ease, transform var(--motion-press) ease;
+}
+
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__cta"]:hover,
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__next-action"]:hover,
+.app-shell[data-role="player"] .shell-content :is(a, button)[class*="__action"]:hover {
+  background: var(--glass-3-surface);
+  transform: translateY(-1px);
+}
+
+/* Enlaces de texto neutros */
+.app-shell[data-role="player"] .shell-content [class*="__text-link"] { color: var(--jg-text); }
+
+/* ---------- Páginas con utilidades Tailwind (ranking, games, coins, pet, racha,
+   notifications, teams, learn, domain-readonly) ---------- */
+
+/* Este bloque no está en @layer, por lo que gana a las utilidades Tailwind. */
+.app-shell[data-role="player"] .shell-content :is(.rounded-3xl, .rounded-2xl, .rounded-xl, .rounded-lg)[class*="bg-"],
+.app-shell[data-role="player"] .shell-content :is(.rounded-3xl, .rounded-2xl)[class*="ring-"],
+.app-shell[data-role="player"] .shell-content .rounded-3xl.bg-white {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  box-shadow: var(--glass-2-shadow);
+}
+
+.app-shell[data-role="player"] .shell-content :is(.rounded-2xl, .rounded-lg)[class*="border"] {
+  border-color: var(--glass-border);
+  background: var(--glass-1-surface);
+}
+
+/* Badges en píldora de vidrio */
+.app-shell[data-role="player"] .shell-content .rounded-full[class*="border"] {
+  border-color: var(--glass-border-strong);
+  background: var(--glass-2-surface);
+}
+
+.app-shell[data-role="player"] .shell-content .rounded-full.bg-green-500 {
+  background: var(--jg-badge);
+  color: var(--jg-badge-on);
+}
+
+/* Tiles blancos (iconos) convertidos a vidrio */
+.app-shell[data-role="player"] .shell-content .bg-white {
+  background: var(--jg-tile);
+  color: var(--jg-text);
+}
+
+/* Enlaces tipo lista de juegos (group + hover) */
+.app-shell[data-role="player"] .shell-content a.group[class*="rounded"] {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  box-shadow: var(--glass-2-shadow);
+}
+
+/* Tabs / pestañas */
+.app-shell[data-role="player"] .shell-content [class*="__tabs"] button,
+.app-shell[data-role="player"] .shell-content [class*="-tabs"] button {
+  border-radius: 999px;
+}
+
+/* Barras de progreso y scrollbars discretos */
+.app-shell[data-role="player"] .shell-content :is([class*="__bar"], [class*="__progress-fill"], [class*="__progress"], [role="progressbar"])::-webkit-progress-bar { background: var(--jg-track); }
+
+.app-shell[data-role="player"] .shell-content ::-webkit-scrollbar { width: 6px; height: 6px; }
+.app-shell[data-role="player"] .shell-content ::-webkit-scrollbar-thumb { background: var(--jg-scrollbar); border-radius: 999px; }
+.app-shell[data-role="player"] .shell-nav { scrollbar-color: var(--jg-scrollbar) transparent; }

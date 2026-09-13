@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { GlassCard } from "@glinui/ui";
 import { NavigationIcon } from "@/components/shell/navigation-icon";
 import type { NavigationIcon as NavigationIconName } from "@/lib/shell/navigation";
 import { PlayerEvolutionPreview, type PlayerHomeEvolution } from "@/components/player/player-evolution-preview";
@@ -117,11 +118,11 @@ function CardPreview({ card, rpg }: { card?: PlayerDashboardCard; rpg?: PlayerRp
   const ctaLabel = card?.ctaLabel ?? (earned ? "Ver mi colección" : "Ver progreso");
   const href = card?.href ?? "/jugador/progress";
   return (
-    <section className="player-home-130c__card-slot" data-card-state={state} aria-labelledby="player-home-card-title">
+    <GlassCard className="player-home-130c__card-slot" data-card-state={state} aria-labelledby="player-home-card-title">
       <div className="player-home-130c__card-heading"><div><span className="player-home-130c__eyebrow">{eyebrow}</span><h2 id="player-home-card-title">Tu colección sigue creciendo.</h2></div><span className="player-home-130c__card-state">{badge}</span></div>
       <div className="player-home-130c__card-body"><div className="player-home-130c__card-art">{card?.art ? <CardArtwork card={card} /> : <span><CollectionIcon /></span>}</div><div className="player-home-130c__card-copy"><span>{rarity} · {category}</span><strong>{title}</strong><p>{reason}</p>{!earned && rpg ? <small>{rpg.streakProgress}% hacia tu próximo hito · {Math.max(0, rpg.nextMilestone - rpg.streakCurrent)} días por completar</small> : null}</div></div>
       <Link href={href} className="player-home-130c__text-link player-home-130h__text-link">{ctaLabel}<ArrowIcon /></Link>
-    </section>
+    </GlassCard>
   );
 }
 
@@ -129,7 +130,7 @@ function VideoPreview({ video }: { video?: PlayerDashboardVideo }) {
   const state = video?.state ?? "empty";
   const ctaLabel = video?.completionPercent && video.completionPercent > 0 ? "Continuar video" : "Ver video";
   return (
-    <section className="player-home-130c__video" aria-labelledby="player-home-video-title" data-video-state={state}>
+    <GlassCard className="player-home-130c__video" aria-labelledby="player-home-video-title" data-video-state={state}>
       <div className="player-home-130c__section-heading"><div><span className="player-home-130c__eyebrow">PARA MEJORAR TU JUEGO</span><h2 id="player-home-video-title">Un foco para hoy.</h2></div><span className="player-home-130c__section-note">Contenido aprobado</span></div>
       {video && state === "available" ? (
         <Link href={video.href ?? "#"} className="player-home-130c__video-link">
@@ -156,7 +157,7 @@ function VideoPreview({ video }: { video?: PlayerDashboardVideo }) {
       ) : (
         <p className="player-home-130c__empty">Aún no tienes un video recomendado.</p>
       )}
-    </section>
+    </GlassCard>
   );
 }
 
@@ -205,10 +206,10 @@ export function PlayerDashboard({ name, avatarUrl, position, scopeLabel, evoluti
 
           <div className="player-home-130c__message player-home-130h__message"><span className="player-home-130c__eyebrow">TU CAMINO DE CRACK</span><h1 id="player-home-title">Tu partido empieza aquí.</h1><p>Entrena, aprende y sigue construyendo tu camino.</p></div>
 
-          <section className="player-home-130c__next player-home-130h__next" data-next-step={nextStep.kind} aria-labelledby="next-step-title">
+          <GlassCard className="player-home-130c__next player-home-130h__next" data-next-step={nextStep.kind} aria-labelledby="next-step-title">
             <div><span className="player-home-130c__eyebrow">TU SIGUIENTE PASO</span><h2 id="next-step-title">{nextStep.title}</h2><p>{nextStep.description}</p></div>
             <Link href={nextStep.href} className="player-home-130c__primary-cta player-home-130h__primary-cta"><span>{nextStep.actionLabel}</span><ArrowIcon /></Link>
-          </section>
+          </GlassCard>
 
           <nav className="player-home-130c__quick-access player-home-130h__quick-access" aria-label="Accesos rápidos">
             {quickAccess.map((item) => (
