@@ -42,7 +42,9 @@ export default async function Page() {
     },
   });
 
+  const teamId = membership?.team?.id ?? "";
   const teamName = membership?.team?.name ?? "";
+
   const members: TeamMemberData[] = membership
     ? membership.team.members.map((m) => ({
         id: m.user.id,
@@ -60,7 +62,7 @@ export default async function Page() {
 
   return (
     <div className="space-y-6">
-      <EquipoView teamName={teamName} members={members} />
+      <EquipoView teamId={teamId} teamName={teamName} members={members} />
     </div>
   );
 }
