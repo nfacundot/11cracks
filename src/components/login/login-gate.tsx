@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LoginForm } from "@/components/forms/login-form";
 import { RegisterForm } from "@/components/forms/register-form";
@@ -18,6 +19,23 @@ function CloseIcon() {
 export function LoginGate() {
   const [sheet, setSheet] = useState<SheetMode>(null);
   const open = sheet !== null;
+  const router = useRouter();
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/session", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        if (data?.authenticated && data.home) {
+          router.replace(data.home);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   return (
     <>
