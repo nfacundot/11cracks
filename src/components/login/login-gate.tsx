@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { SplashScreen } from "@/components/splash-screen";
 import { LoginForm } from "@/components/forms/login-form";
 import { RegisterForm } from "@/components/forms/register-form";
 
@@ -22,8 +21,6 @@ export function LoginGate() {
 
   return (
     <>
-      <SplashScreen />
-
       <div className="login-gate">
         <div className="login-gate__hero" role="presentation" />
         <div className="login-gate__scrim" role="presentation" />

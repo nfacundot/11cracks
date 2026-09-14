@@ -8,6 +8,7 @@ import "./globals.css";
 import { PwaRegister } from "@/components/pwa-register";
 import { LessonLoaderGlobal } from "@/components/lesson-loader";
 import { InlineScript } from "@/components/inline-script";
+import { SplashScreen } from "@/components/splash-screen";
 
 const barlow = Barlow_Condensed({
   variable: "--font-barlow",
@@ -72,6 +73,7 @@ export default function RootLayout({
         <PwaRegister />
         <LessonLoaderGlobal />
         {children}
+        <SplashScreen />
         <div id="overlay-root" />
       </body>
     </html>
