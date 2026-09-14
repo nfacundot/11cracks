@@ -36,14 +36,7 @@ export default async function LoginPage() {
               <span className="login-energy-trace" aria-hidden="true" />
 
               <div className="login-brand-row">
-                <div className="login-intro">
-                  <h1 id="login-heading">
-                    <span>Entra en</span>
-                    <span>tu mundo</span>
-                  </h1>
-                  <p>Tu próximo paso empieza aquí.</p>
-                </div>
-                <div className="login-brand login-brand--inline">
+                <div className="login-brand login-brand--inline login-brand--hero">
                   <Image
                     src="/brand/11-cracks.svg"
                     alt="11 Cracks"
@@ -52,6 +45,13 @@ export default async function LoginPage() {
                     priority
                   />
                   <span className="login-brand__signal" aria-hidden="true" />
+                </div>
+                <div className="login-intro">
+                  <h1 id="login-heading">
+                    <span>Entra en</span>
+                    <span>tu mundo</span>
+                  </h1>
+                  <p>Tu próximo paso empieza aquí.</p>
                 </div>
               </div>
 
