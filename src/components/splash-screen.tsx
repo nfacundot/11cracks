@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const GIF_URL = "/img/icons/introder.gif";
-const INTRO_MS = 8000;
-const INTRO_BUFFER_MS = 300;
+const SPLASH_URL = "/img/back/splasher1.png";
+const SHOW_MS = 1500;
 
 export function SplashScreen({ onDone }: { onDone?: () => void }) {
   const [hidden, setHidden] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
 
@@ -23,31 +21,23 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
 
   useEffect(() => {
     if (!isMobile) return;
-    if (!imgLoaded) return;
     const finish = () => {
       setHidden(true);
       doneRef.current?.();
     };
-    const timer = setTimeout(finish, INTRO_MS + INTRO_BUFFER_MS);
+    const timer = setTimeout(finish, SHOW_MS);
     return () => clearTimeout(timer);
-  }, [isMobile, imgLoaded]);
-
-  const handleError = () => {
-    setHidden(true);
-    doneRef.current?.();
-  };
+  }, [isMobile]);
 
   if (hidden || !isMobile) return null;
 
   return (
     <div className="fixed inset-0 z-[100] bg-black" style={{ pointerEvents: "none" }}>
       <img
-        src={GIF_URL}
+        src={SPLASH_URL}
         alt=""
         className="h-full w-full object-cover"
         draggable={false}
-        onLoad={() => setImgLoaded(true)}
-        onError={handleError}
       />
     </div>
   );
