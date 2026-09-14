@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { restoreSession } from "@/actions/auth";
 import { LoginForm } from "@/components/forms/login-form";
 import { RegisterForm } from "@/components/forms/register-form";
+import { snapshotStoredToken, clearStoredToken } from "@/lib/session-client";
 
 type SheetMode = "login" | "register" | null;
 
@@ -23,15 +25,43 @@ export function LoginGate() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/session", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (cancelled) return;
-        if (data?.authenticated && data.home) {
-          router.replace(data.home);
+
+    async function checkOrRestore() {
+      const token = snapshotStoredToken();
+      let data: { authenticated: boolean; home?: string } | null = null;
+      try {
+        const res = await fetch("/api/session", { cache: "no-store" });
+        data = res.ok ? await res.json() : null;
+      } catch {}
+
+      let home = data?.home ?? null;
+      let restoreFailed = false;
+
+      if (!data?.authenticated && token) {
+        try {
+          const state = await restoreSession(token);
+          if (state?.home) home = state.home;
+          else {
+            restoreFailed = true;
+            clearStoredToken();
+          }
+        } catch {
+          restoreFailed = true;
+          clearStoredToken();
         }
-      })
-      .catch(() => {});
+        if (!restoreFailed && home) {
+          data = { authenticated: true, home };
+        }
+      }
+
+      if (cancelled) return;
+      if (data?.authenticated && home) {
+        router.replace(home);
+      }
+    }
+
+    checkOrRestore();
+
     return () => {
       cancelled = true;
     };

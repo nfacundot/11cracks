@@ -7,6 +7,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export const SESSION_COOKIE = "11cracks_session";
+export const TOKEN_COOKIE = "11cracks_token";
+export const LOGOUT_COOKIE = "11cracks_logged_out";
 
 export const PROTECTED_EMAILS = ["superadmin@gmail.com", "admin@gmail.com"];
 
@@ -41,11 +43,29 @@ export async function setSessionCookie(token: string) {
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
+  // Réplica legible para que el cliente pueda guardarla como respaldo
+  // cuando el WebView nativo pierde las cookies (cierre de la app).
+  cookieStore.set(TOKEN_COOKIE, token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30,
+    path: "/",
+  });
 }
 
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);
+  cookieStore.delete(TOKEN_COOKIE);
+  // Marca para que el cliente borre su respaldo local tras un logout.
+  cookieStore.set(LOGOUT_COOKIE, "1", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60,
+    path: "/",
+  });
 }
 
 export async function getSessionToken(): Promise<string | null> {

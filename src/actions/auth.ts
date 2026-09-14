@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import {
   comparePassword,
   hashPassword,
+  verifyToken,
   signToken,
   setSessionCookie,
   clearSessionCookie,
@@ -13,7 +14,7 @@ import {
 } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
 
-export type AuthState = { error?: string; success?: string; userId?: string; userName?: string } | undefined;
+export type AuthState = { error?: string; success?: string; userId?: string; userName?: string; home?: string } | undefined;
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "El nombre debe tener al menos 2 caracteres").max(50),
@@ -97,6 +98,23 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 export async function activateAccount(userId: string) {
   await setSessionCookie(signToken({ id: userId }));
   redirect(homeForRole("JUGADOR"));
+}
+
+export async function restoreSession(token: string): Promise<AuthState> {
+  if (!token) return { error: "Sin sesión para restaurar" };
+
+  const payload = verifyToken(token);
+  if (!payload) return { error: "Sesión expirada" };
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { id: true, role: true },
+  });
+  if (!user) return { error: "Cuenta no encontrada" };
+
+  await setSessionCookie(signToken({ id: user.id }));
+
+  return { success: "Sesión restaurada", home: homeForRole(user.role) };
 }
 
 export async function logout() {
