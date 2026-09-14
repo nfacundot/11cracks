@@ -246,6 +246,28 @@ html.light .app-shell[data-role="player"] .role-atmosphere__light {
   box-shadow: var(--glass-5-shadow);
 }
 
+/* Respiro inferior: el contenido nunca queda tapado por el dock flotante */
+.app-shell[data-role="player"] .shell-content {
+  padding-bottom: calc(var(--shell-mobile-dock-height) + 3.4rem + env(safe-area-inset-bottom));
+}
+
+/* Desvanecido debajo del contenido para separar del dock */
+.app-shell[data-role="player"] .shell-main::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 3rem;
+  margin-top: -3rem;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.34), transparent);
+}
+
+html.light .app-shell[data-role="player"] .shell-main::after {
+  background: linear-gradient(0deg, rgba(40, 40, 60, 0.14), transparent);
+}
+
 .app-shell[data-role="player"] .shell-dock::before { display: none; }
 
 .app-shell[data-role="player"] .shell-dock .shell-nav__link {
@@ -405,6 +427,53 @@ html.light .app-shell[data-role="player"] .role-atmosphere__light {
 .app-shell[data-role="player"] .shell-content .bg-white {
   background: var(--jg-tile);
   color: var(--jg-text);
+}
+
+/* Pills suaves (bg-white/xx, bg-emerald-*, bg-zinc-*, dark:bg-*) → vidrio */
+.app-shell[data-role="player"] .shell-content .rounded-full[class*="bg-white/"],
+.app-shell[data-role="player"] .shell-content .rounded-full[class*="bg-emerald"],
+.app-shell[data-role="player"] .shell-content .rounded-full[class*="bg-zinc"] {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-2-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-2-blur));
+  box-shadow: var(--glass-1-shadow);
+  color: var(--jg-text);
+}
+
+/* Inputs / selects de los formularios jugador → vidrio */
+.app-shell[data-role="player"] .shell-content :is(input, select, textarea)[class*="rounded"],
+.app-shell[data-role="player"] .shell-content [class*="-input"],
+.app-shell[data-role="player"] .shell-content [class*="-field"] {
+  border: 1px solid var(--glass-border-strong);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-1-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-1-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-1-blur));
+  color: var(--jg-text);
+}
+
+/* Sheets / bottom-sheets / dialogs dentro del scope jugador */
+.app-shell[data-role="player"] .shell-content :is([class*="__sheet"], [class*="__dialog"], [class*="__modal"]):is([class*="rounded"], [class*="bg-"]),
+.app-shell[data-role="player"] .shell-content .animate-sheet-up {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-4-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-4-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-4-blur));
+  box-shadow: var(--glass-4-shadow);
+  color: var(--jg-text);
+}
+
+/* Avisos y cartas de popup (rounded-full icono) */
+.app-shell[data-role="player"] .shell-content .animate-pop:is([class*="bg-white"], [class*="bg-emerald"]) {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  background: var(--glass-3-surface);
+  backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate)) blur(var(--glass-3-blur));
+  box-shadow: var(--glass-3-shadow);
 }
 
 /* Enlaces tipo lista de juegos (group + hover) */
