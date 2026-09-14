@@ -7,9 +7,9 @@ html.dark .login-page {
   --glass-border: rgb(255 255 255 / 0.1);
   --glass-border-strong: rgb(255 255 255 / 0.18);
   --glass-refraction-top: rgb(255 255 255 / 0.15);
-  --glass-surface-1: rgb(0 0 0 / 0.3);
-  --glass-surface-2: rgb(0 0 0 / 0.42);
-  --glass-surface-3: rgb(0 0 0 / 0.52);
+  --glass-surface-1: rgb(0 0 0 / 0.36);
+  --glass-surface-2: rgb(0 0 0 / 0.46);
+  --glass-surface-3: rgb(0 0 0 / 0.72);
   --lg-text: #f4f4f5;
   --lg-text-dim: rgba(244, 244, 245, 0.62);
   --lg-text-muted: rgba(244, 244, 245, 0.5);
@@ -17,8 +17,8 @@ html.dark .login-page {
   --lg-accent-soft: rgba(255, 255, 255, 0.86);
   --lg-track: rgba(255, 255, 255, 0.08);
   --lg-focus: rgba(255, 255, 255, 0.55);
-  --lg-input-bg: rgb(255 255 255 / 0.06);
-  --lg-hover-bg: rgba(255, 255, 255, 0.08);
+  --lg-input-bg: rgb(255 255 255 / 0.1);
+  --lg-hover-bg: rgba(255, 255, 255, 0.12);
   color-scheme: dark;
 }
 
@@ -26,18 +26,18 @@ html.light .login-page {
   --glass-border: rgb(255 255 255 / 0.55);
   --glass-border-strong: rgb(255 255 255 / 0.75);
   --glass-refraction-top: rgb(255 255 255 / 0.95);
-  --glass-surface-1: rgb(255 255 255 / 0.42);
-  --glass-surface-2: rgb(255 255 255 / 0.55);
-  --glass-surface-3: rgb(255 255 255 / 0.68);
+  --glass-surface-1: rgb(255 255 255 / 0.6);
+  --glass-surface-2: rgb(255 255 255 / 0.68);
+  --glass-surface-3: rgb(255 255 255 / 0.82);
   --lg-text: #1c1c22;
-  --lg-text-dim: rgba(28, 28, 34, 0.65);
-  --lg-text-muted: rgba(28, 28, 34, 0.5);
+  --lg-text-dim: rgba(28, 28, 34, 0.72);
+  --lg-text-muted: rgba(28, 28, 34, 0.58);
   --lg-accent: #0f172a;
   --lg-accent-soft: rgba(15, 23, 42, 0.86);
-  --lg-track: rgba(15, 15, 30, 0.1);
-  --lg-focus: rgba(15, 23, 42, 0.5);
-  --lg-input-bg: rgb(255 255 255 / 0.5);
-  --lg-hover-bg: rgba(255, 255, 255, 0.75);
+  --lg-track: rgba(15, 15, 30, 0.12);
+  --lg-focus: rgba(15, 23, 42, 0.6);
+  --lg-input-bg: rgb(255 255 255 / 0.65);
+  --lg-hover-bg: rgba(255, 255, 255, 0.85);
   color-scheme: light;
 }
 
@@ -78,8 +78,8 @@ html.light .login-page .login-content.login-panel {
     var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)),
     inset 0 1px 0 var(--lg-accent-soft),
     inset 0 -1px 0 rgb(255 255 255 / 0.05);
-  backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-4-blur, 24px));
-  -webkit-backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-4-blur, 24px));
+  backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(28px);
+  -webkit-backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(28px);
 }
 
 html.dark .login-page .login-content.login-panel::before,
