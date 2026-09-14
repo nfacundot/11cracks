@@ -1,0 +1,294 @@
+/* Rediseño glin (Liquid Glass) del Inicio /jugador: cristal esmerilado sobre
+   la imagen de fondo, tarjetas de vidrio con iluminación ambiental, botones
+   de vidrio con blur intenso y glow neón en iconos/nav activa. Solo cambia la
+   piel; no altera la estructura del componente ni el layout del shell.
+   Uniforme en mobile y PC. */
+
+.app-shell[data-role="player"] .player-home:is(.player-home-130c, .player-home-130h) {
+  /* Ambient light suave, difusa, sobre todo el home */
+  --home-glin-ambient: radial-gradient(56% 42% at 24% 0%, color-mix(in oklch, var(--brand-gold) 9%, transparent), transparent 72%),
+    radial-gradient(42% 34% at 88% 14%, color-mix(in oklch, var(--context-neurocracks) 10%, transparent), transparent 74%),
+    radial-gradient(60% 48% at 50% 108%, color-mix(in oklch, var(--context-progress) 7%, transparent), transparent 76%);
+}
+
+/* ─── Fondo: la imagen es visible a través del cristal esmerilado ─── */
+.app-shell[data-role="player"] .player-home-130h .player-home__scene-image,
+.app-shell[data-role="player"] .player-home-130c .player-home__scene-image {
+  filter: saturate(1.05) contrast(1.06) brightness(0.88) blur(1.2rem) scale(1.12);
+  opacity: 0.85;
+}
+
+/* Grade más translúcido para dejar ver el fondo borroso */
+.app-shell[data-role="player"] .player-home-130h .player-home__scene-grade,
+.app-shell[data-role="player"] .player-home-130c .player-home__scene-grade {
+  background:
+    linear-gradient(180deg, color-mix(in oklch, #0a0a0d 34%, transparent) 0%, transparent 55%, color-mix(in oklch, #0a0a0d 62%, transparent) 100%),
+    linear-gradient(90deg, color-mix(in oklch, #0a0a0d 55%, transparent) 0%, transparent 70%);
+  opacity: 1;
+}
+
+html.light .app-shell[data-role="player"] .player-home-130h .player-home__scene-grade,
+html.light .app-shell[data-role="player"] .player-home-130c .player-home__scene-grade {
+  background:
+    linear-gradient(180deg, color-mix(in oklch, #d7d8e0 44%, transparent) 0%, transparent 55%, color-mix(in oklch, #d7d8e0 72%, transparent) 100%),
+    linear-gradient(90deg, color-mix(in oklch, #d7d8e0 66%, transparent) 0%, transparent 72%);
+}
+
+/* Depth: luz ambiental difusa sobre la escena */
+.app-shell[data-role="player"] .player-home-130h .player-home__scene-depth,
+.app-shell[data-role="player"] .player-home-130c .player-home__scene-depth {
+  background: var(--home-glin-ambient);
+  box-shadow: inset 0 0 9rem color-mix(in oklch, #000 22%, transparent);
+}
+
+html.light .app-shell[data-role="player"] .player-home-130h .player-home__scene-depth,
+html.light .app-shell[data-role="player"] .player-home-130c .player-home__scene-depth {
+  box-shadow: inset 0 0 9rem color-mix(in oklch, #fff 26%, transparent);
+}
+
+/* ─── Superficie glass base reutilizable ─── */
+.app-shell[data-role="player"] .player-home-130h :is(
+  .player-evolution,
+  .player-home-130h__hud > div,
+  .player-home-130h__training,
+  .player-home-130h__next,
+  .player-home-130h__message,
+  .player-home-130c__card-slot,
+  .player-home-130c__video,
+  .player-home-130c__pending
+) {
+  --glin-surface: border-box;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--glass-border, rgb(255 255 255 / 0.1));
+  border-top-color: var(--glass-refraction-top, rgb(255 255 255 / 0.15));
+  background:
+    linear-gradient(150deg, color-mix(in oklch, #fff 7%, transparent), transparent 46%),
+    var(--glass-3-surface, rgb(0 0 0 / 0.4));
+  background-origin: var(--glin-surface);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.45)), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  backdrop-filter: saturate(180%) blur(26px);
+  -webkit-backdrop-filter: saturate(180%) blur(26px);
+}
+
+/* Refracción superior + pincelada de luz ambiental dentro de cada panel */
+.app-shell[data-role="player"] .player-home-130h :is(
+  .player-evolution,
+  .player-home-130h__hud > div,
+  .player-home-130h__training,
+  .player-home-130h__next,
+  .player-home-130h__message,
+  .player-home-130c__card-slot,
+  .player-home-130c__video,
+  .player-home-130c__pending
+)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(66% 52% at 18% 0%, rgb(255 255 255 / 0.1), transparent 62%),
+    radial-gradient(52% 40% at 88% 96%, color-mix(in oklch, var(--brand-gold) 11%, transparent), transparent 70%);
+  border-radius: inherit;
+}
+
+html.light .app-shell[data-role="player"] .player-home-130h :is(
+  .player-evolution,
+  .player-home-130h__hud > div,
+  .player-home-130h__training,
+  .player-home-130h__next,
+  .player-home-130h__message,
+  .player-home-130c__card-slot,
+  .player-home-130c__video
+)::after {
+  background:
+    radial-gradient(66% 52% at 18% 0%, rgb(255 255 255 / 0.85), transparent 62%),
+    radial-gradient(52% 40% at 88% 96%, color-mix(in oklch, var(--brand-gold) 16%, transparent), transparent 70%);
+}
+
+/* ─── Aviso / mensaje central ─── */
+.app-shell[data-role="player"] .player-home-130h .player-home-130h__message {
+  background:
+    linear-gradient(150deg, color-mix(in oklch, #fff 5%, transparent), transparent 50%),
+    var(--glass-2-surface, rgb(0 0 0 / 0.3));
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  padding: clamp(1.1rem, 2.4vw, 1.8rem) clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--jg-radius, 1.5rem);
+}
+
+/* ─── HUD: tiles de estadísticas como vidrio translúcido ─── */
+.app-shell[data-role="player"] .player-home-130h__hud > div {
+  border-radius: 1.1rem;
+  padding: .85rem .9rem;
+  background:
+    linear-gradient(150deg, color-mix(in oklch, #fff 6%, transparent), transparent 48%),
+    var(--glass-2-surface, rgb(0 0 0 / 0.3));
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+}
+
+/* Racha → píldora roja translúcida (estilo "En vivo") */
+.app-shell[data-role="player"] .player-home-130h__hud > div:first-child {
+  border: 1px solid color-mix(in oklch, #ff3b30 42%, transparent);
+  border-top-color: color-mix(in oklch, #ff5a4d 62%, transparent);
+  background:
+    linear-gradient(150deg, color-mix(in oklch, #ff3b30 16%, transparent), transparent 52%),
+    color-mix(in oklch, #2a0502 40%, transparent);
+  box-shadow: 0 12px 34px color-mix(in oklch, #ff3b30 22%, transparent), inset 0 1px 0 rgb(255 255 255 / 0.14);
+}
+
+.app-shell[data-role="player"] .player-home-130h__hud > div:first-child strong {
+  color: #ff6a5e;
+  text-shadow: 0 0 0.9rem color-mix(in oklch, #ff3b30 45%, transparent);
+}
+
+.app-shell[data-role="player"] .player-home-130h__hud > div:first-child span::before {
+  content: "";
+  display: inline-block;
+  width: .45rem;
+  height: .45rem;
+  margin-right: .35rem;
+  border-radius: 50%;
+  background: #ff3b30;
+  box-shadow: 0 0 0.55rem #ff3b30;
+  animation: glin-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes glin-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .55; transform: scale(.78); }
+}
+
+/* ─── Siguiente paso: tarjeta vidrio + CTA de cristal claro ─── */
+.app-shell[data-role="player"] .player-home-130h__next {
+  border-radius: var(--jg-radius-lg, 1.875rem);
+  padding: clamp(1.2rem, 2.6vw, 1.9rem);
+}
+
+.app-shell[data-role="player"] .player-home-130h__primary-cta {
+  border: 1px solid color-mix(in oklch, #fff 30%, transparent);
+  border-top-color: #fff7;
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.08));
+  backdrop-filter: saturate(190%) blur(14px);
+  -webkit-backdrop-filter: saturate(190%) blur(14px);
+  color: #fff;
+  font-family: var(--font-barlow), sans-serif;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.24);
+  transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+
+.app-shell[data-role="player"] .player-home-130h__primary-cta:hover {
+  background: linear-gradient(160deg, rgb(255 255 255 / 0.26), rgb(255 255 255 / 0.12));
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.3);
+  transform: translateY(-1px);
+}
+
+/* ─── Accesos rápidos: botones de cristal claro con icono neón ─── */
+.app-shell[data-role="player"] .player-home-130h__quick-access a {
+  border: 1px solid var(--glass-border-strong, rgb(255 255 255 / 0.18));
+  border-top-color: var(--glass-refraction-top, rgb(255 255 255 / 0.15));
+  border-radius: 1.25rem;
+  background: linear-gradient(150deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.05));
+  backdrop-filter: saturate(190%) blur(14px);
+  -webkit-backdrop-filter: saturate(190%) blur(14px);
+  box-shadow: var(--glass-2-shadow, 0 8px 24px rgba(0, 0, 0, 0.38)), inset 0 1px 0 rgb(255 255 255 / 0.14);
+  transition: transform .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+
+.app-shell[data-role="player"] .player-home-130h__quick-access a:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.45)), inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+
+/* Glow neón en el icono de cada acceso */
+.app-shell[data-role="player"] .player-home-130h__quick-access a > span {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid color-mix(in oklch, var(--quick-tone) 45%, transparent);
+  border-radius: 0.9rem;
+  background: color-mix(in oklch, var(--quick-tone) 13%, transparent);
+  color: var(--quick-tone);
+  filter: drop-shadow(0 0 0.4rem color-mix(in oklch, var(--quick-tone) 42%, transparent));
+}
+
+.app-shell[data-role="player"] .player-home-130h__quick-access a > span svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+/* ─── Tarjetas secundarias (colección y video): vidrio con luz ambiental ─── */
+.app-shell[data-role="player"] .player-home-130h__secondary-grid .player-home-130c__card-slot,
+.app-shell[data-role="player"] .player-home-130h__secondary-grid .player-home-130c__video {
+  border: 1px solid var(--glass-border, rgb(255 255 255 / 0.1));
+  border-top-color: var(--glass-refraction-top, rgb(255 255 255 / 0.15));
+  border-radius: var(--jg-radius-lg, 1.875rem);
+  background:
+    linear-gradient(150deg, color-mix(in oklch, #fff 7%, transparent), transparent 46%),
+    var(--glass-3-surface, rgb(0 0 0 / 0.4));
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.45)), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  backdrop-filter: saturate(180%) blur(26px);
+  -webkit-backdrop-filter: saturate(180%) blur(26px);
+}
+
+/* Artwork de la carta: panel interno transparente sin redisponer */
+.app-shell[data-role="player"] .player-home-130c__card-art {
+  border: 1px solid var(--glass-border, rgb(255 255 255 / 0.1));
+  border-radius: 1.2rem;
+  background: color-mix(in oklch, #000 40%, transparent);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+}
+
+/* ─── Riel de navegación (PC): glow neón en la sección activa ─── */
+.app-shell[data-role="player"] .shell-rail .shell-nav__link[data-active="true"] .shell-nav__icon {
+  filter: drop-shadow(0 0 0.4rem color-mix(in oklch, var(--brand-gold) 52%, transparent));
+}
+
+/* ─── Texto sobre vidrio: siempre legible ─── */
+.app-shell[data-role="player"] .player-home-130h .player-evolution__copy h2,
+.app-shell[data-role="player"] .player-home-130h__message h1 {
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.5);
+}
+
+html.light .app-shell[data-role="player"] .player-home-130h .player-evolution__copy h2,
+html.light .app-shell[data-role="player"] .player-home-130h__message h1 {
+  text-shadow: 0 1px 18px rgb(255 255 255 / 0.5);
+}
+
+/* ─── Uniformidad: mismos radios/espacios en mobile y PC ─── */
+.app-shell[data-role="player"] .player-home-130h__canvas {
+  padding: clamp(1.1rem, 2.8vw, 2.4rem) clamp(1.1rem, 3.4vw, 3.4rem) calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+.app-shell[data-role="player"] .player-home-130h__hero {
+  gap: 1rem;
+  grid-template-columns: minmax(0, 57%);
+}
+
+.app-shell[data-role="player"] .player-home-130h__secondary-grid {
+  gap: 2.6rem;
+}
+
+@media (max-width: 63.9375rem) {
+  .app-shell[data-role="player"] .player-home-130h__hero { grid-template-columns: minmax(0, 1fr); }
+  .app-shell[data-role="player"] .player-home-130h__secondary-grid { gap: 2rem; }
+  .app-shell[data-role="player"] .player-home-130h__hud > div { padding: .7rem .65rem; }
+  .app-shell[data-role="player"] .player-home-130h__quick-access a { min-height: 4rem; }
+}
+
+/* Ajuste fino mobile muy pequeño */
+@media (max-width: 24rem) {
+  .app-shell[data-role="player"] .player-home-130h__hud { grid-template-columns: 1fr; }
+}

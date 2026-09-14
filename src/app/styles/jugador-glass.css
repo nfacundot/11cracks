@@ -291,6 +291,16 @@ html.light .app-shell[data-role="player"] .shell-main::after {
   box-shadow: var(--glass-1-shadow);
 }
 
+/* Glow neón suave en el icono activo del dock */
+.app-shell[data-role="player"] .shell-dock .shell-nav__link[data-active="true"] .shell-nav__icon {
+  color: var(--jg-text);
+  filter: drop-shadow(0 0 0.45rem color-mix(in oklch, var(--brand-gold) 55%, transparent));
+}
+
+.app-shell[data-role="player"] .shell-dock .shell-nav__link[data-active="true"] .shell-nav__icon svg {
+  filter: drop-shadow(0 0 0.35rem color-mix(in oklch, var(--brand-gold) 60%, transparent));
+}
+
 /* ---------- Drawer móvil (vidrio) ---------- */
 
 .app-shell[data-role="player"] .shell-drawer__backdrop { background: var(--jg-backdrop); backdrop-filter: blur(0.4rem); }
