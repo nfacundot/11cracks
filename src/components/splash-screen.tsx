@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 const SPLASH_URL = "/splash/back/ui/programlogo.png";
-const SHOW_MS = 1500;
+const MIN_SHOW_MS = 800;
+const MAX_WAIT_MS = 8000;
 
 export function SplashScreen({ onDone }: { onDone?: () => void }) {
   const [hidden, setHidden] = useState(false);
@@ -21,12 +22,37 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
 
   useEffect(() => {
     if (!isMobile) return;
+    const startedAt = Date.now();
+
     const finish = () => {
+      const elapsed = Date.now() - startedAt;
+      // Asegura un mínimo visible sin depender del momento de carga.
+      const wait = Math.max(0, MIN_SHOW_MS - elapsed);
+      if (wait > 0) {
+        setTimeout(finish, wait);
+        return;
+      }
       setHidden(true);
       doneRef.current?.();
     };
-    const timer = setTimeout(finish, SHOW_MS);
-    return () => clearTimeout(timer);
+
+    let loaded = false;
+    const img = new window.Image();
+    img.onload = () => {
+      loaded = true;
+      finish();
+    };
+    img.onerror = finish;
+    img.src = SPLASH_URL;
+
+    // Respaldo por si la descarga se cuelga.
+    const maxTimer = setTimeout(finish, MAX_WAIT_MS);
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+      clearTimeout(maxTimer);
+    };
   }, [isMobile]);
 
   if (hidden || !isMobile) return null;
