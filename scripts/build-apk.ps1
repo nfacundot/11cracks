@@ -1,5 +1,5 @@
 param(
-  [string]$LanIp = ""
+  [string]$ServerUrl = "https://11cracks.vercel.app"
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,21 +9,12 @@ $sdk = "$env:LOCALAPPDATA\Android\Sdk"
 $adb = "$sdk\platform-tools\adb.exe"
 $gradle = Join-Path $root "android\gradlew.bat"
 
-if (-not $LanIp) {
-  $LanIp = Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue |
-    Where-Object { $_.IPAddress -notlike "127.*" -and $_.IPAddress -notlike "169.254.*" } |
-    Sort-Object { $_.InterfaceAlias -match "Wi-Fi" } -Descending |
-    Select-Object -First 1 -ExpandProperty IPAddress
-}
-
-if (-not $LanIp) { Write-Host "No se encontro IP. Usa: -LanIp 192.168.x.x" -ForegroundColor Red; exit 1 }
-
-Write-Host "== Compilando APK -> http://$LanIp`:3000 ==" -ForegroundColor Green
+Write-Host "== Compilando APK -> $ServerUrl ==" -ForegroundColor Green
 
 $env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot"
 $env:ANDROID_HOME = $sdk
 $env:ANDROID_SDK_ROOT = $sdk
-$env:LAN_IP = $LanIp
+$env:CAPACITOR_SERVER_URL = $ServerUrl
 
 Set-Location $root
 npx cap sync android

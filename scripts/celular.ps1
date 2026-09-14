@@ -23,6 +23,7 @@ Write-Host "== IP del servidor: $ip :3000 ==" -ForegroundColor Green
 
 # 1) Levantar el servidor Next.js accesible desde la red (0.0.0.0)
 $env:LAN_IP = $ip
+$env:CAPACITOR_MODE = "lan"
 $serverProc = Start-Process -FilePath "powershell" -ArgumentList "-NoProfile", "-Command", "cd '$root'; `$env:JAVA_HOME='C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot'; npm run dev -- -H 0.0.0.0" -WindowStyle Hidden -PassThru
 Write-Host "Servidor iniciado (PID $($serverProc.Id)). Esperando a que arranque..." -ForegroundColor Cyan
 

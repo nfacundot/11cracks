@@ -31,9 +31,9 @@ export function LoadingScreen({ bgPosition = "37% 20%" }: { bgPosition?: string 
       />
       <div className="relative z-10 flex flex-col items-center gap-5">
         <img
-          src="/img/emotes/11-crackslogta.svg"
+          src="/img/back/splasher1.png"
           alt="11Cracks"
-          className="h-17 w-auto animate-wiggle object-contain"
+          className="max-h-[46vh] w-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
         />
         <div className="flex flex-col items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#686862]">
