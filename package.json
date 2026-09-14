@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:https": "next dev -p 3443 --experimental-https",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "android": "powershell -ExecutionPolicy Bypass -File scripts/celular.ps1",
