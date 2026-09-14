@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const SPLASH_URL = "/img/back/splasher1.png";
+const SPLASH_URL = "/splash/back/ui/programlogo.png";
 const SHOW_MS = 1500;
 
 export function SplashScreen({ onDone }: { onDone?: () => void }) {
@@ -32,11 +32,11 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
   if (hidden || !isMobile) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black" style={{ pointerEvents: "none" }}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black" style={{ pointerEvents: "none" }}>
       <img
         src={SPLASH_URL}
         alt=""
-        className="h-full w-full object-cover"
+        className="max-h-full max-w-full object-contain"
         draggable={false}
       />
     </div>
