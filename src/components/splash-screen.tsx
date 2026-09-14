@@ -9,7 +9,7 @@ const INTRO_BUFFER_MS = 300;
 export function SplashScreen({ onDone }: { onDone?: () => void }) {
   const [hidden, setHidden] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [gifFailed, setGifFailed] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
 
@@ -18,25 +18,24 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
     const update = () => setIsMobile(mq.matches);
     update();
     mq.addEventListener("change", update);
-    return () => {
-      mq.removeEventListener("change", update);
-    };
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
     if (!isMobile) return;
-    if (gifFailed) {
-      setHidden(true);
-      doneRef.current?.();
-      return;
-    }
+    if (!imgLoaded) return;
     const finish = () => {
       setHidden(true);
       doneRef.current?.();
     };
     const timer = setTimeout(finish, INTRO_MS + INTRO_BUFFER_MS);
     return () => clearTimeout(timer);
-  }, [isMobile, gifFailed]);
+  }, [isMobile, imgLoaded]);
+
+  const handleError = () => {
+    setHidden(true);
+    doneRef.current?.();
+  };
 
   if (hidden || !isMobile) return null;
 
@@ -47,7 +46,8 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
         alt=""
         className="h-full w-full object-cover"
         draggable={false}
-        onError={() => setGifFailed(true)}
+        onLoad={() => setImgLoaded(true)}
+        onError={handleError}
       />
     </div>
   );
