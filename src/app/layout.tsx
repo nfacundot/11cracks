@@ -67,7 +67,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-[var(--font-barlow)]">
         <InlineScript
-          html={`(function(){try{var d=document.documentElement,s=null;try{s=localStorage.getItem("11cracks-theme")}catch(e){}var mq=window.matchMedia?window.matchMedia("(prefers-color-scheme: dark)"):null;var dark=s?s==="dark":(mq?mq.matches:true);var apply=function(v){d.classList.toggle("light",!v);d.classList.toggle("dark",v)};apply(dark);if(mq&&!s){var h=function(e){var t=null;try{t=localStorage.getItem("11cracks-theme")}catch(_){}if(t)return;apply(e.matches)};mq.addEventListener?mq.addEventListener("change",h):mq.addListener&&mq.addListener(h)}}catch(e){}})();`}
+          html={`(function(){try{var d=document.documentElement;function stored(){try{return localStorage.getItem("11cracks-theme")}catch(e){return null}}function apply(v){d.classList.toggle("light",!v);d.classList.toggle("dark",v)}function resolve(){var s=stored();if(s===null||s===""){var h=new Date().getHours();apply(h>=6&&h<19)}else{apply(s==="dark")}}resolve();setInterval(function(){if(stored())return;resolve()},60000)}catch(e){}})();`}
         />
         <PwaRegister />
         <LessonLoaderGlobal />

@@ -1,0 +1,296 @@
+/* Rediseño "Liquid Glass" para login/registro (Glin UI spec).
+   Modo noche = html.dark, modo día = html.light (resuelto automáticamente por
+   hora en el layout raíz). Solo cambia piel (colores/bordes/radio/glow),
+   conservando el layout y la semántica del flujo de autenticación. */
+
+html.dark .login-page {
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-border-strong: rgb(255 255 255 / 0.18);
+  --glass-refraction-top: rgb(255 255 255 / 0.15);
+  --glass-surface-1: rgb(0 0 0 / 0.3);
+  --glass-surface-2: rgb(0 0 0 / 0.42);
+  --glass-surface-3: rgb(0 0 0 / 0.52);
+  --lg-text: #f4f4f5;
+  --lg-text-dim: rgba(244, 244, 245, 0.62);
+  --lg-text-muted: rgba(244, 244, 245, 0.5);
+  --lg-accent: #ffffff;
+  --lg-accent-soft: rgba(255, 255, 255, 0.86);
+  --lg-track: rgba(255, 255, 255, 0.08);
+  --lg-focus: rgba(255, 255, 255, 0.55);
+  --lg-input-bg: rgb(255 255 255 / 0.06);
+  --lg-hover-bg: rgba(255, 255, 255, 0.08);
+  color-scheme: dark;
+}
+
+html.light .login-page {
+  --glass-border: rgb(255 255 255 / 0.55);
+  --glass-border-strong: rgb(255 255 255 / 0.75);
+  --glass-refraction-top: rgb(255 255 255 / 0.95);
+  --glass-surface-1: rgb(255 255 255 / 0.42);
+  --glass-surface-2: rgb(255 255 255 / 0.55);
+  --glass-surface-3: rgb(255 255 255 / 0.68);
+  --lg-text: #1c1c22;
+  --lg-text-dim: rgba(28, 28, 34, 0.65);
+  --lg-text-muted: rgba(28, 28, 34, 0.5);
+  --lg-accent: #0f172a;
+  --lg-accent-soft: rgba(15, 23, 42, 0.86);
+  --lg-track: rgba(15, 15, 30, 0.1);
+  --lg-focus: rgba(15, 23, 42, 0.5);
+  --lg-input-bg: rgb(255 255 255 / 0.5);
+  --lg-hover-bg: rgba(255, 255, 255, 0.75);
+  color-scheme: light;
+}
+
+/* ── Fondo: degradado monocromo difuso en lugar de foto de estadio ── */
+
+html.dark .login-page {
+  background:
+    radial-gradient(58% 44% at 18% 12%, rgba(120, 120, 132, 0.18), transparent 70%),
+    radial-gradient(50% 40% at 86% 8%, rgba(88, 88, 100, 0.14), transparent 72%),
+    radial-gradient(64% 52% at 50% 108%, rgba(140, 140, 152, 0.14), transparent 74%),
+    linear-gradient(168deg, #131316 0%, #0b0b0e 44%, #060608 100%);
+}
+
+html.light .login-page {
+  background:
+    radial-gradient(58% 44% at 18% 12%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(50% 40% at 86% 8%, rgba(214, 215, 226, 0.6), transparent 72%),
+    radial-gradient(64% 52% at 50% 108%, rgba(255, 255, 255, 0.7), transparent 74%),
+    linear-gradient(168deg, #ececf2 0%, #dcdee6 48%, #c9ccd6 100%);
+}
+
+html.dark .login-page .login-scene,
+html.light .login-page .login-scene {
+  display: none;
+}
+
+/* ── Panel principal: tarjeta Liquid Glass ── */
+
+html.dark .login-page .login-content.login-panel,
+html.light .login-page .login-content.login-panel {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: var(--jg-radius, 1.5rem);
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0) 38%) padding-box,
+    var(--glass-surface-3) padding-box;
+  box-shadow:
+    var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)),
+    inset 0 1px 0 var(--lg-accent-soft),
+    inset 0 -1px 0 rgb(255 255 255 / 0.05);
+  backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-4-blur, 24px));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-4-blur, 24px));
+}
+
+html.dark .login-page .login-content.login-panel::before,
+html.light .login-page .login-content.login-panel::before {
+  border-color: rgb(255 255 255 / 0.06);
+  border-radius: calc(var(--jg-radius, 1.5rem) - 0.4rem);
+  background-image: none;
+}
+
+html.dark .login-page .login-content.login-panel::after,
+html.light .login-page .login-content.login-panel::after {
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5) 20%, rgb(255 255 255 / 0.14) 63%, transparent);
+}
+
+html.dark .login-page .login-panel__surface,
+html.light .login-page .login-panel__surface {
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: calc(var(--jg-radius, 1.5rem) - 0.35rem);
+  background:
+    radial-gradient(circle at 96% 0%, rgb(255 255 255 / 0.05), transparent 28%),
+    linear-gradient(145deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0) 66%) padding-box,
+    var(--glass-surface-1) padding-box;
+  box-shadow: inset 0 1px 0 var(--lg-accent-soft);
+}
+
+html.dark .login-page .login-panel__bracket,
+html.light .login-page .login-panel__bracket {
+  border-color: var(--lg-focus);
+}
+
+html.dark .login-page .login-panel__corner,
+html.light .login-page .login-panel__corner {
+  border-color: var(--lg-focus);
+}
+
+html.dark .login-page .login-energy-trace::before {
+  background: linear-gradient(90deg, transparent, var(--lg-accent) 42%, rgb(255 255 255 / 0.55) 70%, transparent);
+}
+
+html.light .login-page .login-energy-trace::before {
+  background: linear-gradient(90deg, transparent, var(--lg-accent) 42%, rgb(15 23 42 / 0.4) 70%, transparent);
+}
+
+/* ── Textos ── */
+
+html.dark .login-page .login-intro h1,
+html.light .login-page .login-intro h1 {
+  color: var(--lg-text);
+  text-shadow: none;
+}
+
+html.dark .login-page .login-intro p {
+  color: var(--lg-text-dim);
+}
+
+html.light .login-page .login-intro p {
+  color: var(--lg-text-dim);
+}
+
+html.dark .login-page .login-brand--inline .login-brand__signal {
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0.7rem rgba(255, 255, 255, 0.4);
+}
+
+/* ── Tabs (Entrar / Crear cuenta) ── */
+
+html.dark .login-page .login-tabs,
+html.light .login-page .login-tabs {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: 999px;
+  padding: 0.3rem;
+  background: var(--glass-surface-1);
+  box-shadow: var(--glass-1-shadow, 0 2px 10px rgba(0, 0, 0, 0.18));
+}
+
+html.dark .login-page .login-tabs button,
+html.light .login-page .login-tabs button {
+  border-radius: 999px;
+  color: var(--lg-text-dim);
+  transition: all var(--motion-ui, 250ms) ease;
+}
+
+html.dark .login-page .login-tabs button:hover:not(.is-active) { color: var(--lg-text); }
+html.light .login-page .login-tabs button:hover:not(.is-active) { color: var(--lg-text); }
+
+html.dark .login-page .login-tabs button.is-active,
+html.light .login-page .login-tabs button.is-active {
+  border-color: var(--glass-border-strong);
+  color: var(--lg-accent);
+  background: var(--lg-accent-soft);
+  box-shadow: var(--glass-1-shadow, 0 2px 10px rgba(0, 0, 0, 0.18));
+}
+
+html.dark .login-page .login-tabs button.is-active { color: #0a0a0d; }
+html.light .login-page .login-tabs button.is-active { color: #ffffff; }
+
+/* ── Campos ── */
+
+html.dark .login-page .field-group label {
+  color: var(--lg-text-dim);
+}
+
+html.light .login-page .field-group label {
+  color: var(--lg-text-dim);
+}
+
+html.dark .login-page .login-form .input-shell,
+html.light .login-page .login-form .input-shell {
+  border: 1px solid var(--glass-border);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: 1rem;
+  background: var(--lg-input-bg);
+  backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-2-blur, 12px));
+  -webkit-backdrop-filter: saturate(var(--glass-saturate, 180%)) blur(var(--glass-2-blur, 12px));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+html.dark .login-page .login-form .input-shell:hover {
+  background: color-mix(in srgb, var(--lg-hover-bg) 40%, var(--lg-input-bg));
+  border-color: var(--glass-border-strong);
+}
+
+html.light .login-page .login-form .input-shell:hover {
+  background: color-mix(in srgb, var(--lg-hover-bg) 40%, var(--lg-input-bg));
+  border-color: var(--glass-border-strong);
+}
+
+html.dark .login-page .login-form .input-shell:focus-within,
+html.light .login-page .login-form .input-shell:focus-within {
+  border-color: var(--lg-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lg-focus) 25%, transparent), inset 0 1px 0 rgb(255 255 255 / 0.1);
+}
+
+html.dark .login-page .input-shell input {
+  color: var(--lg-text);
+  caret-color: var(--lg-accent);
+}
+
+html.light .login-page .input-shell input {
+  color: var(--lg-text);
+  caret-color: var(--lg-accent);
+}
+
+html.dark .login-page .input-shell input::placeholder { color: var(--lg-text-muted); }
+html.light .login-page .input-shell input::placeholder { color: var(--lg-text-muted); }
+
+html.dark .login-page .input-shell__icon { color: var(--lg-text-dim); }
+html.light .login-page .input-shell__icon { color: var(--lg-text-dim); }
+
+html.dark .login-page .password-toggle { color: var(--lg-text-dim); }
+html.light .login-page .password-toggle { color: var(--lg-text-dim); }
+
+html.dark .login-page .password-toggle:hover { color: var(--lg-text); background: var(--lg-hover-bg); }
+html.light .login-page .password-toggle:hover { color: var(--lg-text); background: var(--lg-hover-bg); }
+
+html.dark .login-page .forgot-link,
+html.light .login-page .forgot-link {
+  color: var(--lg-text-muted);
+}
+
+html.dark .login-page .forgot-link:hover { color: var(--lg-text); }
+html.light .login-page .forgot-link:hover { color: var(--lg-text); }
+
+/* ── Botón principal ── */
+
+html.dark .login-page .login-submit {
+  border: 1px solid var(--glass-border-strong);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: 999px;
+  color: #0a0a0d;
+  background: linear-gradient(105deg, #ffffff, #e9e9ee);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.9);
+}
+
+html.light .login-page .login-submit {
+  border: 1px solid var(--glass-border-strong);
+  border-top-color: var(--glass-refraction-top);
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(105deg, #1c2430, #0f172a);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.14);
+}
+
+html.dark .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.03); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 4px rgb(255 255 255 / 0.12); }
+html.light .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.04); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.14), 0 0 0 4px rgb(15 23 42 / 0.1); }
+
+html.dark .login-page .login-spinner { border-color: rgba(255, 255, 255, 0.4); border-top-color: #0a0a0d; }
+html.light .login-page .login-spinner { border-color: rgba(255, 255, 255, 0.4); border-top-color: #ffffff; }
+
+/* ── Footer ── */
+
+html.dark .login-page .login-footer { border-top-color: var(--glass-border); color: var(--lg-text-muted); }
+html.light .login-page .login-footer { border-top-color: var(--glass-border); color: var(--lg-text-muted); }
+
+html.dark .login-page .login-footer > :first-child { color: var(--lg-text); }
+html.light .login-page .login-footer > :first-child { color: var(--lg-text); }
+
+html.dark .login-page .login-footer__separator { background: var(--lg-focus); }
+html.light .login-page .login-footer__separator { background: var(--lg-focus); }
+
+/* ── Accesibilidad: sin movimiento ── */
+
+@media (prefers-reduced-motion: reduce) {
+  html.dark .login-page .login-content.login-panel,
+  html.light .login-page .login-content.login-panel,
+  html.dark .login-page .login-panel__surface,
+  html.light .login-page .login-panel__surface {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

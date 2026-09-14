@@ -1,0 +1,160 @@
+/* Overlay de modo claro (día) para el shell compartido (coach/admin/superadmin
+   y base). El rol jugador recibe su propio Liquid Glass en jugador-glass.css;
+   aquí solo se aclaran las superficies duras de shell.css que `html.light` no
+   llegaba a convertir (los tokens sí cambian vía :root.light). */
+
+html.light .app-shell {
+  color: oklch(0.18 0.012 95);
+  background: oklch(0.92 0.015 88);
+}
+
+/* ── Atmosphere (gradientes claros, sin foto) ── */
+
+html.light .app-shell .role-atmosphere {
+  background:
+    radial-gradient(58% 44% at 18% 12%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(50% 40% at 86% 8%, rgba(214, 215, 226, 0.6), transparent 72%),
+    radial-gradient(64% 52% at 50% 108%, rgba(255, 255, 255, 0.7), transparent 74%),
+    linear-gradient(168deg, #ececf2 0%, #dcdee6 48%, #c9ccd6 100%);
+}
+
+html.light .app-shell .role-atmosphere__image,
+html.light .app-shell .role-atmosphere__geometry {
+  display: none;
+}
+
+html.light .app-shell .role-atmosphere__grade,
+html.light .app-shell[data-role="coach"] .role-atmosphere__grade,
+html.light .app-shell[data-role="admin"] .role-atmosphere__grade,
+html.light .app-shell[data-role="superadmin"] .role-atmosphere__grade {
+  background:
+    radial-gradient(46% 30% at 82% 78%, rgba(255, 255, 255, 0.5), transparent 70%),
+    linear-gradient(0deg, rgba(96, 98, 112, 0.14), transparent 45%);
+}
+
+html.light .app-shell .role-atmosphere__vignette {
+  box-shadow: inset 0 0 10rem rgba(70, 70, 90, 0.14);
+}
+
+html.light .app-shell .role-atmosphere__light {
+  opacity: 0.34;
+  background: linear-gradient(90deg, transparent, rgba(15, 23, 42, 0.08), transparent);
+}
+
+/* ── Rail de escritorio ── */
+
+html.light .app-shell .shell-rail {
+  border-right: 1px solid oklch(0.42 0.025 82 / 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.62));
+  box-shadow: 1.8rem 0 5rem rgba(15, 15, 30, 0.1);
+}
+
+html.light .app-shell .shell-rail::after {
+  opacity: 0.15;
+}
+
+html.light .app-shell .shell-brand-context {
+  border-bottom-color: oklch(0.42 0.025 82 / 0.2);
+}
+
+html.light .app-shell .shell-nav__link {
+  color: oklch(0.38 0.012 95);
+}
+
+html.light .app-shell .shell-nav__link:hover {
+  color: oklch(0.18 0.012 95);
+  background: rgba(15, 15, 30, 0.05);
+}
+
+html.light .app-shell .shell-nav__link[data-active="true"] {
+  color: oklch(0.18 0.012 95);
+  border-color: color-mix(in oklch, var(--brand-gold) 40%, transparent);
+  background: linear-gradient(90deg, rgba(201, 162, 74, 0.16), transparent 82%);
+}
+
+html.light .app-shell .shell-nav__icon { color: oklch(0.52 0.01 95); }
+html.light .app-shell .shell-nav__link[data-active="true"] .shell-nav__icon { color: var(--brand-gold-deep); filter: none; }
+
+html.light .app-shell .shell-rail__identity,
+html.light .app-shell .shell-drawer__account {
+  border-top-color: oklch(0.42 0.025 82 / 0.2);
+  background: linear-gradient(90deg, rgba(201, 162, 74, 0.08), transparent);
+}
+
+html.light .app-shell .shell-avatar {
+  border-color: oklch(0.42 0.025 82 / 0.32);
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #fff, 0 0.85rem 1.8rem rgba(15, 15, 30, 0.14);
+}
+
+/* ── Cabecera móvil, topbar, account ── */
+
+html.light .app-shell .shell-mobile-head,
+html.light .app-shell .shell-topbar {
+  border-bottom-color: oklch(0.42 0.025 82 / 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.6));
+}
+
+html.light .app-shell .shell-menu-trigger {
+  border-color: oklch(0.42 0.025 82 / 0.3);
+  color: oklch(0.18 0.012 95);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+html.light .app-shell .shell-menu-trigger span:last-child { background: var(--brand-gold-deep); }
+
+html.light .app-shell .shell-location span,
+html.light .app-shell .shell-scope small { color: oklch(0.52 0.01 95); }
+html.light .app-shell .shell-location strong { color: oklch(0.18 0.012 95); }
+
+html.light .app-shell .shell-scope > span { background: linear-gradient(90deg, transparent, var(--brand-gold-deep)); }
+html.light .app-shell .shell-account__chevron { color: var(--brand-gold-deep); }
+
+html.light .app-shell .shell-account > .shell-account-actions {
+  border-color: oklch(0.42 0.025 82 / 0.24);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 1.5rem 4rem rgba(15, 15, 30, 0.16);
+}
+
+html.light .app-shell .shell-account-actions a,
+html.light .app-shell .shell-account-actions button { color: oklch(0.38 0.012 95); }
+html.light .app-shell .shell-account-actions a:hover,
+html.light .app-shell .shell-account-actions button:hover { color: oklch(0.18 0.012 95); background: rgba(15, 15, 30, 0.05); }
+
+/* ── Dock inferior ── */
+
+html.light .app-shell .shell-dock {
+  border-color: oklch(0.42 0.025 82 / 0.26);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.78));
+  box-shadow: 0 1.4rem 3.2rem rgba(15, 15, 30, 0.16);
+}
+
+html.light .app-shell .shell-dock::before {
+  border-inline-color: oklch(0.42 0.025 82 / 0.3);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+html.light .app-shell .shell-dock .shell-nav__link,
+html.light .app-shell .shell-dock > button { color: oklch(0.52 0.01 95); }
+html.light .app-shell .shell-dock .shell-nav__link[data-active="true"] {
+  color: oklch(0.18 0.012 95);
+  background: linear-gradient(180deg, rgba(201, 162, 74, 0.22), transparent 74%);
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--brand-gold) 55%, transparent);
+}
+html.light .app-shell .shell-dock .shell-nav__link[data-active="true"] .shell-nav__icon { color: var(--brand-gold-deep); filter: none; }
+html.light .app-shell .shell-dock__more i { background: var(--brand-gold-deep); }
+
+/* ── Drawer móvil ── */
+
+html.light .app-shell .shell-drawer__backdrop { background: rgba(15, 15, 30, 0.18); }
+html.light .app-shell .shell-drawer__panel {
+  border-left-color: oklch(0.42 0.025 82 / 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 249, 252, 0.98));
+  box-shadow: -2rem 0 4rem rgba(15, 15, 30, 0.14);
+}
+html.light .app-shell .shell-drawer__panel > header { border-bottom-color: oklch(0.42 0.025 82 / 0.2); }
+html.light .app-shell .shell-drawer__panel > header button {
+  border-color: oklch(0.42 0.025 82 / 0.3);
+  color: oklch(0.18 0.012 95);
+}
+html.light .app-shell .shell-drawer__panel > .shell-account-actions { border-top-color: oklch(0.42 0.025 82 / 0.2); }

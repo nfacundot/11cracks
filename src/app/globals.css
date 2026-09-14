@@ -1,7 +1,11 @@
 @import "tailwindcss";
+@import "@glinui/tokens/theme.css";
 @import "./styles/tokens.css";
 @import "./styles/shell.css";
+@import "./styles/shell-light.css";
 @import "./styles/login.css";
+@import "./styles/jugador-glass.css";
+@import "./styles/login-glass.css";
 @import "./styles/player-home.css";
 @import "./styles/dashboard-player.css";
 @import "./styles/player-progress.css";
@@ -20,6 +24,9 @@
 @import "./styles/admin-payments.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+html.light { color-scheme: light; }
+html.dark { color-scheme: dark; }
 
 :root {
   --background: #050606;
@@ -69,8 +76,8 @@
 }
 
 body {
-  background: #050606;
-  color: #F2F0E9;
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
