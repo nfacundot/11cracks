@@ -175,8 +175,8 @@ html.light .login-page .login-tabs button.is-active {
   box-shadow: var(--glass-1-shadow, 0 2px 10px rgba(0, 0, 0, 0.18));
 }
 
-html.dark .login-page .login-tabs button.is-active { color: #0a0a0d; }
-html.light .login-page .login-tabs button.is-active { color: #ffffff; }
+html.dark .login-page .login-tabs button.is-active { color: #f4f4f5; background: rgb(18 19 24 / 0.9); }
+html.light .login-page .login-tabs button.is-active { color: #1c1c22; background: rgb(255 255 255 / 0.95); }
 
 /* ── Campos ── */
 
@@ -247,29 +247,41 @@ html.light .login-page .forgot-link:hover { color: var(--lg-text); }
 
 /* ── Botón principal ── */
 
+html.dark .login-page .login-gate__btn--primary {
+  color: #f4f4f5;
+  background: linear-gradient(110deg, #23242b, #121318);
+  border-color: var(--glass-border-strong);
+}
+
+html.light .login-page .login-gate__btn--primary {
+  color: #0a0a0d;
+  background: linear-gradient(110deg, #ffffff, #e6e7ec);
+  border-color: var(--glass-border-strong);
+}
+
 html.dark .login-page .login-submit {
   border: 1px solid var(--glass-border-strong);
   border-top-color: var(--glass-refraction-top);
   border-radius: 999px;
-  color: #0a0a0d;
-  background: linear-gradient(105deg, #ffffff, #e9e9ee);
-  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  color: #f4f4f5;
+  background: linear-gradient(105deg, #23242b, #121318);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.16);
 }
 
 html.light .login-page .login-submit {
   border: 1px solid var(--glass-border-strong);
   border-top-color: var(--glass-refraction-top);
   border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(105deg, #1c2430, #0f172a);
-  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.14);
+  color: #0a0a0d;
+  background: linear-gradient(105deg, #ffffff, #e6e7ec);
+  box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.9);
 }
 
-html.dark .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.03); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 4px rgb(255 255 255 / 0.12); }
-html.light .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.04); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.14), 0 0 0 4px rgb(15 23 42 / 0.1); }
+html.dark .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.08); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.3)), inset 0 1px 0 rgb(255 255 255 / 0.16), 0 0 0 4px rgb(255 255 255 / 0.12); }
+html.light .login-page .login-submit:hover:not(:disabled) { filter: brightness(1.02); box-shadow: var(--glass-3-shadow, 0 16px 44px rgba(0, 0, 0, 0.18)), inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 4px rgb(15 23 42 / 0.1); }
 
-html.dark .login-page .login-spinner { border-color: rgba(255, 255, 255, 0.4); border-top-color: #0a0a0d; }
-html.light .login-page .login-spinner { border-color: rgba(255, 255, 255, 0.4); border-top-color: #ffffff; }
+html.dark .login-page .login-spinner { border-color: rgba(255, 255, 255, 0.4); border-top-color: #f4f4f5; }
+html.light .login-page .login-spinner { border-color: rgba(0, 0, 0, 0.25); border-top-color: #0a0a0d; }
 
 /* ── Footer ── */
 
