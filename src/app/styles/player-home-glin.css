@@ -325,9 +325,15 @@
   .app-shell[data-role="player"] .player-home-130h__quick-access a { min-height: 4rem; }
 }
 
-/* Ajuste fino mobile muy pequeño */
+/* Ajuste fino mobile muy pequeño: HUD mantiene la fila única de 3 contadores
+   (Racha verificada · Horas validadas · Próximo hito) y compacta su tipografía */
 @media (max-width: 24rem) {
-  .app-shell[data-role="player"] .player-home-130h__hud { grid-template-columns: 1fr; }
+  .app-shell[data-role="player"] .player-home-130h__hud { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .app-shell[data-role="player"] .player-home-130h__hud > div { padding: .55rem .3rem; }
+  .app-shell[data-role="player"] .player-home-130h__hud span,
+  .app-shell[data-role="player"] .player-home-130h__hud small,
+  .app-shell[data-role="player"] .player-home-130h__hud > div > small:last-child { font-size: .47rem; letter-spacing: .04em; }
+  .app-shell[data-role="player"] .player-home-130h__hud strong { font-size: 1.08rem; }
 }
 
 /* ═══ Modo noche (html.dark): el Inicio /jugador pasa a vidrio oscuro sobre la
@@ -515,4 +521,51 @@ html.dark .app-shell[data-role="player"] .player-home-130c__video-copy b {
   border-color: color-mix(in oklch, var(--context-progress) 70%, #eef3ee);
   color: #eef3ee;
   background: rgb(255 255 255 / 0.12);
+}
+
+/* ─── Mobile: "Próximo entrenamiento" como panel redondo (píldora glass) ─── */
+@media (max-width: 47.9375rem) {
+  .app-shell[data-role="player"] .player-home-130h__training {
+    border: 1px solid var(--glass-border, rgba(16, 22, 19, 0.12));
+    border-left: 1px solid var(--glass-border, rgba(16, 22, 19, 0.12));
+    border-top-color: var(--glass-refraction-top, rgb(255 255 255 / 0.6));
+    border-radius: 999px;
+    background: var(--glass-1-surface, rgb(244 248 239 / 0.55));
+    box-shadow: var(--glass-1-shadow, 0 12px 28px rgba(61, 87, 67, 0.08));
+  }
+
+  .app-shell[data-role="player"] .player-home-130h__training--empty {
+    padding: .9rem 1.15rem;
+  }
+}
+
+/* ─── Reveal por scroll de los paneles del Inicio: fade + desplazamiento
+   que se dispara al entrar en el viewport en ambas direcciones (abajo y reversa) ─── */
+.app-shell[data-role="player"] .player-home-reveal [data-reveal] {
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+  will-change: opacity, transform;
+}
+
+.app-shell[data-role="player"] .player-home-reveal[data-reveal-ready] [data-reveal] {
+  opacity: 0;
+  transform: translateY(0.9rem);
+}
+
+.app-shell[data-role="player"] .player-home-reveal[data-reveal-ready] [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Cascada suave entre los tres contadores del HUD */
+.app-shell[data-role="player"] .player-home-reveal .player-home-130h__hud > div:nth-child(2) { transition-delay: 80ms, 80ms; }
+.app-shell[data-role="player"] .player-home-reveal .player-home-130h__hud > div:nth-child(3) { transition-delay: 160ms, 160ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell[data-role="player"] .player-home-reveal [data-reveal] {
+    transition: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

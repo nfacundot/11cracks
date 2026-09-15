@@ -5,6 +5,7 @@ import { NavigationIcon } from "@/components/shell/navigation-icon";
 import type { NavigationIcon as NavigationIconName } from "@/lib/shell/navigation";
 import { PlayerEvolutionPreview, type PlayerHomeEvolution } from "@/components/player/player-evolution-preview";
 import { PlayerHomeScene } from "@/components/player/player-home-scene";
+import { PlayerHomeReveal } from "@/components/player/player-home-reveal";
 import { getPlayerHomeScene } from "@/lib/player/scene-home";
 import type { PlayerRpgData } from "@/components/player/player-rpg-home";
 
@@ -118,7 +119,7 @@ function CardPreview({ card, rpg }: { card?: PlayerDashboardCard; rpg?: PlayerRp
   const ctaLabel = card?.ctaLabel ?? (earned ? "Ver mi colección" : "Ver progreso");
   const href = card?.href ?? "/jugador/progress";
   return (
-    <GlassCard className="player-home-130c__card-slot" data-card-state={state} aria-labelledby="player-home-card-title">
+    <GlassCard className="player-home-130c__card-slot" data-reveal data-card-state={state} aria-labelledby="player-home-card-title">
       <div className="player-home-130c__card-heading"><div><span className="player-home-130c__eyebrow">{eyebrow}</span><h2 id="player-home-card-title">Tu colección sigue creciendo.</h2></div><span className="player-home-130c__card-state">{badge}</span></div>
       <div className="player-home-130c__card-body"><div className="player-home-130c__card-art">{card?.art ? <CardArtwork card={card} /> : <span><CollectionIcon /></span>}</div><div className="player-home-130c__card-copy"><span>{rarity} · {category}</span><strong>{title}</strong><p>{reason}</p>{!earned && rpg ? <small>{rpg.streakProgress}% hacia tu próximo hito · {Math.max(0, rpg.nextMilestone - rpg.streakCurrent)} días por completar</small> : null}</div></div>
       <Link href={href} className="player-home-130c__text-link player-home-130h__text-link">{ctaLabel}<ArrowIcon /></Link>
@@ -130,7 +131,7 @@ function VideoPreview({ video }: { video?: PlayerDashboardVideo }) {
   const state = video?.state ?? "empty";
   const ctaLabel = video?.completionPercent && video.completionPercent > 0 ? "Continuar video" : "Ver video";
   return (
-    <GlassCard className="player-home-130c__video" aria-labelledby="player-home-video-title" data-video-state={state}>
+    <GlassCard className="player-home-130c__video" data-reveal aria-labelledby="player-home-video-title" data-video-state={state}>
       <div className="player-home-130c__section-heading"><div><span className="player-home-130c__eyebrow">PARA MEJORAR TU JUEGO</span><h2 id="player-home-video-title">Un foco para hoy.</h2></div><span className="player-home-130c__section-note">Contenido aprobado</span></div>
       {video && state === "available" ? (
         <Link href={video.href ?? "#"} className="player-home-130c__video-link">
@@ -173,61 +174,63 @@ export function PlayerDashboard({ name, avatarUrl, position, scopeLabel, evoluti
 
   return (
     <article className="player-home player-home-130c player-home-130h" style={heroStyle} data-club-accent="11cracks">
-      <PlayerHomeScene initialScene={getPlayerHomeScene("jugador01")} fixed />
+      <PlayerHomeReveal>
+        <PlayerHomeScene initialScene={getPlayerHomeScene("jugador01")} fixed />
 
-      <div className="player-home-130c__canvas player-home-130h__canvas">
-        <section className="player-home-130c__hero player-home-130h__hero" aria-labelledby="player-home-title">
-          <header className="player-home-130c__identity player-home-130h__identity">
-            <span className="player-home-130c__avatar player-home-130h__avatar">
-              {hasAvatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl as string} alt={name} width={88} height={88} />
-              ) : (
-                <span className="player-home-130c__avatar-initials">{initials}</span>
-              )}
-            </span>
-            <div><span className="player-home-130c__identity-kicker player-home-130h__identity-kicker">{scopeLabel}</span><strong>{name}</strong>{roleContext ? <small>{roleContext}</small> : null}</div>
-          </header>
+        <div className="player-home-130c__canvas player-home-130h__canvas">
+          <section className="player-home-130c__hero player-home-130h__hero" aria-labelledby="player-home-title">
+            <header className="player-home-130c__identity player-home-130h__identity">
+              <span className="player-home-130c__avatar player-home-130h__avatar">
+                {hasAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={avatarUrl as string} alt={name} width={88} height={88} />
+                ) : (
+                  <span className="player-home-130c__avatar-initials">{initials}</span>
+                )}
+              </span>
+              <div><span className="player-home-130c__identity-kicker player-home-130h__identity-kicker">{scopeLabel}</span><strong>{name}</strong>{roleContext ? <small>{roleContext}</small> : null}</div>
+            </header>
 
-          <div className="player-home-130c__evolution player-home-130h__evolution">
-            <PlayerEvolutionPreview evolution={evolution} variant="home" />
-          </div>
+            <div className="player-home-130c__evolution player-home-130h__evolution" data-reveal>
+              <PlayerEvolutionPreview evolution={evolution} variant="home" />
+            </div>
 
-          <div className="player-home-130c__hud player-home-130h__hud" aria-label="Tu estado actual">
-            <div><span>Racha verificada</span><strong>{racha.streak > 0 ? `${racha.streak} días` : "—"}</strong><small>{racha.state}</small></div>
-            <div><span>Horas validadas</span><strong>{hours?.value ?? "—"}{hours ? <small>{hours.detail}</small> : null}</strong><small>Meta de certificación</small></div>
-            <div><span>Próximo hito</span><strong>{racha.nextMilestone ? `${racha.nextMilestone} días` : "—"}</strong><small>Continuidad validada</small></div>
-          </div>
+            <div className="player-home-130c__hud player-home-130h__hud" aria-label="Tu estado actual">
+              <div data-reveal><span>Racha verificada</span><strong>{racha.streak > 0 ? `${racha.streak} días` : "—"}</strong><small>{racha.state}</small></div>
+              <div data-reveal><span>Horas validadas</span><strong>{hours?.value ?? "—"}{hours ? <small>{hours.detail}</small> : null}</strong><small>Meta de certificación</small></div>
+              <div data-reveal><span>Próximo hito</span><strong>{racha.nextMilestone ? `${racha.nextMilestone} días` : "—"}</strong><small>Continuidad validada</small></div>
+            </div>
 
-          <section className="player-home-130c__training player-home-130h__training player-home-130c__training--empty" data-training-state="empty" aria-labelledby="next-training-title">
-            <div className="player-home-130c__training-heading player-home-130h__training-heading"><span className="player-home-130c__eyebrow">PRÓXIMO ENTRENAMIENTO</span><CalendarIcon /></div>
-            <p id="next-training-title" className="player-home-130c__empty player-home-130h__empty">Aún no tienes un próximo entrenamiento programado.</p>
+            <section className="player-home-130c__training player-home-130h__training player-home-130c__training--empty" data-reveal data-training-state="empty" aria-labelledby="next-training-title">
+              <div className="player-home-130c__training-heading player-home-130h__training-heading"><span className="player-home-130c__eyebrow">PRÓXIMO ENTRENAMIENTO</span><CalendarIcon /></div>
+              <p id="next-training-title" className="player-home-130c__empty player-home-130h__empty">Aún no tienes un próximo entrenamiento programado.</p>
+            </section>
+
+            <div className="player-home-130c__message player-home-130h__message" data-reveal><span className="player-home-130c__eyebrow">TU CAMINO DE CRACK</span><h1 id="player-home-title">Tu partido empieza aquí.</h1><p>Entrena, aprende y sigue construyendo tu camino.</p></div>
+
+            <GlassCard className="player-home-130c__next player-home-130h__next" data-reveal data-next-step={nextStep.kind} aria-labelledby="next-step-title">
+              <div><span className="player-home-130c__eyebrow">TU SIGUIENTE PASO</span><h2 id="next-step-title">{nextStep.title}</h2><p>{nextStep.description}</p></div>
+              <Link href={nextStep.href} className="player-home-130c__primary-cta player-home-130h__primary-cta"><span>{nextStep.actionLabel}</span><ArrowIcon /></Link>
+            </GlassCard>
+
+            <nav className="player-home-130c__quick-access player-home-130h__quick-access" data-reveal aria-label="Accesos rápidos">
+              {quickAccess.map((item) => (
+                <Link href={item.href} key={item.href} data-tone={item.tone}>
+                  <span><NavigationIcon name={item.icon} /></span>
+                  <strong>{item.label}</strong>
+                  <small>{item.label === "Mi progreso" ? "Evolución y XP" : item.label === "El Camino" ? "Actividad pendiente" : "Ver agenda"}</small>
+                  <ArrowIcon />
+                </Link>
+              ))}
+            </nav>
           </section>
 
-          <div className="player-home-130c__message player-home-130h__message"><span className="player-home-130c__eyebrow">TU CAMINO DE CRACK</span><h1 id="player-home-title">Tu partido empieza aquí.</h1><p>Entrena, aprende y sigue construyendo tu camino.</p></div>
-
-          <GlassCard className="player-home-130c__next player-home-130h__next" data-next-step={nextStep.kind} aria-labelledby="next-step-title">
-            <div><span className="player-home-130c__eyebrow">TU SIGUIENTE PASO</span><h2 id="next-step-title">{nextStep.title}</h2><p>{nextStep.description}</p></div>
-            <Link href={nextStep.href} className="player-home-130c__primary-cta player-home-130h__primary-cta"><span>{nextStep.actionLabel}</span><ArrowIcon /></Link>
-          </GlassCard>
-
-          <nav className="player-home-130c__quick-access player-home-130h__quick-access" aria-label="Accesos rápidos">
-            {quickAccess.map((item) => (
-              <Link href={item.href} key={item.href} data-tone={item.tone}>
-                <span><NavigationIcon name={item.icon} /></span>
-                <strong>{item.label}</strong>
-                <small>{item.label === "Mi progreso" ? "Evolución y XP" : item.label === "El Camino" ? "Actividad pendiente" : "Ver agenda"}</small>
-                <ArrowIcon />
-              </Link>
-            ))}
-          </nav>
-        </section>
-
-        <div className="player-home-130c__secondary-grid player-home-130h__secondary-grid">
-          <CardPreview card={card} rpg={rpg} />
-          <VideoPreview video={video} />
+          <div className="player-home-130c__secondary-grid player-home-130h__secondary-grid">
+            <CardPreview card={card} rpg={rpg} />
+            <VideoPreview video={video} />
+          </div>
         </div>
-      </div>
+      </PlayerHomeReveal>
     </article>
   );
 }
