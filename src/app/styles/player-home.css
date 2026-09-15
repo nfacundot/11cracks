@@ -1392,3 +1392,44 @@
 .player-rpg-racha-journey>p{margin:0;color:var(--text-secondary);font-size:.9rem;line-height:1.5}
 @media(max-width:700px){.player-rpg-racha-journey__path{grid-template-columns:1fr 1fr}}
 @media(max-width:460px){.player-rpg-racha-journey__path{grid-template-columns:1fr}}
+
+/* ─── Inicio /jugador: fondo día/noche (estadio) según el tema.
+   html.light → backstadday (PC) / backstadmobday (mobile);
+   default y html.dark → backstad (PC) / backstadmob (mobile). ─── */
+
+.app-shell[data-role="player"] .player-home__scene-picture {
+  position: absolute;
+  inset: 0;
+}
+
+.app-shell[data-role="player"] .player-home__scene-picture .player-home__scene-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Noche (default / html.dark): foto nocturna visible, diurna oculta */
+.app-shell[data-role="player"] .player-home__scene-picture--day { display: none; }
+.app-shell[data-role="player"] .player-home__scene-picture--night { display: block; }
+
+/* Día (html.light): foto diurna visible, nocturna oculta */
+html.light .app-shell[data-role="player"] .player-home__scene-picture--day { display: block; }
+html.light .app-shell[data-role="player"] .player-home__scene-picture--night { display: none; }
+
+/* Día: overlays más suaves para no apagar la foto diurna */
+html.light .app-shell[data-role="player"] .player-home__scene-grade {
+  background:
+    radial-gradient(46% 30% at 82% 78%, rgba(255, 255, 255, 0.4), transparent 70%),
+    linear-gradient(0deg, rgba(16, 22, 19, 0.16), transparent 45%);
+  filter: none;
+}
+
+html.light .app-shell[data-role="player"] .player-home__scene-light {
+  opacity: 0.5;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: player-home-light 8s ease-in-out infinite alternate;
+}
+
+html.light .app-shell[data-role="player"] .player-home__scene-depth {
+  box-shadow: inset 0 0 8rem rgba(16, 22, 19, 0.14);
+}

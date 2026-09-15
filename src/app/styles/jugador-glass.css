@@ -664,8 +664,7 @@ html.dark .app-shell[data-role="player"] .shell-drawer__panel > header button {
   box-shadow: none;
 }
 
-/* Escena decorativa del home fuera de juego */
-.app-shell[data-role="player"] .player-home__scene { display: none; }
+/* El Inicio muestra su propia escena día/noche en player-home.css */
 
 /* Textos y acentos neutros */
 .app-shell[data-role="player"] .shell-content { color: var(--jg-text); }

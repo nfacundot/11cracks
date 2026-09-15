@@ -1,86 +1,35 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { CSSProperties } from "react";
-import { playerHomeScenes as playerHomeScenePool, type PlayerHomeSceneDefinition } from "@/lib/player/scene-home";
-
-const currentStorageKey = "11cracks.player-home.current-scene";
-const lastStorageKey = "11cracks.player-home.last-scene";
-
-function selectScene(initialScene: PlayerHomeSceneDefinition): PlayerHomeSceneDefinition {
-  try {
-    const navigation = window.performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    const isDocumentReload = navigation?.type === "reload";
-    const currentSceneId = isDocumentReload ? window.sessionStorage.getItem(currentStorageKey) : null;
-    const currentScene = playerHomeScenePool.find((scene) => scene.id === currentSceneId);
-    if (currentScene) return currentScene;
-
-    const lastSceneId = window.sessionStorage.getItem(lastStorageKey);
-    const alternatives = lastSceneId
-      ? playerHomeScenePool.filter((scene) => scene.id !== lastSceneId)
-      : playerHomeScenePool;
-    const selected = alternatives[Math.floor(Math.random() * alternatives.length)] ?? initialScene;
-    window.sessionStorage.setItem(currentStorageKey, selected.id);
-    window.sessionStorage.setItem(lastStorageKey, selected.id);
-    return selected;
-  } catch {
-    return initialScene;
-  }
-}
+import type { PlayerHomeSceneDefinition } from "@/lib/player/scene-home";
 
 export function PlayerHomeScene({ initialScene, fixed = false }: { initialScene: PlayerHomeSceneDefinition; fixed?: boolean }) {
-  const [scene, setScene] = useState(initialScene);
   const [ready, setReady] = useState(fixed);
-  const committedRef = useRef(false);
-
-  useEffect(() => {
-    if (fixed) {
-      setReady(true);
-      return;
-    }
-    const frame = window.requestAnimationFrame(() => {
-      setScene(selectScene(initialScene));
-      committedRef.current = true;
-      setReady(true);
-    });
-    return () => {
-      window.cancelAnimationFrame(frame);
-      if (committedRef.current) {
-        try {
-          window.sessionStorage.removeItem(currentStorageKey);
-        } catch {
-          // Private browsing can disable sessionStorage; scene selection still works.
-        }
-      }
-    };
-  }, [fixed, initialScene]);
 
   const sceneStyle = {
-    "--player-home-scene-desktop-position": scene.desktopPosition,
-    "--player-home-scene-tablet-position": scene.tabletPosition,
-    "--player-home-scene-mobile-position": scene.mobilePosition,
+    "--player-home-scene-desktop-position": "58% 50%",
+    "--player-home-scene-tablet-position": "60% 50%",
+    "--player-home-scene-mobile-position": "68% 42%",
   } as CSSProperties;
 
   return (
     <div
       className="player-home__scene"
-      data-scene-id={scene.id}
       data-scene-ready={ready}
-      data-subject-side={scene.subjectSide}
-      data-overlay-strength={scene.overlayStrength}
       aria-hidden="true"
       style={sceneStyle}
     >
-      <Image
-        key={scene.id}
-        className="player-home__scene-image"
-        src={scene.src}
-        alt=""
-        fill
-        priority
-        sizes="(min-width: 1024px) calc(100vw - 240px), 100vw"
-      />
+      <picture className="player-home__scene-picture player-home__scene-picture--day">
+        <source media="(max-width: 47.9375rem)" srcSet="/img/back/backstadmobday.jpg" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="player-home__scene-image" src="/img/back/backstadday.jpg" alt="" />
+      </picture>
+      <picture className="player-home__scene-picture player-home__scene-picture--night">
+        <source media="(max-width: 47.9375rem)" srcSet="/img/back/backstadmob.jpg" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="player-home__scene-image" src="/img/back/backstad.webp" alt="" />
+      </picture>
       <span className="player-home__scene-grade" />
       <span className="player-home__scene-light" />
       <span className="player-home__scene-depth" />
