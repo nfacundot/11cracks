@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.a11cracks.app",
+      "sha256_cert_fingerprints": [
+        "1E:6E:EA:AC:52:11:37:E3:24:81:99:67:DA:EC:3E:F3:26:15:2B:76:ED:A4:85:33:74:3D:A3:9E:5B:7B:17:66"
+      ]
+    }
+  }
+]
