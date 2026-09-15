@@ -186,7 +186,7 @@ export function PlayerDashboard({ name, avatarUrl, position, scopeLabel, evoluti
                 <span className="player-home-130c__avatar-initials">{initials}</span>
               )}
             </span>
-            <div><span className="player-home-130c__identity-kicker player-home-130h__identity-kicker">11 CRACKS · JUGADOR</span><strong>{name}</strong><small>{scopeLabel}{roleContext ? ` · ${roleContext}` : ""}</small></div>
+            <div><span className="player-home-130c__identity-kicker player-home-130h__identity-kicker">{scopeLabel}</span><strong>{name}</strong>{roleContext ? <small>{roleContext}</small> : null}</div>
           </header>
 
           <div className="player-home-130c__evolution player-home-130h__evolution">

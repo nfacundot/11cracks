@@ -7,6 +7,7 @@ import type { NavigationGroup, NavigationItem, ShellRole } from "@/lib/shell/nav
 import { NavigationIcon } from "./navigation-icon";
 import { RoleAtmosphere } from "./role-atmosphere";
 import { LogoutForm } from "./logout-form";
+import { NotificationBell } from "./notification-bell";
 
 export type ShellUser = {
   name: string;
@@ -30,7 +31,7 @@ const profileHrefByRole: Record<ShellRole, string> = {
   superadmin: "/superadmin/perfil",
 };
 
-const playerDockIds = new Set(["dashboard", "progress", "training", "neurocracks"]);
+const playerDockIds = new Set(["dashboard", "training", "coins", "profile"]);
 
 function isActivePath(pathname: string, href: string) {
   if (pathname === href) return true;
@@ -130,6 +131,9 @@ export function AppShell({ user, groups, children, clubLogo, scopeLabel }: { use
     ? navigationItems.filter((item) => playerDockIds.has(item.id))
     : navigationItems.filter((item) => item.id !== "profile" && item.id !== "settings").slice(0, 4);
 
+  const dockLeft = user.role === "player" ? dockItems.slice(0, 2) : dockItems;
+  const dockRight = user.role === "player" ? dockItems.slice(2) : [];
+
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false);
     requestAnimationFrame(() => menuTriggerRef.current?.focus());
@@ -172,6 +176,7 @@ export function AppShell({ user, groups, children, clubLogo, scopeLabel }: { use
   return (
     <div className="app-shell" data-role={user.role} data-player-home={pathname === "/jugador"}>
       <RoleAtmosphere role={user.role} />
+      {user.role === "player" ? <NotificationBell /> : null}
 
       <aside className="shell-rail">
         <Brand />
@@ -182,23 +187,25 @@ export function AppShell({ user, groups, children, clubLogo, scopeLabel }: { use
         </div>
       </aside>
 
-      <div className="shell-mobile-head">
+      <div className="shell-mobile-head" data-player-head={user.role === "player"}>
         <Brand compact />
-        {user.role === "player" && clubLogo ? (
+        {user.role === "player" ? null : clubLogo ? (
           <div className="shell-mobile-scope" aria-label={`Alcance activo: ${effectiveScope}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="shell-mobile-scope__club" src={clubLogo} alt="" />
           </div>
         ) : null}
-        <button
-          ref={menuTriggerRef}
-          className="shell-menu-trigger"
-          type="button"
-          aria-label="Abrir navegación"
-          aria-expanded={drawerOpen}
-          aria-controls="mobile-navigation"
-          onClick={openDrawer}
-        ><span /><span /></button>
+        {user.role === "player" ? null : (
+          <button
+            ref={menuTriggerRef}
+            className="shell-menu-trigger"
+            type="button"
+            aria-label="Abrir navegación"
+            aria-expanded={drawerOpen}
+            aria-controls="mobile-navigation"
+            onClick={openDrawer}
+          ><span /><span /></button>
+        )}
       </div>
 
       <div className="shell-main">
@@ -223,19 +230,37 @@ export function AppShell({ user, groups, children, clubLogo, scopeLabel }: { use
           </details>
         </header>
 
-        <main className="shell-content">{children}</main>
+        <main className="shell-content">
+          <div className="shell-preview" key={pathname}>{children}</div>
+        </main>
       </div>
 
-      <nav className="shell-dock" aria-label="Navegación rápida">
-        {dockItems.map((item) => (
+      <nav className="shell-dock" aria-label="Navegación rápida" data-center-fab={user.role === "player"}>
+        {dockLeft.map((item) => (
           <NavLink key={item.id} item={item} pathname={pathname} />
         ))}
-        {user.role !== "player" ? (
+        {user.role === "player" ? (
+          <button
+            type="button"
+            className="shell-dock__fab"
+            onClick={openDrawer}
+            aria-label="Abrir menú completo"
+            aria-expanded={drawerOpen}
+            aria-controls="mobile-navigation"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/img/icons/faviconlit.png" alt="" />
+          </button>
+        ) : null}
+        {dockRight.map((item) => (
+          <NavLink key={item.id} item={item} pathname={pathname} />
+        ))}
+        {user.role === "player" ? null : (
           <button type="button" onClick={openDrawer} aria-label="Abrir menú completo">
             <span className="shell-dock__more" aria-hidden="true"><i /><i /><i /></span>
             <span>Menú</span>
           </button>
-        ) : null}
+        )}
       </nav>
 
       <div className="shell-drawer" data-open={drawerOpen} aria-hidden={!drawerOpen}>

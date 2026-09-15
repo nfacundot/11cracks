@@ -1,6 +1,7 @@
 export default function RootLoading() {
   return (
     <div
+      className="cracks-root-loading"
       style={{
         position: "fixed",
         inset: 0,
@@ -39,6 +40,10 @@ export default function RootLoading() {
         @keyframes cracks-loading-pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(0.86); opacity: 0.55; }
+        }
+        /* El "Cargando…" es de escritorio: en mobile manda el splash screen. */
+        @media (max-width: 767px) {
+          .cracks-root-loading { display: none !important; }
         }
       `}</style>
     </div>

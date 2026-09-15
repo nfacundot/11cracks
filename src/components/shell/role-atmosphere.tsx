@@ -56,12 +56,25 @@ function RoleGeometry({ role }: { role: ShellRole }) {
 export function RoleAtmosphere({ role }: { role: ShellRole }) {
   return (
     <div className="role-atmosphere" data-world={role} aria-hidden="true">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="role-atmosphere__image"
-        src="/img/back/backstad.webp"
-        alt=""
-      />
+      {role === "player" ? (
+        <>
+          <picture className="role-atmosphere__scene role-atmosphere__scene--day">
+            <source media="(max-width: 47.9375rem)" srcSet="/img/back/backstadmobday.jpg" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="role-atmosphere__image" src="/img/back/backstadday.jpg" alt="" />
+          </picture>
+          <picture className="role-atmosphere__scene role-atmosphere__scene--night">
+            <source media="(max-width: 47.9375rem)" srcSet="/img/back/backstadmob.jpg" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="role-atmosphere__image" src="/img/back/backstad.webp" alt="" />
+          </picture>
+        </>
+      ) : (
+        <picture className="role-atmosphere__scene role-atmosphere__scene--night">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="role-atmosphere__image" src="/img/back/backstad.webp" alt="" />
+        </picture>
+      )}
       <div className="role-atmosphere__grade" />
       <div className="role-atmosphere__vignette" />
       <div className="role-atmosphere__light" />

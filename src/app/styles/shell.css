@@ -227,7 +227,10 @@
 .shell-account-actions button:hover { color: var(--text-primary); background: var(--surface-control-hover); }
 
 .shell-content { width: 100%; min-height: calc(100svh - 9.5rem); margin-inline: auto; padding: 0 clamp(var(--space-5), 3.5vw, var(--space-7)) calc(var(--shell-mobile-dock-height) + 1.65rem + env(safe-area-inset-bottom)); }
-.shell-preview { animation: shell-enter var(--motion-entrance) var(--ease-standard) both; }
+.shell-preview { animation: shell-enter var(--motion-entrance) var(--ease-standard) both; transform-origin: 50% 0; }
+
+/* Parallax de scroll: la página asciende de abajo hacia arriba al hacer scroll */
+.shell-content { animation: shell-scroll-rise linear; animation-timeline: scroll(root block); transform-origin: 50% 0; }
 
 .shell-dock { position: fixed; right: var(--space-3); bottom: max(var(--space-3), env(safe-area-inset-bottom)); left: var(--space-3); z-index: 35; display: grid; grid-template-columns: repeat(4, 1fr); min-height: var(--shell-mobile-dock-height); overflow: visible; border: 1px solid color-mix(in oklch, var(--brand-gold) 30%, transparent); border-radius: 0.25rem; background: linear-gradient(180deg, oklch(0.1 0.007 100 / 0.96), oklch(0.045 0.004 100 / 0.98)); box-shadow: 0 1.4rem 3.2rem oklch(0.02 0.003 105 / 0.72), 0 0 2.4rem color-mix(in oklch, var(--brand-gold) 7%, transparent); backdrop-filter: blur(1.05rem); }
 .shell-dock::before { content: ""; position: absolute; top: -0.28rem; left: 18%; width: 64%; height: 0.28rem; border-inline: 1px solid var(--brand-gold-muted); background: oklch(0.065 0.005 100 / 0.96); clip-path: polygon(2% 100%, 5% 0, 95% 0, 98% 100%); }
@@ -260,7 +263,8 @@
 .shell-drawer__panel > .shell-account-actions a,
 .shell-drawer__panel > .shell-account-actions button { justify-content: center; padding: 0.3rem; font-size: 0.72rem; text-align: center; }
 
-@keyframes shell-enter { from { opacity: 0; transform: translateY(0.7rem); filter: blur(0.3rem); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes shell-enter { from { opacity: 0; transform: translateY(3.5rem); filter: blur(0.4rem); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes shell-scroll-rise { from { transform: translateY(6%); opacity: 0.94; } to { transform: translateY(0); opacity: 1; } }
 @keyframes role-scene-enter { from { opacity: 0.55; transform: scale(1.055); } to { opacity: 1; transform: scale(1.018); } }
 @keyframes role-light-drift { from { transform: rotate(10deg) translateX(-5%); opacity: 0.32; } to { transform: rotate(10deg) translateX(8%); opacity: 0.56; } }
 @keyframes active-mark-response { 0%, 100% { opacity: 0.55; transform: rotate(45deg) scale(0.72); } 50% { opacity: 1; transform: rotate(45deg) scale(1.12); } }
@@ -307,10 +311,13 @@
   .shell-account__copy { max-width: 6.8rem; }
   .shell-account__copy small { display: none; }
   .shell-content { padding: 0 clamp(var(--space-4), 5vw, var(--space-6)) calc(var(--shell-mobile-dock-height) + 1.65rem + env(safe-area-inset-bottom)); }
+  /* En mobile el parallax vertical deja un hueco arriba: se desactiva */
+  .shell-content { animation: none; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .shell-preview,
+  .shell-content,
   .role-atmosphere__image,
   .role-atmosphere__light,
   .shell-nav__active-mark { animation: none; }

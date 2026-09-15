@@ -612,6 +612,11 @@
 @media (max-width: 47.9375rem) {
   .player-home-130h__canvas { padding: 1rem 1rem calc(5.5rem + env(safe-area-inset-bottom)); }
 
+  .app-shell[data-player-home="true"] .shell-topbar { display: none; }
+
+.player-home-130h__identity {
+    display: none;
+  }
   .player-home-130h .player-evolution__copy h2 { font-size: clamp(2.55rem, 13vw, 3.5rem); }
   .player-home-130h .player-evolution__visual { width: min(100%, 16rem); margin-top: .25rem; }
   .player-home-130h .player-evolution--home .player-evolution__dimensions { width: min(100%, 19rem); }

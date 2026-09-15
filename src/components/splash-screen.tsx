@@ -23,11 +23,13 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
   }, []);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const update = () => setIsDark(mq.matches);
+    const update = () => {
+      const hour = new Date().getHours();
+      setIsDark(hour >= 19 || hour < 7);
+    };
     update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
+    const timer = setInterval(update, 60000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -89,18 +91,6 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
         style={{
           width: "min(72vw, 560px)",
           padding: "clamp(2rem, 8vw, 4rem)",
-          borderRadius: "28px",
-          background: isDark
-            ? "rgba(20, 26, 23, 0.35)"
-            : "rgba(255, 255, 255, 0.35)",
-          border: isDark
-            ? "1px solid rgba(255, 255, 255, 0.12)"
-            : "1px solid rgba(255, 255, 255, 0.6)",
-          boxShadow: isDark
-            ? "0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08)"
-            : "0 8px 32px rgba(90, 110, 100, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
-          backdropFilter: "blur(18px)",
-          WebkitBackdropFilter: "blur(18px)",
         }}
       >
         <img
@@ -113,7 +103,7 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
             height: "auto",
             objectFit: "contain",
             filter: isDark
-              ? "none"
+              ? "drop-shadow(0 4px 18px rgba(0, 0, 0, 0.45))"
               : "drop-shadow(0 2px 10px rgba(16, 22, 19, 0.12))",
           }}
           draggable={false}
