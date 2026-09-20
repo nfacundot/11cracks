@@ -415,7 +415,7 @@ export function OidoCrackManager({ words, gameId }: { words: WordViewModel[]; ga
               return (
                 <div
                   key={w.id}
-                  className="flex items-center gap-2 rounded-xl border border-white/5 bg-[#080909]/85 p-2"
+                  className="flex items-center gap-2 rounded-xl border border-white/5 tk-panel p-2"
                 >
                   <div className="flex flex-col gap-1">
                     <p className="text-[10px] font-black uppercase tracking-widest text-cyan-300">

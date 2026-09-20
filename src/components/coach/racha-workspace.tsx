@@ -75,7 +75,7 @@ export function RachaWorkspace({ workspace }: { workspace: StreakWorkspace }) {
     return (
       <div className="flex flex-col gap-6 pt-12">
         <GlobalHero eyebrow="COACH · RACHA" title="Racha" subtitle="Constancia verificable del equipo." />
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-6">
           <p className="text-[13px]" style={{ color: S.textSecondary }}>No tienes equipos asignados como entrenador.</p>
         </section>
       </div>
@@ -90,27 +90,27 @@ export function RachaWorkspace({ workspace }: { workspace: StreakWorkspace }) {
         subtitle="La racha mide constancia verificable: asistencia, NeuroCracks y más. Sin reglas ACTIVE de PET/Validaciones nunca se fabrica un FINAL."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club</span>
-            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setPlayerId(workspace.scopes.find((s) => s.clubId === e.target.value)?.players[0]?.id ?? ""); }} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setPlayerId(workspace.scopes.find((s) => s.clubId === e.target.value)?.players[0]?.id ?? ""); }} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               {workspace.scopes.map((scope) => <option key={scope.clubId} value={scope.clubId}>{scope.clubName}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Jugador</span>
-            <select value={playerId} onChange={(e) => setPlayerId(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={playerId} onChange={(e) => setPlayerId(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               {players.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Periodo desde</span>
-            <input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Periodo hasta</span>
-            <input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -214,7 +214,7 @@ export function CoachConfiguracionView({
 
       {/* ─── Equipo del coach (parte superior) ─── */}
       {team.id ? (
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-5">
             {team.logoUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -294,7 +294,7 @@ export function CoachConfiguracionView({
       ) : null}
 
       {/* ─── Panel: Preferencias del entrenador / Configurar Equipo ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h3 className="text-[13px] font-extrabold uppercase tracking-[0.08em]" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
@@ -436,7 +436,7 @@ export function CoachConfiguracionView({
                 style={{ fontFamily: S.barlow, color: S.textPrimary }}
               />
               {suggestions.length > 0 ? (
-                <div className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-[10px] border border-white/[0.08] bg-[#0B0D0D] shadow-xl shadow-black/50">
+                <div className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-[10px] border border-white/[0.08] tk-panel-solid shadow-xl shadow-black/50">
                   {suggestions.map((player) => (
                     <button
                       key={player.id}
@@ -488,7 +488,7 @@ export function CoachConfiguracionView({
                       value={assignments[player.id] ?? ""}
                       onChange={(e) => changePosition(player, e.target.value)}
                       disabled={savingPosId === player.id}
-                      className="w-[110px] shrink-0 rounded-[8px] border border-[#C9A24A]/30 bg-[#141414] px-1.5 py-1.5 text-[11px] font-bold outline-none transition focus:border-[#C9A24A]/60 disabled:opacity-50"
+                      className="w-[110px] shrink-0 rounded-[8px] border border-[#C9A24A]/30 tk-panel-solid px-1.5 py-1.5 text-[11px] font-bold outline-none transition focus:border-[#C9A24A]/60 disabled:opacity-50"
                       style={{ fontFamily: S.barlow, color: S.textPrimary }}
                       aria-label={`Posición de ${player.name}`}
                     >
@@ -667,7 +667,7 @@ export function CoachConfiguracionView({
               role="alert"
               className={`fixed left-1/2 top-6 z-[100] flex max-w-md -translate-x-1/2 items-center gap-3 rounded-[12px] border px-4 py-3 shadow-2xl shadow-black/60 ${
                 toast.kind === "ok"
-                  ? "border-[#C9A24A]/50 bg-[#0B0D0D]"
+                  ? "border-[#C9A24A]/50 tk-panel-solid"
                   : "border-red-500/50 bg-[#1A0D0D]"
               }`}
               style={{ fontFamily: S.barlow }}
@@ -682,7 +682,7 @@ export function CoachConfiguracionView({
               </span>
               <p
                 className={`text-[13px] font-bold leading-snug ${
-                  toast.kind === "ok" ? "text-[#F3F0E8]" : "text-red-400"
+                  toast.kind === "ok" ? "text-(--text-primary)" : "text-red-400"
                 }`}
               >
                 {toast.msg}

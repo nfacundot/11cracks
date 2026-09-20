@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -97,7 +97,7 @@ function ActionForm({ batch, clubId, fields, submitLabel, action, confirmText }:
               type={date ? "date" : numeric ? "number" : "text"}
               min={numeric ? 0 : undefined}
               step={numeric && f.key !== "bottlesSent" && f.key !== "copPaid" ? "0.001" : undefined}
-              className={`rounded-[8px] border border-white/10 bg-black/40 px-3 py-2 text-[12px] outline-none focus:border-[#C9A24A]/60 ${date ? "" : "w-48"}`}
+              className={`rounded-[8px] border border-white/10 tk-control px-3 py-2 text-[12px] outline-none focus:border-[#C9A24A]/60 ${date ? "" : "w-48"}`}
               style={{ color: S.textPrimary }}
             />
           </label>
@@ -171,38 +171,38 @@ export function PetWorkspace({ view }: { view: PetWorkspaceClub[] }) {
         subtitle="Recolección → Lote → Pesaje real → Liquidación → Conciliación. El estimado nunca se convierte en dinero real."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <label className="flex flex-col gap-1.5 md:max-w-[260px]">
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club</span>
-          <select value={clubId} onChange={(e) => { setClubId(e.target.value); setSelectedContributions([]); }} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+          <select value={clubId} onChange={(e) => { setClubId(e.target.value); setSelectedContributions([]); }} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
             {view.map((item) => <option key={item.clubId} value={item.clubId}>{item.clubName}</option>)}
           </select>
         </label>
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Registrar recolección · {club?.clubName ?? "Sin club"}
         </h3>
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Jugador</span>
-            <select value={contributionForm.playerId} onChange={(e) => setContributionForm((prev) => ({ ...prev, playerId: e.target.value }))} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={contributionForm.playerId} onChange={(e) => setContributionForm((prev) => ({ ...prev, playerId: e.target.value }))} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               <option value="">Sin jugador asignado</option>
               {(club?.players ?? []).map((player) => <option key={player.id} value={player.id}>{player.name}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Botellas</span>
-            <input type="number" min={0} value={contributionForm.bottles || ""} onChange={(e) => setContributionForm((prev) => ({ ...prev, bottles: e.target.valueAsNumber }))} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="number" min={0} value={contributionForm.bottles || ""} onChange={(e) => setContributionForm((prev) => ({ ...prev, bottles: e.target.valueAsNumber }))} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Fecha</span>
-            <input type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="date" defaultValue={new Date().toISOString().slice(0, 10)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Kg estimados (opcional)</span>
-            <input type="number" min={0} step="0.001" value={contributionForm.estimatedKg} onChange={(e) => setContributionForm((prev) => ({ ...prev, estimatedKg: e.target.value }))} placeholder="Solo visible, no genera COP" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="number" min={0} step="0.001" value={contributionForm.estimatedKg} onChange={(e) => setContributionForm((prev) => ({ ...prev, estimatedKg: e.target.value }))} placeholder="Solo visible, no genera COP" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
         <button type="button" disabled={isPending} onClick={submitContribution} className="mt-5 rounded-[10px] border border-[#C9A24A]/40 bg-[#C9A24A]/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition hover:bg-[#C9A24A]/20 disabled:opacity-40" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
@@ -210,14 +210,14 @@ export function PetWorkspace({ view }: { view: PetWorkspaceClub[] }) {
         </button>
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Crear lote (DRAFT)
         </h3>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Código único de lote</span>
-            <input value={batchCode} onChange={(e) => setBatchCode(e.target.value)} placeholder="LOTE-001" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={batchCode} onChange={(e) => setBatchCode(e.target.value)} placeholder="LOTE-001" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <div className="flex items-end">
             <button type="button" disabled={isPending || selectedContributions.length === 0 || !batchCode.trim()} onClick={submitCreateBatch} className="rounded-[10px] border border-[#C9A24A]/40 bg-[#C9A24A]/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition hover:bg-[#C9A24A]/20 disabled:opacity-40" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
@@ -240,7 +240,7 @@ export function PetWorkspace({ view }: { view: PetWorkspaceClub[] }) {
         </div>
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Lotes · {club?.clubName ?? "Sin club"}
         </h3>
@@ -277,7 +277,7 @@ export function PetWorkspace({ view }: { view: PetWorkspaceClub[] }) {
         {message ? <p className="mt-4 text-[12px]" style={{ color: message.kind === "ok" ? "#7FA65A" : "#D2694A" }}>{message.text}</p> : null}
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Aportes recientes
         </h3>

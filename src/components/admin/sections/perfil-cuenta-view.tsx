@@ -18,7 +18,7 @@ export function PerfilCuentaView({ title, user }: { title: "Perfil" | "Configura
         subtitle="Operación autorizada · alcance administrativo de tu organización."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6 max-w-md">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6 max-w-md">
         <div className="flex flex-col gap-1 text-center">
           <p
             className="text-[20px] font-bold"

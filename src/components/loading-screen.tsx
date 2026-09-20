@@ -21,7 +21,7 @@ export function LoadingScreen({ bgPosition = "37% 20%" }: { bgPosition?: string 
   if (progress >= 100) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050606]">
+    <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center tk-panel">
       <div
         className="absolute inset-0 bg-cover bg-no-repeat opacity-15"
         style={{
@@ -39,7 +39,7 @@ export function LoadingScreen({ bgPosition = "37% 20%" }: { bgPosition?: string 
           <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#686862]">
             Cargando
           </span>
-          <div className="h-0.5 w-48 overflow-hidden rounded-full bg-[#0E1111]">
+          <div className="h-0.5 w-48 overflow-hidden rounded-full tk-panel-solid">
             <div
               className="h-full rounded-full bg-[#C9A24A] transition-all duration-100"
               style={{ width: `${progress}%` }}

@@ -104,7 +104,7 @@ export function EvaluacionWorkspace({ workspace }: { workspace: EvaluationsWorks
     return (
       <div className="flex flex-col gap-6 pt-12">
         <GlobalHero eyebrow="COACH · OBSERVACIÓN" title="Evaluar" subtitle="Registra lo que observaste en cancha." />
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-6">
           <p className="text-[13px]" style={{ color: S.textSecondary }}>No tienes equipos asignados como entrenador en este club.</p>
         </section>
       </div>
@@ -119,27 +119,27 @@ export function EvaluacionWorkspace({ workspace }: { workspace: EvaluationsWorks
         subtitle="Selecciona el jugador y registra lo observado con la rúbrica. Publicar recalcula el snapshot con la fórmula activa."
       />
 
-      <form ref={formRef} className="flex flex-col gap-5 rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <form ref={formRef} className="flex flex-col gap-5 rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club</span>
-            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setPlayerId(workspace.scopes.find((s) => s.clubId === e.target.value)?.players[0]?.id ?? ""); setSelected({}); }} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setPlayerId(workspace.scopes.find((s) => s.clubId === e.target.value)?.players[0]?.id ?? ""); setSelected({}); }} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               {workspace.scopes.map((scope) => <option key={scope.clubId} value={scope.clubId}>{scope.clubName}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Jugador</span>
-            <select value={playerId} onChange={(e) => { setPlayerId(e.target.value); setSelected({}); }} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={playerId} onChange={(e) => { setPlayerId(e.target.value); setSelected({}); }} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               {players.map((player) => <option key={player.id} value={player.id}>{player.name}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Periodo desde</span>
-            <input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="date" value={periodStart} onChange={(e) => setPeriodStart(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Periodo hasta</span>
-            <input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="date" value={periodEnd} onChange={(e) => setPeriodEnd(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
 
@@ -175,7 +175,7 @@ export function EvaluacionWorkspace({ workspace }: { workspace: EvaluationsWorks
         </div>
       </form>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Evaluaciones de {players.find((p) => p.id === playerId)?.name ?? "Jugador"}
         </h3>
@@ -216,7 +216,7 @@ function RubricPanel({ title, dimensions, selected, onSelect }: {
   onSelect: (key: string, level: RubricLevel) => void;
 }) {
   return (
-    <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+    <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
       <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
         {title}
       </h3>
@@ -236,7 +236,7 @@ function RubricPanel({ title, dimensions, selected, onSelect }: {
                     type="button"
                     onClick={() => onSelect(dimension.key, level)}
                     className={`rounded-[8px] border px-2.5 py-1.5 text-[11px] transition ${active ? "border-[#C9A24A]/70 bg-[#C9A24A]/15" : "border-white/10 bg-black/30 hover:border-white/25"}`}
-                    style={{ color: active ? "#F3F0E8" : S.textSecondary }}
+                    style={{ color: active ? "var(--text-primary)" : S.textSecondary }}
                   >
                     {RUBRIC_LABEL[level]}<em className="ml-1 not-italic opacity-70">{RUBRIC_VALUE[level]}</em>
                   </button>

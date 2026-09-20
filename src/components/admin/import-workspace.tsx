@@ -120,24 +120,24 @@ export function ImportWorkspace({ view }: { view: ImportWorkspace }) {
         subtitle="Suba un CSV, revise errores, aplique filas válidas con idempotencia por archivo y fila. Duplicar un archivo idéntico no permite re-importar."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Subir archivo
         </h3>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Tipo</span>
-            <select value={importType} onChange={(e) => setImportType(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={importType} onChange={(e) => setImportType(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               <option value="pet_contributions">pet_contributions</option>
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club (opcional)</span>
-            <input value={clubId} onChange={(e) => setClubId(e.target.value)} placeholder="Si vacío, se infiere del contenido" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={clubId} onChange={(e) => setClubId(e.target.value)} placeholder="Si vacío, se infiere del contenido" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Archivo CSV</span>
-            <input type="file" accept=".csv,.tsv,.txt" onChange={readAndSetFile} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="file" accept=".csv,.tsv,.txt" onChange={readAndSetFile} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
         {fileText ? (
@@ -154,7 +154,7 @@ export function ImportWorkspace({ view }: { view: ImportWorkspace }) {
         {message ? <p className="mt-3 text-[12px]" style={{ color: message.kind === "ok" ? "#7FA65A" : "#D2694A" }}>{message.text}</p> : null}
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Lotes
@@ -191,7 +191,7 @@ export function ImportWorkspace({ view }: { view: ImportWorkspace }) {
       </section>
 
       {selectedBatch && (
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
               Detalle: {selectedBatch.fileName}

@@ -81,7 +81,7 @@ export function EquipoView({
         subtitle="Consulta, acompaña y sigue la evolución de tu plantel."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/25 bg-[#080909]/85 p-5">
+      <section className="rounded-[14px] border border-[#C9A24A]/25 tk-panel p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <p
@@ -136,7 +136,7 @@ export function EquipoView({
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-[14px] border border-white/[0.05] bg-[#080909]/85">
+        <div className="overflow-hidden rounded-[14px] border border-white/[0.05] tk-panel">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] border-collapse text-left" style={{ fontFamily: S.barlow }}>
               <thead>
@@ -363,7 +363,7 @@ export function EquipoView({
               name="name"
               required
               placeholder="Nombre y apellido"
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             />
           </label>
@@ -376,7 +376,7 @@ export function EquipoView({
               name="username"
               required
               placeholder="nombre.usuario"
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             />
           </label>
@@ -390,7 +390,7 @@ export function EquipoView({
               type="email"
               required
               placeholder="jugador@correo.com"
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             />
           </label>
@@ -405,7 +405,7 @@ export function EquipoView({
               required
               minLength={6}
               placeholder="Mínimo 6 caracteres"
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             />
           </label>
@@ -417,7 +417,7 @@ export function EquipoView({
             <select
               name="role"
               defaultValue="PLAYER"
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             >
               {ROLE_OPTIONS.map((r) => (
@@ -435,7 +435,7 @@ export function EquipoView({
             <select
               name="lineupPosition"
               defaultValue=""
-              className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
+              className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/50"
               style={{ color: S.textPrimary }}
             >
               <option value="">Sin posición</option>

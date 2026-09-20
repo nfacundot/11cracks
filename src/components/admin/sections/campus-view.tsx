@@ -13,7 +13,7 @@ export function CampusView() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Panel 1: Asistencia del equipo */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Asistencia del equipo
           </h3>
@@ -31,7 +31,7 @@ export function CampusView() {
         </section>
 
         {/* Panel 2: Evaluaciones */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Evaluaciones
           </h3>
@@ -49,7 +49,7 @@ export function CampusView() {
         </section>
 
         {/* Panel 3: Horas validadas */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Horas validadas
           </h3>
@@ -67,7 +67,7 @@ export function CampusView() {
         </section>
 
         {/* Panel 4: Qué notar hoy */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Qué notar hoy
           </h3>

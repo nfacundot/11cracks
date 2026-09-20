@@ -306,3 +306,19 @@ html.light .login-page .login-footer__separator { background: var(--lg-focus); }
     transform: none;
   }
 }
+/* Escena PlayCanvas del paso de rol (avatar jugador/entrenador) */
+.avatar-stage {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 162, 74, 0.25);
+  background: radial-gradient(120% 90% at 50% 100%, rgba(20, 55, 31, 0.55), rgba(8, 9, 9, 0.95));
+}
+
+.avatar-stage__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

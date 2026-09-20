@@ -16,7 +16,7 @@ const HISTORIAL = [
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6 ${className}`}>
+    <section className={`rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6 ${className}`}>
       <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
         {title}
       </h3>
@@ -35,7 +35,7 @@ export function EntrenamientoView() {
       />
 
       {/* ─── Panel 1: Próximo entrenamiento ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
           Próximo entrenamiento
         </h3>

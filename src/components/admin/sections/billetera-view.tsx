@@ -25,7 +25,7 @@ export function BilleteraView() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* ─── Panel 1: Fuentes operativas ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3
             className="text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ fontFamily: S.barlow, color: S.textSecondary }}
@@ -53,7 +53,7 @@ export function BilleteraView() {
         </section>
 
         {/* ─── Panel 2: Indicadores de impacto ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3
             className="text-[11px] font-semibold uppercase tracking-[0.14em]"
             style={{ fontFamily: S.barlow, color: S.textSecondary }}

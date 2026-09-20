@@ -105,29 +105,29 @@ export function CoinsWorkspace({ view }: { view: CoinsWorkspace }) {
         subtitle="Ledger idempotente por idempotencyKey. Sin regla CoinRuleVersion ACTIVE no se emiten monedas (PENDING_RULE)."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Corrección manual (ADMIN)
         </h3>
         <div className="mt-4 grid gap-4 md:grid-cols-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club</span>
-            <select value={form.clubId} onChange={(e) => setForm((prev) => ({ ...prev, clubId: e.target.value }))} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={form.clubId} onChange={(e) => setForm((prev) => ({ ...prev, clubId: e.target.value }))} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               <option value="">Seleccione club</option>
               {clubs.map((c) => <option key={c.clubId} value={c.clubId}>{c.clubName}</option>)}
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Jugador</span>
-            <input value={form.playerId} onChange={(e) => setForm((prev) => ({ ...prev, playerId: e.target.value }))} placeholder="Id del jugador" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={form.playerId} onChange={(e) => setForm((prev) => ({ ...prev, playerId: e.target.value }))} placeholder="Id del jugador" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Delta CC</span>
-            <input type="number" value={form.coinDelta} onChange={(e) => setForm((prev) => ({ ...prev, coinDelta: e.target.value }))} placeholder="+80 o -80" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="number" value={form.coinDelta} onChange={(e) => setForm((prev) => ({ ...prev, coinDelta: e.target.value }))} placeholder="+80 o -80" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Nota</span>
-            <input value={form.notes} onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))} placeholder="Motivo (auditable)" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={form.notes} onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))} placeholder="Motivo (auditable)" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
         <button type="button" disabled={isPending} onClick={submitCorrection} className="mt-4 rounded-[10px] border border-[#C9A24A]/40 bg-[#C9A24A]/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition hover:bg-[#C9A24A]/20 disabled:opacity-40" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
@@ -137,7 +137,7 @@ export function CoinsWorkspace({ view }: { view: CoinsWorkspace }) {
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Balances por jugador
           </h3>
@@ -147,7 +147,7 @@ export function CoinsWorkspace({ view }: { view: CoinsWorkspace }) {
           </div>
         </section>
 
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Ledger reciente
           </h3>

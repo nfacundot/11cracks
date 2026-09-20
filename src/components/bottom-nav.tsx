@@ -25,7 +25,7 @@ export function BottomNav() {
       : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.04] bg-[#020303]/95 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.04] tk-bar backdrop-blur-xl md:hidden">
       <div className="safe-bottom mx-auto flex w-full max-w-md items-stretch justify-between">
         {items.map((link) => (
           <Link

@@ -292,7 +292,7 @@ export function GolPalabraManager({ words, gameId }: { words: WordViewModel[]; g
               return (
                 <div
                   key={w.id}
-                  className="rounded-xl border border-white/5 bg-[#080909]/85 p-2"
+                  className="rounded-xl border border-white/5 tk-panel p-2"
                 >
                   <p className="text-[10px] font-black uppercase tracking-widest text-lime-300">
                     🔊 {w.word}

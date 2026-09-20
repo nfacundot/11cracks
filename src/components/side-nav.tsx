@@ -78,7 +78,7 @@ export function SideNav({
     .toUpperCase();
 
   return (
-    <nav className="sticky top-0 flex h-dvh w-[300px] shrink-0 flex-col border-r border-white/[0.04] bg-[#020303] max-md:hidden">
+    <nav className="sticky top-0 flex h-dvh w-[300px] shrink-0 flex-col border-r border-white/[0.04] tk-bar max-md:hidden">
       <div className="flex shrink-0 items-center justify-center px-6 py-6">
         <img
           src="/img/emotes/11-crackslogta.svg"
@@ -122,7 +122,7 @@ export function SideNav({
           </div>
         )}
         <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="truncate text-sm font-bold uppercase leading-none text-[#F2F0E9]">
+          <span className="truncate text-sm font-bold uppercase leading-none text-(--text-primary)">
             {user.name}
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#C9A24A]">

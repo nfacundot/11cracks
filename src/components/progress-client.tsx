@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   LineChart,
@@ -51,7 +51,7 @@ const EVALUACIONES_RECIENTES = [
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6 ${className}`}>
+    <section className={`rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6 ${className}`}>
       <h3
         className="text-[11px] font-semibold uppercase tracking-[0.14em]"
         style={{ fontFamily: S.barlow, color: S.textSecondary }}
@@ -65,7 +65,7 @@ function Panel({ title, children, className = "" }: { title: string; children: R
 
 function StatCard({ label, value, sub }: { label: string; value: React.ReactNode; sub: string }) {
   return (
-    <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6 flex-1 min-w-0">
+    <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6 flex-1 min-w-0">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
         {label}
       </p>
@@ -206,7 +206,7 @@ export function ProgressClient({
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="SEGUIMIENTO">
           <div className="space-y-4">
-            <blockquote className="text-[14px] font-medium italic text-[#F2F0E9]" style={{ fontFamily: S.barlow }}>
+            <blockquote className="text-[14px] font-medium italic text-(--text-primary)" style={{ fontFamily: S.barlow }}>
               "Trabaja recepción orientada con pierna izquierda."
             </blockquote>
             <p className="text-[12px] font-medium text-[#AAA69C]" style={{ fontFamily: S.barlow }}>

@@ -94,7 +94,7 @@ export function MiPerfilView({
       />
 
       {/* ─── Foto + datos básicos ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="grid gap-6 md:grid-cols-[auto_1fr]">
           {/* Foto */}
           <div className="flex flex-col items-center gap-3">
@@ -188,7 +188,7 @@ export function MiPerfilView({
 
       {/* ─── Formulario de perfil ─── */}
       <form action={formAction} className="flex flex-col gap-4">
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3
             className="text-[13px] font-extrabold uppercase tracking-[0.08em]"
             style={{ fontFamily: S.barlow, color: S.textPrimary }}
@@ -284,7 +284,7 @@ export function MiPerfilView({
           role="alert"
           className={`fixed left-1/2 top-6 z-[100] flex max-w-md -translate-x-1/2 items-center gap-3 rounded-[12px] border px-4 py-3 shadow-2xl shadow-black/60 ${
             toast.kind === "ok"
-              ? "border-[#C9A24A]/50 bg-[#0B0D0D]"
+              ? "border-[#C9A24A]/50 tk-panel-solid"
               : "border-red-500/50 bg-[#1A0D0D]"
           }`}
           style={{ fontFamily: S.barlow }}
@@ -298,7 +298,7 @@ export function MiPerfilView({
           </span>
           <p
             className={`text-[13px] font-bold leading-snug ${
-              toast.kind === "ok" ? "text-[#F3F0E8]" : "text-red-400"
+              toast.kind === "ok" ? "text-(--text-primary)" : "text-red-400"
             }`}
           >
             {toast.msg}

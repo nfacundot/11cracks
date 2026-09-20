@@ -59,22 +59,22 @@ export function CorrectionsWorkspace({ view }: { view: { corrections: DataCorrec
         subtitle="Nunca se borra o reemplaza silenciosamente: reverso (−coinDelta, reversalOf) + reemplazo (+nuevo delta), todos apuntan a la misma corrección. Policy: solo coin_ledger por ahora."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Solicitar corrección de movimiento (ADMIN)
         </h3>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Id del movimiento (ledger)</span>
-            <input value={form.entityId} onChange={(e) => setForm((prev) => ({ ...prev, entityId: e.target.value }))} placeholder="id de CrackCoinLedger POSTED" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={form.entityId} onChange={(e) => setForm((prev) => ({ ...prev, entityId: e.target.value }))} placeholder="id de CrackCoinLedger POSTED" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Nuevo delta CC</span>
-            <input type="number" value={form.coinDelta} onChange={(e) => setForm((prev) => ({ ...prev, coinDelta: e.target.value }))} placeholder="+80" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input type="number" value={form.coinDelta} onChange={(e) => setForm((prev) => ({ ...prev, coinDelta: e.target.value }))} placeholder="+80" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Motivo</span>
-            <input value={form.reason} onChange={(e) => setForm((prev) => ({ ...prev, reason: e.target.value }))} placeholder="Corrección inicial" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+            <input value={form.reason} onChange={(e) => setForm((prev) => ({ ...prev, reason: e.target.value }))} placeholder="Corrección inicial" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
           </label>
         </div>
         <button type="button" disabled={isPending} onClick={request} className="mt-4 rounded-[10px] border border-[#C9A24A]/40 bg-[#C9A24A]/10 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] transition hover:bg-[#C9A24A]/20 disabled:opacity-40" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
@@ -83,7 +83,7 @@ export function CorrectionsWorkspace({ view }: { view: { corrections: DataCorrec
         {message ? <p className="mt-3 text-[12px]" style={{ color: message.kind === "ok" ? "#7FA65A" : "#D2694A" }}>{message.text}</p> : null}
       </section>
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
           Solicitudes
         </h3>

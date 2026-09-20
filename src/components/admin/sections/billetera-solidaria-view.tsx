@@ -20,7 +20,7 @@ const IMPACTO_CLUB = [
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6 ${className}`}>
+    <section className={`rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6 ${className}`}>
       <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
         {title}
       </h3>
@@ -39,7 +39,7 @@ export function BilleteraSolidariaView() {
           title="Billetera Solidaria"
           subtitle="Entiende qué apoyo existe para ti y qué hace posible el ecosistema."
         />
-        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 px-6 py-4 text-right">
+        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 tk-panel px-6 py-4 text-right">
           <p className="text-[14px] font-extrabold uppercase tracking-tight" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
             Forjadores Pro
           </p>
@@ -50,7 +50,7 @@ export function BilleteraSolidariaView() {
       </div>
 
       {/* ─── Apoyo disponible (panel completo) ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-6">
           <div className="min-w-0 flex-1">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
@@ -119,7 +119,7 @@ export function BilleteraSolidariaView() {
       </div>
 
       {/* ─── MI IMPACTO ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
           Mi impacto
         </h3>

@@ -184,7 +184,7 @@ export function CanchaView({
   );
   const [dragId, setDragId] = useState<string | null>(null);
   const [tool, setTool] = useState<"mover" | "lapiz" | "marcador">("mover");
-  const [color, setColor] = useState("#F3F0E8");
+  const [color, setColor] = useState("var(--text-primary)");
   const [alpha, setAlpha] = useState(1);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [trazos, setTrazos] = useState<Trazo[]>(initialTrazos);
@@ -285,7 +285,7 @@ export function CanchaView({
           const synced: Trazo[] = data.trazos
             .filter((t) => Array.isArray(t.puntos) && t.puntos.length > 0)
             .map((t) => ({
-              color: String(t.color || "#F3F0E8"),
+              color: String(t.color || "var(--text-primary)"),
               width: Number(t.width) || 2.5,
               alpha: Number(t.alpha) || 1,
               puntos: t.puntos!
@@ -547,7 +547,7 @@ export function CanchaView({
         />
       ) : null}
 
-      <section className={playerWindow ? "player-alineacion__panel" : "rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6"}>
+      <section className={playerWindow ? "player-alineacion__panel" : "rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6"}>
         {/* ─── Header del panel ─── */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {readOnly ? (
@@ -613,7 +613,7 @@ export function CanchaView({
               <select
                 value={alignmentId ?? ""}
                 onChange={(e) => switchAlignment(e.target.value)}
-                className="rounded-[8px] border border-white/10 bg-[#080909] px-3 py-1.5 text-[13px] outline-none transition hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
+                className="rounded-[8px] border border-white/10 tk-panel-solid px-3 py-1.5 text-[13px] outline-none transition hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
                 style={{ fontFamily: S.barlow, color: S.textPrimary }}
               >
                 {alignmentList.map((a) => (
@@ -809,7 +809,7 @@ export function CanchaView({
                         />
                       ) : (
                         <div
-                          className={`absolute inset-0 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-[#080909] text-[11px] font-extrabold ${
+                          className={`absolute inset-0 flex h-10 w-10 items-center justify-center rounded-full border-2 tk-panel-solid text-[11px] font-extrabold ${
                             activo || mio ? "border-[#E3C065]" : "border-[#C9A24A]/60"
                           }`}
                           style={{ color: S.textPrimary }}
@@ -821,7 +821,7 @@ export function CanchaView({
                         <div className="absolute -inset-1 animate-pulse rounded-full border-2 border-[#C9A24A] bg-[#C9A24A]/10" />
                       )}
                     </div>
-                    <div className="flex flex-col items-center rounded border border-white/[0.05] bg-[#080909]/90 px-1.5 py-0.5 text-center" style={{ fontFamily: S.barlow }}>
+                    <div className="flex flex-col items-center rounded border border-white/[0.05] tk-panel px-1.5 py-0.5 text-center" style={{ fontFamily: S.barlow }}>
                       <span className="whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.05em]" style={{ color: S.textPrimary }}>
                         {p.name}
                         {mio ? <span className="ml-1 text-emerald-300">· Tú</span> : null}
@@ -850,19 +850,19 @@ export function CanchaView({
                   className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-lg shadow-black/40 transition ${
                     toolsOpen
                       ? "border-[#C9A24A]/70 bg-[#C9A24A]/15 text-[#E3C065]"
-                      : "border-white/10 bg-[#080909]/90 text-[#F3F0E8] hover:border-white/25"
+                      : "border-white/10 tk-panel text-(--text-primary) hover:border-white/25"
                   }`}
                   style={{ fontFamily: S.barlow }}
                 >
                   <PencilIcon className="h-5 w-5" />
                 </button>
-                <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/fab:opacity-100">
+                <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-(--text-primary) shadow-xl opacity-0 transition group-hover/fab:opacity-100">
                   Herramientas de cancha
                 </span>
               </div>
               {toolsOpen && (
                 <div
-                  className="w-[15rem] rounded-[12px] border border-white/10 bg-[#080909]/95 p-3 shadow-2xl shadow-black/60 backdrop-blur"
+                  className="w-[15rem] rounded-[12px] border border-white/10 tk-panel p-3 shadow-2xl shadow-black/60 backdrop-blur"
                   style={{ fontFamily: S.barlow }}
                 >
                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">Herramientas</p>
@@ -880,12 +880,12 @@ export function CanchaView({
                         className={`group/tool relative flex flex-col items-center gap-1 rounded-[10px] border px-1 py-2 transition ${
                           tool === t.id
                             ? "border-[#C9A24A]/70 bg-[#C9A24A]/15 text-[#E3C065]"
-                            : "border-white/10 text-[#F3F0E8] hover:border-white/25 hover:bg-white/[0.03]"
+                            : "border-white/10 text-(--text-primary) hover:border-white/25 hover:bg-white/[0.03]"
                         }`}
                       >
                         {t.icon}
                         <span className="text-[9px] font-bold uppercase tracking-[0.08em]">{t.label}</span>
-                        <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/tool:opacity-100">
+                        <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-(--text-primary) shadow-xl opacity-0 transition group-hover/tool:opacity-100">
                           {t.desc}
                         </span>
                       </button>
@@ -909,7 +909,7 @@ export function CanchaView({
                         className="block h-9 w-9 rounded-full border-2 border-white/25 shadow-inner shadow-black/40 transition group-hover/color:scale-110"
                         style={{ background: `rgba(${hexToRgb(color).join(", ")}, ${alpha})` }}
                       />
-                      <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-[#F3F0E8] shadow-xl opacity-0 transition group-hover/color:opacity-100">
+                      <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-black px-2.5 py-1.5 text-xs font-semibold text-(--text-primary) shadow-xl opacity-0 transition group-hover/color:opacity-100">
                         Elegir color
                       </span>
                     </label>
@@ -1003,7 +1003,7 @@ export function CanchaView({
             onChange={(e) => setPublishName(e.target.value)}
             placeholder="Ej: Alineación Local, 4-3-3 Ofensiva…"
             maxLength={60}
-            className="mb-4 w-full rounded-[10px] border border-white/10 bg-[#080909] px-3 py-2 text-[13px] outline-none transition placeholder:text-white/20 hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
+            className="mb-4 w-full rounded-[10px] border border-white/10 tk-panel-solid px-3 py-2 text-[13px] outline-none transition placeholder:text-white/20 hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
             style={{ fontFamily: S.barlow, color: S.textPrimary }}
           />
           <div className="flex justify-end gap-2">
@@ -1038,7 +1038,7 @@ export function CanchaView({
             onChange={(e) => setRenameName(e.target.value)}
             placeholder="Nombre de la alineación…"
             maxLength={60}
-            className="mb-4 w-full rounded-[10px] border border-white/10 bg-[#080909] px-3 py-2 text-[13px] outline-none transition placeholder:text-white/20 hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
+            className="mb-4 w-full rounded-[10px] border border-white/10 tk-panel-solid px-3 py-2 text-[13px] outline-none transition placeholder:text-white/20 hover:border-[#C9A24A]/30 focus:border-[#C9A24A]/60"
             style={{ fontFamily: S.barlow, color: S.textPrimary }}
           />
           <div className="flex justify-end gap-2">
@@ -1093,7 +1093,7 @@ export function CanchaView({
           role="alert"
           className={`fixed left-1/2 top-6 z-[100] flex max-w-md -translate-x-1/2 items-center gap-3 rounded-[12px] border px-4 py-3 shadow-2xl shadow-black/60 ${
             toast.kind === "ok"
-              ? "border-[#C9A24A]/50 bg-[#0B0D0D]"
+              ? "border-[#C9A24A]/50 tk-panel-solid"
               : "border-red-500/50 bg-[#1A0D0D]"
           }`}
           style={{ fontFamily: S.barlow }}
@@ -1107,7 +1107,7 @@ export function CanchaView({
           </span>
           <p
             className={`text-[13px] font-bold leading-snug ${
-              toast.kind === "ok" ? "text-[#F3F0E8]" : "text-red-400"
+              toast.kind === "ok" ? "text-(--text-primary)" : "text-red-400"
             }`}
           >
             {toast.msg}

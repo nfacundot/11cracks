@@ -30,7 +30,7 @@ export function NeurocracksView() {
           title="NeuroCracks"
           subtitle="Aprende nuevas herramientas para crecer como jugador y como persona."
         />
-        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 px-6 py-4 text-right">
+        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 tk-panel px-6 py-4 text-right">
           <p style={{ fontFamily: S.barlow, fontWeight: 800, fontSize: "clamp(30px, 3vw, 40px)", lineHeight: 1, color: S.textPrimary }}>
             1
           </p>
@@ -55,7 +55,7 @@ export function NeurocracksView() {
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {RUTAS.map((r) => (
-            <div key={r.nombre} className="rounded-[14px] border border-white/[0.05] bg-[#080909]/85 p-4">
+            <div key={r.nombre} className="rounded-[14px] border border-white/[0.05] tk-panel p-4">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ fontFamily: S.barlow, color: "#686862" }}>
                 <span style={{ color: S.gold }}>✦</span> Próximamente
               </span>
@@ -86,7 +86,7 @@ export function NeurocracksView() {
 
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {/* Lado 1: tarjeta principal */}
-          <div className="relative overflow-hidden rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+          <div className="relative overflow-hidden rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: "#686862" }}>
               NeuroCracks · entrenamiento de idioma
             </p>
@@ -116,7 +116,7 @@ export function NeurocracksView() {
           </div>
 
           {/* Lado 2: siguientes desafíos */}
-          <div className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+          <div className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: "#686862" }}>
               Siguiente desafío
             </p>

@@ -1,8 +1,8 @@
 const S = {
   barlow: 'var(--font-barlow), "Barlow Condensed", sans-serif',
-  textPrimary: "#F3F0E8",
-  textSecondary: "#AAA69C",
-  gold: "#C89B32",
+  textPrimary: "var(--text-primary)",
+  textSecondary: "var(--text-secondary)",
+  gold: "var(--brand-gold-bright)",
 };
 
 export function GlobalHero({

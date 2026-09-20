@@ -60,14 +60,14 @@ export function TopBar({
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-[#C9A24A]/10 bg-[#020303]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-20 border-b border-[#C9A24A]/10 tk-bar backdrop-blur-md">
       <div className="flex h-[70px] items-center justify-between px-5 md:px-8">
         {/* Left: Role + Page */}
         <div className="flex flex-col gap-0.5">
           <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#686862]">
             {ROLE_LABELS[user.role] ?? user.role}
           </span>
-          <span className="text-[22px] font-bold uppercase leading-none tracking-wide text-[#F2F0E9] md:text-[26px]">
+          <span className="text-[22px] font-bold uppercase leading-none tracking-wide text-(--text-primary) md:text-[26px]">
             Inicio
           </span>
         </div>
@@ -99,7 +99,7 @@ export function TopBar({
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="flex items-center gap-2 rounded-lg border border-[#C9A24A]/20 bg-[#080909] px-3 py-2 transition hover:border-[#C9A24A]/40 hover:bg-[#0B0D0D]"
+              className="flex items-center gap-2 rounded-lg border border-[#C9A24A]/20 tk-panel-solid px-3 py-2 transition hover:border-[#C9A24A]/40 hover:tk-panel-solid"
             >
               {user.avatarUrl ? (
                 <img
@@ -120,11 +120,11 @@ export function TopBar({
             </button>
 
             {open && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-[12px] border border-[#806322]/30 bg-[#080909] shadow-2xl shadow-black/60">
+              <div className="absolute right-0 top-full z-50 mt-2 w-[260px] overflow-hidden rounded-[12px] border border-[#806322]/30 tk-panel-solid shadow-2xl shadow-black/60">
                 <Link
                   href={PROFILE_URL[user.role] ?? "/jugador/profile"}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
+                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:tk-panel-solid hover:text-(--text-primary)"
                 >
                   <UserIcon className="h-4 w-4 shrink-0" />
                   Perfil
@@ -132,7 +132,7 @@ export function TopBar({
                 <Link
                   href={PROFILE_URL[user.role] ?? "/jugador/profile"}
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
+                  className="flex items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:tk-panel-solid hover:text-(--text-primary)"
                 >
                   <SettingsIcon className="h-4 w-4 shrink-0" />
                   Configuración
@@ -141,7 +141,7 @@ export function TopBar({
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="flex w-full items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:bg-[#0E1111] hover:text-[#F2F0E9]"
+                  className="flex w-full items-center gap-3 px-5 py-3.5 text-[13px] font-medium text-[#A5A39C] transition hover:tk-panel-solid hover:text-(--text-primary)"
                 >
                   <LogOutIcon className="h-4 w-4 shrink-0" />
                   Cerrar sesión

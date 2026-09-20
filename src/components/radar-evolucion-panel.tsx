@@ -13,7 +13,7 @@ import {
 const NEON_PURPLE = "#B044FF";
 const NEON_PURPLE_LIGHT = "#C77DFF";
 const CYAN = "#00C1EB";
-const WHITE = "#F3F0E8";
+const WHITE = "var(--text-primary)";
 const GRAY = "#77746D";
 const GRAY_LIGHT = "#AAA69C";
 const DARK = "#050505";

@@ -5,13 +5,13 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --surface-canvas: oklch(0.115 0.007 105);
-  --surface-canvas-deep: oklch(0.08 0.006 105);
-  --surface-panel: oklch(0.155 0.009 100);
-  --surface-elevated: oklch(0.195 0.011 95);
-  --surface-control: oklch(0.17 0.008 95 / 0.78);
-  --surface-control-hover: oklch(0.21 0.01 95 / 0.86);
-  --surface-glass: oklch(0.16 0.008 100 / 0.72);
+  --surface-canvas: oklch(0.09 0.006 105);
+  --surface-canvas-deep: oklch(0.065 0.005 105);
+  --surface-panel: oklch(0.125 0.007 100);
+  --surface-elevated: oklch(0.165 0.008 95);
+  --surface-control: oklch(0.15 0.008 95 / 0.92);
+  --surface-control-hover: oklch(0.185 0.009 95 / 0.96);
+  --surface-glass: oklch(0.145 0.008 100 / 0.88);
 
   --text-primary: oklch(0.965 0.013 90);
   --text-secondary: oklch(0.76 0.012 90);
@@ -124,11 +124,11 @@
   color-scheme: light;
   --surface-canvas: oklch(0.965 0.012 90);
   --surface-canvas-deep: oklch(0.92 0.015 88);
-  --surface-panel: oklch(0.99 0.006 90);
-  --surface-elevated: oklch(1 0 0);
-  --surface-control: oklch(0.94 0.012 90 / 0.92);
-  --surface-control-hover: oklch(0.91 0.016 88 / 0.96);
-  --surface-glass: oklch(0.98 0.006 90 / 0.82);
+  --surface-panel: oklch(1 0 0);
+  --surface-elevated: oklch(0.985 0.004 90);
+  --surface-control: oklch(0.95 0.01 90 / 0.96);
+  --surface-control-hover: oklch(0.91 0.014 88 / 0.98);
+  --surface-glass: oklch(0.985 0.004 90 / 0.9);
   --text-primary: oklch(0.18 0.012 95);
   --text-secondary: oklch(0.38 0.012 95);
   --text-muted: oklch(0.52 0.01 95);

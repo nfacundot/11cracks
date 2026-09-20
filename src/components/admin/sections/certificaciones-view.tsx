@@ -29,7 +29,7 @@ export function CertificacionesView() {
       />
 
       {/* ─── Panel: Horas bajo revisión ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3
           className="text-[11px] font-semibold uppercase tracking-[0.14em]"
           style={{ fontFamily: S.barlow, color: S.textSecondary }}
@@ -62,7 +62,7 @@ export function CertificacionesView() {
                 value={cantidad}
                 onChange={(e) => setCantidad(e.target.valueAsNumber)}
                 disabled={horas.pendientes === 0}
-                className="w-16 rounded-[10px] border border-[#C9A24A]/25 bg-[#080909] px-2 py-2 text-center text-[13px] font-bold outline-none transition hover:border-[#C9A24A]/50 disabled:opacity-40"
+                className="w-16 rounded-[10px] border border-[#C9A24A]/25 tk-panel-solid px-2 py-2 text-center text-[13px] font-bold outline-none transition hover:border-[#C9A24A]/50 disabled:opacity-40"
                 style={{ fontFamily: S.barlow, color: S.textPrimary }}
               />
               <button

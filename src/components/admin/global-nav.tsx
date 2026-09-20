@@ -123,7 +123,7 @@ export function GlobalSideNav({
     .toUpperCase();
 
   return (
-    <nav className="sticky top-0 flex h-dvh w-[300px] shrink-0 flex-col border-r border-white/[0.04] bg-[#020303] max-md:hidden">
+    <nav className="sticky top-0 flex h-dvh w-[300px] shrink-0 flex-col border-r border-white/[0.04] tk-bar max-md:hidden">
       <div className="flex shrink-0 items-center justify-center px-6 py-6">
         <img
           src="/img/emotes/11-crackslogta.svg"
@@ -169,7 +169,7 @@ export function GlobalSideNav({
           </div>
         )}
         <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="truncate text-sm font-bold uppercase leading-none text-[#F2F0E9]">
+          <span className="truncate text-sm font-bold uppercase leading-none text-(--text-primary)">
             {user.name}
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#C9A24A]">
@@ -189,7 +189,7 @@ export function GlobalBottomNav({ basePath = "/superadmin" }: { basePath?: strin
   const items = groupsFor(basePath)[0].items;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.04] bg-[#020303]/95 backdrop-blur-xl md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.04] tk-bar backdrop-blur-xl md:hidden">
       <div className="safe-bottom mx-auto flex w-full max-w-md items-stretch justify-between">
         {items.map((link) => (
           <Link

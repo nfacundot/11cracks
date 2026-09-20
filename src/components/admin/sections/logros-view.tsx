@@ -68,7 +68,7 @@ function HitoCard({
 
 function Seccion({ titulo, cantidad, children }: { titulo: string; cantidad: string; children: ReactNode }) {
   return (
-    <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+    <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-[13px] font-extrabold uppercase tracking-[0.08em]" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
           {titulo}
@@ -92,7 +92,7 @@ export function LogrosView() {
           title="Logros"
           subtitle="Reconoce los avances que construyes dentro y fuera de la cancha."
         />
-        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 px-6 py-4 text-right">
+        <div className="shrink-0 rounded-[14px] border border-[#C9A24A]/10 tk-panel px-6 py-4 text-right">
           <p className="text-[14px] font-extrabold uppercase tracking-tight" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
             Forjadores Pro
           </p>
@@ -103,7 +103,7 @@ export function LogrosView() {
       </div>
 
       {/* ─── TU COLECCIÓN ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
           Tu colección
         </h3>
@@ -118,7 +118,7 @@ export function LogrosView() {
       </section>
 
       {/* ─── PRÓXIMO HITO ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>
           Próximo hito
         </h3>

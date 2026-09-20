@@ -7,7 +7,7 @@ import { XIcon } from "@/components/icons";
 import { createUser, type AdminState } from "@/actions/admin";
 import { UserSetupWizard } from "@/components/admin/user-setup-wizard";
 
-const INPUT = "rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-[#F2F0E9] placeholder:text-[#686862] outline-none transition focus:border-[#C9A24A]/50 focus:bg-white/[0.06]";
+const INPUT = "rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-(--text-primary) placeholder:text-[#686862] outline-none transition focus:border-[#C9A24A]/50 focus:bg-white/[0.06]";
 
 export function AddUserModal({
   open,
@@ -35,18 +35,18 @@ export function AddUserModal({
   return createPortal(
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-[#050606]/80 backdrop-blur-[2px]" />
-        <div className="animate-pop relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[#C9A24A]/10 bg-[#080909]/95 shadow-2xl">
+        <div className="absolute inset-0 tk-panel backdrop-blur-[2px]" />
+        <div className="animate-pop relative w-full max-w-2xl overflow-hidden rounded-2xl border border-[#C9A24A]/10 tk-panel shadow-2xl">
           <div className="flex items-center justify-between border-b border-[#C9A24A]/10 px-6 py-5">
             <div>
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#C9A24A]">ADMIN · ACCESOS</span>
-              <h3 className="mt-1 text-lg font-black text-[#F2F0E9]">Agregar o actualizar usuario</h3>
+              <h3 className="mt-1 text-lg font-black text-(--text-primary)">Agregar o actualizar usuario</h3>
             </div>
             <button
               type="button"
               onClick={onClose}
               aria-label="Cerrar"
-              className="rounded-full bg-white/5 p-2 text-[#686862] transition hover:bg-white/10 hover:text-[#F2F0E9]"
+              className="rounded-full bg-white/5 p-2 text-[#686862] transition hover:bg-white/10 hover:text-(--text-primary)"
             >
               <XIcon className="h-4 w-4" />
             </button>
@@ -58,7 +58,7 @@ export function AddUserModal({
                 <button
                   type="button"
                   onClick={() => { onClose(); window.location.reload(); }}
-                  className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-[#F2F0E9]"
+                  className="rounded-xl border border-white/10 px-6 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-(--text-primary)"
                 >
                   Cerrar
                 </button>
@@ -148,7 +148,7 @@ export function AddUserModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-[#F2F0E9]"
+                    className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-(--text-primary)"
                   >
                     Cancelar
                   </button>

@@ -54,7 +54,7 @@ export function LearnClient({
           </div>
 
           <div className="flex flex-col gap-1">
-            <h1 className="text-[26px] font-bold uppercase leading-none tracking-wide text-[#F2F0E9] sm:text-[32px] md:text-[40px]">
+            <h1 className="text-[26px] font-bold uppercase leading-none tracking-wide text-(--text-primary) sm:text-[32px] md:text-[40px]">
               {userName}
             </h1>
             <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#C9A24A] sm:text-sm">
@@ -73,7 +73,7 @@ export function LearnClient({
         <div className="flex justify-center">
           <Link
             href="/jugador/progress"
-            className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[#F2F0E9] transition hover:text-[#00C8F5]"
+            className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-(--text-primary) transition hover:text-[#00C8F5]"
           >
             Ver mi progreso
             <ChevronRightIcon className="h-4 w-4 text-[#00C8F5]" />

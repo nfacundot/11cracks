@@ -3,11 +3,12 @@
 import { useState, useActionState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { XIcon, ShieldIcon, UsersIcon, CheckIcon } from "@/components/icons";
+import { AvatarStage, type AvatarRole } from "@/components/login/avatar-stage";
 import { selfSetRole, validateClubCode, selfCreateTeam, selfJoinTeam, type ClubCodeResult } from "@/actions/team";
 
 type WizardStep = "role" | "coach" | "player" | "done";
 
-const INPUT = "w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-[#F2F0E9] placeholder:text-[#686862] outline-none transition focus:border-[#C9A24A]/50 focus:bg-white/[0.06]";
+const INPUT = "w-full rounded-[10px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-medium text-(--text-primary) placeholder:text-[#686862] outline-none transition focus:border-[#C9A24A]/50 focus:bg-white/[0.06]";
 const LABEL = "text-[10px] font-semibold uppercase tracking-[0.12em] text-[#686862]";
 
 function StepIndicator({ current, total }: { current: number; total: number }) {
@@ -36,37 +37,48 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
 }
 
 function RoleStep({ onSelect }: { onSelect: (role: "coach" | "player") => void }) {
+  const [preview, setPreview] = useState<AvatarRole | null>(null);
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <div>
         <span className={LABEL}>Paso 1</span>
-        <h4 className="mt-1 text-base font-black text-[#F2F0E9]">Seleccionar rol del usuario</h4>
+        <h4 className="mt-1 text-base font-black text-(--text-primary)">Seleccionar rol del usuario</h4>
         <p className="mt-1 text-xs text-[#686862]">Define si será Entrenador o Jugador para continuar con la configuración.</p>
       </div>
+      <AvatarStage activeRole={preview} className="mx-auto w-full" />
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
           onClick={() => onSelect("coach")}
+          onPointerEnter={() => setPreview("coach")}
+          onPointerLeave={() => setPreview(null)}
+          onFocus={() => setPreview("coach")}
+          onBlur={() => setPreview(null)}
           className="group flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-[#C9A24A]/40 hover:bg-[#C9A24A]/5"
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#C9A24A]/20 bg-[#C9A24A]/10 transition group-hover:bg-[#C9A24A]/20">
             <ShieldIcon className="h-6 w-6 text-[#C9A24A]" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-black text-[#F2F0E9]">Entrenador</p>
+            <p className="text-sm font-black text-(--text-primary)">Entrenador</p>
             <p className="mt-1 text-[11px] text-[#686862]">Crea un equipo nuevo y sube el logo</p>
           </div>
         </button>
         <button
           type="button"
           onClick={() => onSelect("player")}
+          onPointerEnter={() => setPreview("player")}
+          onPointerLeave={() => setPreview(null)}
+          onFocus={() => setPreview("player")}
+          onBlur={() => setPreview(null)}
           className="group flex flex-col items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-[#C9A24A]/40 hover:bg-[#C9A24A]/5"
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#C9A24A]/20 bg-[#C9A24A]/10 transition group-hover:bg-[#C9A24A]/20">
             <UsersIcon className="h-6 w-6 text-[#C9A24A]" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-black text-[#F2F0E9]">Jugador</p>
+            <p className="text-sm font-black text-(--text-primary)">Jugador</p>
             <p className="mt-1 text-[11px] text-[#686862]">Ingresa el código del club para unirse</p>
           </div>
         </button>
@@ -121,7 +133,7 @@ function CoachStep({ userName, userId, onBack, onDone }: { userName: string; use
 
       <div>
         <span className={LABEL}>Paso 2 · Entrenador</span>
-        <h4 className="mt-1 text-base font-black text-[#F2F0E9]">Crear equipo para {userName}</h4>
+        <h4 className="mt-1 text-base font-black text-(--text-primary)">Crear equipo para {userName}</h4>
         <p className="mt-1 text-xs text-[#686862]">Define el nombre del equipo y sube un logo institucional.</p>
       </div>
 
@@ -173,7 +185,7 @@ function CoachStep({ userName, userId, onBack, onDone }: { userName: string; use
       </div>
 
       <div className="flex items-center justify-between border-t border-white/[0.05] pt-4">
-        <button type="button" onClick={onBack} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-[#F2F0E9]">
+        <button type="button" onClick={onBack} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-(--text-primary)">
           Atrás
         </button>
         <button type="submit" disabled={pending || !teamName.trim()} className="rounded-xl bg-[#C9A24A] px-6 py-2.5 text-sm font-black text-[#080909] transition hover:bg-[#d4ad5a] disabled:opacity-40 active:scale-95">
@@ -222,7 +234,7 @@ function PlayerStep({ userName, userId, onBack, onDone }: { userName: string; us
     <div className="flex flex-col gap-4 p-6">
       <div>
         <span className={LABEL}>Paso 2 · Jugador</span>
-        <h4 className="mt-1 text-base font-black text-[#F2F0E9]">Unirse a un equipo para {userName}</h4>
+        <h4 className="mt-1 text-base font-black text-(--text-primary)">Unirse a un equipo para {userName}</h4>
         <p className="mt-1 text-xs text-[#686862]">Ingresa el código de invitación del equipo.</p>
       </div>
 
@@ -260,7 +272,7 @@ function PlayerStep({ userName, userId, onBack, onDone }: { userName: string; us
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-[#F2F0E9] truncate">{validation.team.name}</p>
+                <p className="text-sm font-black text-(--text-primary) truncate">{validation.team.name}</p>
                 <p className="text-[11px] text-[#686862]">{validation.team.memberCount} miembro(s)</p>
                 <p className="font-mono text-[10px] font-bold text-[#C9A24A] tracking-widest">{validation.team.code}</p>
               </div>
@@ -273,7 +285,7 @@ function PlayerStep({ userName, userId, onBack, onDone }: { userName: string; us
       )}
 
       <div className="flex items-center justify-between border-t border-white/[0.05] pt-4">
-        <button type="button" onClick={onBack} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-[#F2F0E9]">
+        <button type="button" onClick={onBack} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-black text-[#686862] transition hover:bg-white/5 hover:text-(--text-primary)">
           Atrás
         </button>
         <button
@@ -296,7 +308,7 @@ function DoneStep({ message, onClose }: { message: string; onClose: () => void }
         <CheckIcon className="h-8 w-8 text-emerald-400" />
       </div>
       <div>
-        <h4 className="text-base font-black text-[#F2F0E9]">Configuración completada</h4>
+        <h4 className="text-base font-black text-(--text-primary)">Configuración completada</h4>
         <p className="mt-2 text-sm text-[#686862]">{message}</p>
       </div>
       <button
@@ -344,18 +356,18 @@ export function UserSetupWizard({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[#050606]/80 backdrop-blur-[2px]" />
-      <div className="animate-pop relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#C9A24A]/10 bg-[#080909]/95 shadow-2xl">
+      <div className="absolute inset-0 tk-panel backdrop-blur-[2px]" />
+      <div className="animate-pop relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#C9A24A]/10 tk-panel shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#C9A24A]/10 px-6 py-5">
           <div>
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#C9A24A]">CONFIGURACIÓN</span>
-            <h3 className="mt-1 text-base font-black text-[#F2F0E9]">Configuraciones adicionales para {userName}</h3>
+            <h3 className="mt-1 text-base font-black text-(--text-primary)">Configuraciones adicionales para {userName}</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="rounded-full bg-white/5 p-2 text-[#686862] transition hover:bg-white/10 hover:text-[#F2F0E9]"
+            className="rounded-full bg-white/5 p-2 text-[#686862] transition hover:bg-white/10 hover:text-(--text-primary)"
           >
             <XIcon className="h-4 w-4" />
           </button>

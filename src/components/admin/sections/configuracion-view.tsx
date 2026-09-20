@@ -39,7 +39,7 @@ export function ConfiguracionView() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* ─── Panel 1: Experiencia ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[13px] font-extrabold uppercase tracking-[0.08em]" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
             Experiencia
           </h3>
@@ -61,7 +61,7 @@ export function ConfiguracionView() {
         </section>
 
         {/* ─── Panel 2: Cuenta ─── */}
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[13px] font-extrabold uppercase tracking-[0.08em]" style={{ fontFamily: S.barlow, color: S.textPrimary }}>
             Cuenta
           </h3>
@@ -100,7 +100,7 @@ export function ConfiguracionView() {
       </div>
 
       {/* ─── Panel 3: Privacidad ─── */}
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <h3 className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ fontFamily: S.barlow, color: S.gold }}>
           Privacidad
         </h3>

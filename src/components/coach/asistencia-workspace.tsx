@@ -109,11 +109,11 @@ export function AsistenciaWorkspace({ workspace }: { workspace: AttendanceWorksp
         subtitle="Marca por jugador: Asistió / Ausente / Pendiente. Pendiente nunca se convierte en ausencia."
       />
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-4">
           <label className="flex flex-col gap-1.5 md:min-w-[220px]">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Club</span>
-            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setStatusByPlayer({}); }} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+            <select value={clubId} onChange={(e) => { setClubId(e.target.value); setStatusByPlayer({}); }} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
               {workspace.scopes.map((scope) => <option key={scope.clubId} value={scope.clubId}>{scope.clubName}</option>)}
             </select>
           </label>
@@ -130,12 +130,12 @@ export function AsistenciaWorkspace({ workspace }: { workspace: AttendanceWorksp
           {mode === "new" ? (
             <label className="flex flex-col gap-1.5 md:min-w-[240px]">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Nombre de la sesión</span>
-              <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ej. Técnica individual" className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+              <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ej. Técnica individual" className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
             </label>
           ) : (
             <label className="flex flex-col gap-1.5 md:min-w-[220px]">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Sesión</span>
-              <select value={selectedSession} onChange={(e) => openSession(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
+              <select value={selectedSession} onChange={(e) => openSession(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }}>
                 {workspace.sessions.map((session) => (
                   <option key={session.sessionId} value={session.sessionId}>
                     {sessionDateOf(session.sessionId)} · {sessionLabelOf(session.sessionId)} · {session.recordCount} registros
@@ -147,21 +147,21 @@ export function AsistenciaWorkspace({ workspace }: { workspace: AttendanceWorksp
           {mode === "new" ? (
             <label className="flex flex-col gap-1.5">
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: S.barlow, color: S.textSecondary }}>Fecha</span>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-[10px] border border-white/10 bg-black/40 px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
+              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-[10px] border border-white/10 tk-control px-3 py-2.5 text-[13px] outline-none focus:border-[#C9A24A]/60" style={{ color: S.textPrimary }} />
             </label>
           ) : null}
         </div>
       </section>
 
       {mode === "existing" && existingModeSession ? (
-        <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+        <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             {sessionDateOf(existingModeSession.sessionId)} · {sessionLabelOf(existingModeSession.sessionId)}
           </h3>
         </section>
       ) : null}
 
-      <section className="rounded-[14px] border border-[#C9A24A]/10 bg-[#080909]/85 p-5 md:p-6">
+      <section className="rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA69C]" style={{ fontFamily: S.barlow }}>
             Jugadores · {club?.clubName ?? "Sin club"}
