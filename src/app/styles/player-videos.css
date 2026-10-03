@@ -18,7 +18,7 @@
 .player-videos-page__filter[data-active="true"] { border-color: var(--action-energy); color: var(--action-energy); background: color-mix(in oklch, var(--action-energy) 8%, transparent); }
 
 .player-videos-player-badge { color: var(--context-neurocracks); font: 700 0.7rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
-.player-videos-modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 1rem; }
+.player-videos-modal { position: fixed; inset: 0; z-index: 2147482000; display: grid; place-items: center; padding: 1rem; }
 .player-videos-modal__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(2px); }
 .player-videos-modal__panel { position: relative; display: grid; gap: 0.9rem; width: 100%; max-width: 56rem; max-height: 90vh; overflow: auto; padding: 1.2rem; border: 1px solid var(--border-subtle); background: var(--surface-panel); }
 .player-videos-modal__head { display: flex; align-items: start; justify-content: space-between; gap: 1rem; }

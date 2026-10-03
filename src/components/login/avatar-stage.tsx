@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as pc from "playcanvas";
+import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export type AvatarRole = "player" | "coach";
 
@@ -11,72 +12,37 @@ type StageProps = {
   className?: string;
 };
 
-function color(hex: string) {
-  const n = parseInt(hex.slice(1), 16);
-  return new pc.Color(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
-}
-
-function mat(hex: string, opts: { emissive?: number } = {}) {
-  const material = new pc.StandardMaterial();
-  material.diffuse = color(hex);
-  material.shininess = 40;
-  if (opts.emissive) {
-    material.emissive = color(hex).mulScalar(opts.emissive);
-  }
-  material.update();
-  return material;
-}
-
-/** AABB mundo de todas las mesh instances de un modelo instanciado. */
-function worldAabb(model: pc.Entity): pc.BoundingBox {
-  const box = new pc.BoundingBox(new pc.Vec3(), new pc.Vec3(0.5, 0.5, 0.5));
-  let first = true;
-  for (const meshInstance of model.render?.meshInstances ?? []) {
-    if (first) {
-      box.copy(meshInstance.aabb);
-      first = false;
-    } else {
-      box.add(meshInstance.aabb);
-    }
-  }
-  return box;
-}
+const GOLD = 0xc9a24a;
 
 /**
- * Normaliza un modelo instanciado: altura deseada, base apoyada en y=0 y
- * centrado en x/z. Devuelve el nodo envuelto listo para animar.
+ * Normaliza un modelo: altura deseada, base apoyada en y=0 y centrado en x/z,
+ * envuelto en un Group listo para animar.
  */
-function normalize(model: pc.Entity, desiredHeight: number): pc.Entity {
-  const wrapper = new pc.Entity();
-  wrapper.addChild(model);
+function normalize(object: THREE.Object3D, desiredHeight: number): THREE.Group {
+  const wrapper = new THREE.Group();
+  wrapper.add(object);
 
-  const aabb = worldAabb(model);
-  const height = aabb.halfExtents.y * 2 || 1;
-  const s = desiredHeight / height;
-  model.setLocalScale(s, s, s);
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  const s = desiredHeight / (size.y || 1);
+  object.scale.setScalar(s);
 
   // Recalcular tras escalar para apoyar la base y centrar
-  const scaled = worldAabb(model);
-  const center = scaled.center;
-  model.setLocalPosition(
-    -center.x / s,
-    -(center.y - scaled.halfExtents.y) / s,
-    -center.z / s,
-  );
+  const scaled = new THREE.Box3().setFromObject(object);
+  const center = scaled.getCenter(new THREE.Vector3());
+  object.position.set(-center.x, -scaled.min.y, -center.z);
 
   return wrapper;
 }
 
-function loadContainer(app: pc.AppBase, name: string, url: string) {
-  return new Promise<pc.Entity>((resolve, reject) => {
-    const asset = new pc.Asset(name, "container", { url });
-    app.assets.add(asset);
-    asset.on("load", () => {
-      const resource = asset.resource as { instantiate: () => pc.Entity };
-      resolve(resource.instantiate());
-    });
-    asset.on("error", (err: string) => reject(new Error(err)));
-    app.assets.load(asset);
+function loadGltf(url: string): Promise<THREE.Object3D> {
+  return new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      url,
+      (gltf) => resolve(gltf.scene),
+      undefined,
+      (err) => reject(err),
+    );
   });
 }
 
@@ -90,112 +56,98 @@ export function AvatarStage({ activeRole, className }: StageProps) {
     if (!canvas) return;
     const cvs: HTMLCanvasElement = canvas;
 
-    const app = new pc.AppBase(canvas);
-    app.init(new pc.AppOptions());
-    app.start();
+    const renderer = new THREE.WebGLRenderer({ canvas: cvs, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-    let cameraComponent: pc.CameraComponent | null = null;
-    let playerRig: pc.Entity | null = null;
-    let coachRig: pc.Entity | null = null;
-    let ring: pc.Entity | null = null;
-    let destroyed = false;
-    let elapsed = 0;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(46, 16 / 10, 0.1, 100);
+    camera.position.set(0, 2.4, 5.6);
+    camera.lookAt(0, 1.1, -1);
+
+    // Césped interior
+    const pitch = new THREE.Mesh(
+      new THREE.CircleGeometry(5, 48),
+      new THREE.MeshStandardMaterial({ color: 0x14371f, roughness: 0.9 }),
+    );
+    pitch.rotation.x = -Math.PI / 2;
+    scene.add(pitch);
+
+    // Círculo central dorado girando
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.02, 1.12, 48),
+      new THREE.MeshBasicMaterial({ color: GOLD, side: THREE.DoubleSide }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.02;
+    scene.add(ring);
+
+    // Luces cálidas de estadio nocturno
+    scene.add(new THREE.AmbientLight(0x404752, 1.6));
+    const key = new THREE.PointLight(GOLD, 60, 20);
+    key.position.set(0, 6, 2);
+    scene.add(key);
+    const fill = new THREE.PointLight(0x9db4ff, 30, 22);
+    fill.position.set(-4, 4, 3);
+    scene.add(fill);
+
+    let playerRig: THREE.Group | null = null;
+    let coachRig: THREE.Group | null = null;
     const animState: Record<AvatarRole, { t: number }> = {
       player: { t: 0 },
       coach: { t: 0 },
     };
 
-    const cleanup = () => {
-      destroyed = true;
-      app.destroy();
-      canvas.width = 0;
-    };
+    let destroyed = false;
+    let raf = 0;
 
     async function build() {
       const [stadiumModel, playerModel, coachModel] = await Promise.all([
-        loadContainer(app, "building-stadium", "/models/building-stadium.glb"),
-        loadContainer(app, "human-male", "/models/human-male.glb"),
-        loadContainer(app, "human-female", "/models/human-female.glb"),
+        loadGltf("/models/building-stadium.glb"),
+        loadGltf("/models/human-male.glb"),
+        loadGltf("/models/human-female.glb"),
       ]);
       if (destroyed) return;
 
       // Estadio de polycity como fondo: centrado en el origen, la cámara queda
       // dentro y enfoca el centro de la cancha.
       const stadium = normalize(stadiumModel, 14);
-      stadium.setPosition(0, -0.05, -3);
-      app.root.addChild(stadium);
-
-      // Césped interior
-      const pitch = new pc.Entity("pitch");
-      pitch.addComponent("render", { type: "plane", material: mat("#14371f") });
-      pitch.setLocalScale(9, 1, 7);
-      app.root.addChild(pitch);
-
-      // Círculo central dorado
-      ring = new pc.Entity("ring");
-      ring.addComponent("render", { type: "cylinder", material: mat("#c9a24a", { emissive: 0.7 }) });
-      ring.setLocalScale(2.2, 0.02, 2.2);
-      ring.setPosition(0, 0.02, 0);
-      app.root.addChild(ring);
+      stadium.position.set(0, -0.05, -3);
+      scene.add(stadium);
 
       // Avatares de blink: masculino (jugador) y femenino (entrenador)
       playerRig = normalize(playerModel, 1.7);
       coachRig = normalize(coachModel, 1.7);
-      playerRig.setPosition(-1.05, 0, 0.4);
-      coachRig.setPosition(1.05, 0, 0.4);
-      playerRig.setLocalScale(0.001, 0.001, 0.001);
-      coachRig.setLocalScale(0.001, 0.001, 0.001);
-      app.root.addChild(playerRig);
-      app.root.addChild(coachRig);
-
-      // Luces cálidas de estadio nocturno
-      const key = new pc.Entity();
-      key.addComponent("light", { type: "omni", color: color("#c9a24a"), intensity: 2, range: 18 });
-      key.setPosition(0, 6, 2);
-      app.root.addChild(key);
-
-      const fill = new pc.Entity();
-      fill.addComponent("light", { type: "omni", color: color("#9db4ff"), intensity: 0.9, range: 20 });
-      fill.setPosition(-4, 4, 3);
-      app.root.addChild(fill);
-
-      const ambient = new pc.Entity();
-      ambient.addComponent("light", { type: "ambient", color: color("#404752") });
-      app.root.addChild(ambient);
-
-      // Cámara: dentro del estadio, enfocando el centro de la cancha
-      const camera = new pc.Entity();
-      camera.addComponent("camera", {
-        clearColor: new pc.Color(0.03, 0.04, 0.05, 1),
-        fov: 46,
-      });
-      cameraComponent = camera.camera!;
-      camera.setPosition(0, 2.4, 5.6);
-      camera.lookAt(0, 1.1, -1);
-      app.root.addChild(camera);
-
-      const resize = () => {
-        if (!cameraComponent) return;
-        const w = cvs.clientWidth || 320;
-        const h = cvs.clientHeight || 200;
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        cvs.width = Math.floor(w * dpr);
-        cvs.height = Math.floor(h * dpr);
-        app.graphicsDevice.resizeCanvas(w, h);
-        cameraComponent.aspectRatio = w / h;
-      };
-      const observer = new ResizeObserver(resize);
-      observer.observe(cvs);
-      resize();
+      playerRig.position.set(-1.05, 0, 0.4);
+      coachRig.position.set(1.05, 0, 0.4);
+      playerRig.scale.setScalar(0.001);
+      coachRig.scale.setScalar(0.001);
+      scene.add(playerRig);
+      scene.add(coachRig);
     }
 
     build().catch((err) => {
       console.error("avatar-stage: error cargando modelos", err);
     });
 
-    app.on("update", (dt: number) => {
-      elapsed += dt;
-      if (ring) ring.setEulerAngles(0, elapsed * 40, 0);
+    const resize = () => {
+      const w = cvs.clientWidth || 320;
+      const h = cvs.clientHeight || 200;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(cvs);
+    resize();
+
+    const clock = new THREE.Clock();
+    const animate = () => {
+      if (destroyed) return;
+      raf = requestAnimationFrame(animate);
+
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const elapsed = clock.elapsedTime;
+      ring.rotation.z = elapsed * 0.7;
 
       const target = targetRef.current;
       for (const role of ["player", "coach"] as AvatarRole[]) {
@@ -213,8 +165,7 @@ export function AvatarStage({ activeRole, className }: StageProps) {
 
         // El elegido pasa al centro del círculo
         const targetX = target === null ? baseX : isSelected ? 0 : baseX * 1.3;
-        const currentX = rig.getPosition().x;
-        const x = currentX + (targetX - currentX) * Math.min(1, dt * 8);
+        const x = rig.position.x + (targetX - rig.position.x) * Math.min(1, dt * 8);
 
         // Idle: respiración + giro suave
         const bob = Math.sin(elapsed * 2.2) * 0.03;
@@ -225,13 +176,29 @@ export function AvatarStage({ activeRole, className }: StageProps) {
               ? Math.sin(elapsed * 0.9) * 0.35
               : 0;
 
-        rig.setLocalScale(s, s, s);
-        rig.setPosition(x, bob, 0.4);
-        rig.setEulerAngles(0, spin, 0);
+        rig.scale.setScalar(s);
+        rig.position.set(x, bob, 0.4);
+        rig.rotation.y = spin;
       }
-    });
 
-    return cleanup;
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    return () => {
+      destroyed = true;
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      scene.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        mesh.geometry?.dispose?.();
+        const material = mesh.material as THREE.Material | THREE.Material[] | undefined;
+        if (Array.isArray(material)) material.forEach((m) => m.dispose());
+        else material?.dispose?.();
+      });
+      renderer.dispose();
+      cvs.width = 0;
+    };
   }, []);
 
   return (

@@ -11,10 +11,10 @@
 .player-progress-page h1, .player-progress-page h2, .player-progress-page h3, .player-progress-page p { margin: 0; }
 .player-progress-page__header h1 { margin-top: 0.3rem; font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 0.86; letter-spacing: -0.04em; text-transform: uppercase; }
 .player-progress-page__header p { max-width: 34rem; margin-top: 0.75rem; color: var(--text-secondary); font-size: 0.95rem; }
-.player-progress-page__hero { display: grid; grid-template-columns: minmax(14rem, 0.65fr) minmax(26rem, 1.35fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); padding: clamp(1.2rem, 3vw, 2.5rem); border: 1px solid color-mix(in oklch, var(--context-progress) 28%, transparent); background: linear-gradient(120deg, oklch(0.09 0.01 220 / 0.88), oklch(0.07 0.006 105 / 0.62)); box-shadow: 0 1.5rem 3.5rem oklch(0.02 0.003 105 / 0.32); }
+.player-progress-page__hero { display: grid; grid-template-columns: minmax(14rem, 0.65fr) minmax(26rem, 1.35fr); align-items: center; gap: clamp(1rem, 4vw, 4rem); padding: clamp(1.2rem, 3vw, 2.5rem); border: 1px solid color-mix(in oklch, var(--context-progress) 28%, transparent); background: linear-gradient(120deg, color-mix(in oklch, var(--surface-panel) 90%, transparent), color-mix(in oklch, var(--surface-elevated) 65%, transparent)); box-shadow: 0 1.5rem 3.5rem color-mix(in oklch, var(--text-primary) 10%, transparent); }
 .player-progress-page__hero-copy h2 { margin-top: 0.35rem; font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 5rem); line-height: 0.88; letter-spacing: -0.04em; text-transform: uppercase; }
 .player-progress-page__hero-copy p { max-width: 20rem; margin-top: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
-.player-progress-page__tabs { display: inline-flex; gap: 0.15rem; margin-top: 1.5rem; padding: 0.2rem; border: 1px solid var(--border-subtle); background: oklch(0.04 0.004 105 / 0.55); }
+.player-progress-page__tabs { display: inline-flex; gap: 0.15rem; margin-top: 1.5rem; padding: 0.2rem; border: 1px solid var(--border-subtle); background: color-mix(in oklch, var(--surface-control) 82%, transparent); }
 .player-progress-page__tabs button { min-height: var(--touch-target-min); padding: 0.55rem 0.9rem; border: 0; color: var(--text-secondary); background: transparent; font-family: var(--font-display); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
 .player-progress-page__tabs button[aria-pressed="true"] { color: var(--text-on-action); background: var(--context-progress); }
 .player-progress-page[data-mode="neurocracks"] .player-progress-page__tabs button[aria-pressed="true"] { color: var(--text-primary); background: var(--context-neurocracks); }
@@ -106,6 +106,10 @@
 .player-progress-racha dl div { min-width: 0; padding: 0.7rem; border-left: 1px solid var(--border-subtle); }
 .player-progress-racha dt { color: var(--text-muted); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .player-progress-racha dd { margin: 0.35rem 0 0; color: var(--text-primary); font: 700 1.05rem var(--font-score); overflow-wrap: anywhere; }
+.player-progress-racha__days { display: flex; gap: 0.35rem; margin-top: 0.7rem; }
+.player-progress-racha__days span { width: 1.3rem; height: 1.3rem; border-radius: 50%; border: 1px solid var(--border-subtle); background: color-mix(in oklch, var(--text-primary) 8%, transparent); }
+.player-progress-racha__days span[data-verified="true"] { border-color: color-mix(in oklch, var(--action-energy) 60%, transparent); background: var(--action-energy); box-shadow: 0 0 0 3px color-mix(in oklch, var(--action-energy) 20%, transparent); }
+.player-progress-racha__count { margin-top: 0.55rem !important; color: var(--text-muted) !important; font-size: 0.72rem !important; }
 .player-progress-language-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1rem; }
 .player-progress-language-grid p { grid-column: 1 / -1; color: var(--text-muted); font-size: 0.78rem; }
 

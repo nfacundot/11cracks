@@ -13,7 +13,7 @@
 .player-training-page__header h1 { margin-top: 0.35rem; font-family: var(--font-display); font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 0.86; letter-spacing: -0.04em; text-transform: uppercase; }
 .player-training-page__header p { max-width: 36rem; margin-top: 0.7rem; color: var(--text-secondary); }
 
-.player-training__next { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 0.7fr); gap: 2rem; min-height: 18rem; padding: clamp(1.5rem, 4vw, 3rem); border: 1px solid color-mix(in oklch, var(--context-training) 48%, transparent); background: linear-gradient(120deg, oklch(0.13 0.018 82 / 0.86), oklch(0.055 0.006 105 / 0.62)); box-shadow: 0 1.5rem 3.5rem oklch(0.02 0.003 105 / 0.34); }
+.player-training__next { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 0.7fr); gap: 2rem; min-height: 18rem; padding: clamp(1.5rem, 4vw, 3rem); border: 1px solid color-mix(in oklch, var(--context-training) 48%, transparent); background: linear-gradient(120deg, color-mix(in oklch, var(--surface-panel) 90%, transparent), color-mix(in oklch, var(--surface-elevated) 65%, transparent)); box-shadow: 0 1.5rem 3.5rem color-mix(in oklch, var(--text-primary) 10%, transparent); }
 .player-training__next-copy { display: grid; align-content: center; gap: 0.45rem; }
 .player-training__next-copy h2 { max-width: 24ch; margin-top: 0.3rem; color: var(--text-primary); font-family: var(--font-display); font-size: clamp(2.4rem, 5vw, 5rem); line-height: 0.88; text-transform: uppercase; }
 .player-training__next-copy p { color: var(--text-secondary); font-size: 1.1rem; }

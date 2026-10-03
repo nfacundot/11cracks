@@ -549,6 +549,7 @@ export function CanchaView({
 
       <section className={playerWindow ? "player-alineacion__panel" : "rounded-[14px] border border-[#C9A24A]/10 tk-panel p-5 md:p-6"}>
         {/* ─── Header del panel ─── */}
+        {!playerWindow ? (
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {readOnly ? (
             <>
@@ -598,6 +599,7 @@ export function CanchaView({
             </>
           )}
         </div>
+        ) : null}
 
         {/* ─── Selector de alineaciones + Acciones ─── */}
         {!readOnly && (
@@ -704,12 +706,12 @@ export function CanchaView({
         {/* ─── Cancha de fútbol ─── */}
         <div
           ref={contRef}
-          className="relative overflow-hidden rounded-[16px] border border-emerald-500/20 bg-emerald-950/30"
+          className={playerWindow ? "relative overflow-hidden rounded-[16px]" : "relative overflow-hidden rounded-[16px] border border-emerald-500/20 bg-emerald-950/30"}
           onPointerMove={moverArrastre}
           onPointerUp={soltarArrastre}
           onPointerLeave={soltarArrastre}
           onPointerCancel={soltarArrastre}
-          style={{ aspectRatio: "100/65", minHeight: "420px" }}
+          style={{ aspectRatio: "100/65", minHeight: playerWindow ? "520px" : "420px" }}
         >
           {/* Fondo cancha */}
           <svg viewBox="0 0 100 65" className="absolute inset-0 z-0 h-full w-full" preserveAspectRatio="none">
@@ -961,6 +963,7 @@ export function CanchaView({
         </div>
 
         {/* ─── Lista de jugadores para referencia ─── */}
+        {!playerWindow ? (
         <div className="mt-6 border-t border-white/[0.05] pt-4">
           <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#686862]" style={{ fontFamily: S.barlow }}>
             Jugadores del plantel
@@ -987,6 +990,7 @@ export function CanchaView({
             </div>
           )}
         </div>
+        ) : null}
       </section>
 
       {/* ─── Modal: Publicar alineación ─── */}

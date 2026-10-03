@@ -97,6 +97,8 @@ export async function getSessionUser() {
       xp: true,
       coins: true,
       trophies: true,
+      energy: true,
+      needs: true,
       currentStreak: true,
       bestStreak: true,
       createdAt: true,

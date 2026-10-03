@@ -51,6 +51,11 @@ export interface PlayerProgressRpg {
 
 export type PlayerProgressRachaState = "ACTIVA" | "INTERRUMPIDA" | "SIN_RACHA";
 
+export interface PlayerProgressRachaDay {
+  date: string;
+  verified: boolean;
+}
+
 export interface PlayerProgressRacha {
   state: PlayerProgressRachaState;
   currentStreak: number | null;
@@ -58,6 +63,8 @@ export interface PlayerProgressRacha {
   lastVerifiedActivityDate?: string;
   nextMilestone: number | null;
   explanation: string;
+  recentDays?: readonly PlayerProgressRachaDay[];
+  verifiedCount?: number;
 }
 
 const sportLabels = ["Técnica", "Velocidad", "Resistencia", "Coordinación", "Decisión", "Lectura de juego"] as const;

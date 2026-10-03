@@ -1,0 +1,431 @@
+/* ════════════════════════════════════════════════════════════════════
+   GOAL50 UI (portado de /theme) + ventanas Winbox estilo macOS
+   Todo el "glass" se adapta a tema claro (día) / oscuro (noche) según
+   las clases .light / .dark que el layout aplica en <html>.
+   ════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  --color-lime: #c6f232;
+  --color-ink: #0c0e05;
+  --color-panel: #171b0d;
+  --color-panel2: #202613;
+  --color-sage: #a9b18f;
+}
+
+/* Tipografías del tema (las variables las inyecta next/font) */
+.goal50-ui {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+.goal50-ui .font-display {
+  font-family: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Glass: variables por tema (oscuro por defecto, claro en .light) ── */
+:root {
+  --g50-glass: rgba(18, 20, 13, 0.42);
+  --g50-glass-strong: rgba(14, 16, 10, 0.72);
+  --g50-glass-border: rgba(255, 255, 255, 0.14);
+  --g50-glass-border-hover: rgba(198, 242, 50, 0.45);
+  --g50-on-glass: #f4f6ef;
+  --g50-on-glass-dim: rgba(244, 246, 239, 0.6);
+  --g50-tile: rgba(255, 255, 255, 0.08);
+  --g50-tile-hover: rgba(255, 255, 255, 0.16);
+  --g50-msgbox: rgba(0, 0, 0, 0.25);
+  --g50-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  --g50-win-bg: rgba(18, 20, 13, 0.55);
+  --g50-win-header: rgba(20, 22, 15, 0.9);
+  --g50-win-body: #0c0e05;
+}
+
+:root.light,
+[data-theme="light"] {
+  --g50-glass: rgba(255, 255, 255, 0.5);
+  --g50-glass-strong: rgba(255, 255, 255, 0.72);
+  --g50-glass-border: rgba(20, 26, 12, 0.12);
+  --g50-glass-border-hover: rgba(90, 120, 20, 0.5);
+  --g50-on-glass: #141a10;
+  --g50-on-glass-dim: rgba(20, 26, 16, 0.6);
+  --g50-tile: rgba(255, 255, 255, 0.5);
+  --g50-tile-hover: rgba(255, 255, 255, 0.85);
+  --g50-msgbox: rgba(255, 255, 255, 0.5);
+  --g50-shadow: 0 24px 60px -24px rgba(20, 30, 10, 0.35);
+  --g50-win-bg: rgba(255, 255, 255, 0.62);
+  --g50-win-header: rgba(255, 255, 255, 0.8);
+  --g50-win-body: #f4f6ef;
+}
+
+.goal50-glass {
+  background: var(--g50-glass);
+  border-color: var(--g50-glass-border);
+  color: var(--g50-on-glass);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: var(--g50-shadow);
+}
+.goal50-glass-strong {
+  background: var(--g50-glass-strong);
+}
+.goal50-text {
+  color: var(--g50-on-glass);
+}
+.goal50-text-dim {
+  color: var(--g50-on-glass-dim);
+}
+
+/* Panel HUD que se adapta a claro/oscuro (mundo y habitación) */
+.g50-panel {
+  background: var(--g50-glass);
+  border: 1px solid var(--g50-glass-border);
+  color: var(--g50-on-glass);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: var(--g50-shadow);
+}
+
+/* Globo de texto (bocadillo) */
+.g50-bubble {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: var(--g50-glass-strong);
+  border: 1px solid var(--g50-glass-border);
+  color: var(--g50-on-glass);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-radius: 14px;
+  padding: 8px 12px;
+  box-shadow: var(--g50-shadow);
+  white-space: nowrap;
+}
+.g50-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--g50-glass-strong);
+  border-right: 1px solid var(--g50-glass-border);
+  border-bottom: 1px solid var(--g50-glass-border);
+}
+.goal50-tile {
+  background: var(--g50-tile);
+  border: 1px solid var(--g50-glass-border);
+  color: var(--g50-on-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.goal50-tile:hover {
+  background: var(--g50-tile-hover);
+  border-color: var(--g50-glass-border-hover);
+}
+.goal50-tile--muted {
+  color: var(--g50-on-glass-dim);
+}
+.goal50-tile--muted:hover {
+  color: var(--g50-on-glass);
+}
+.goal50-tile--danger {
+  color: #e0453a;
+}
+.goal50-tile--danger:hover {
+  color: #ff6b5f;
+  border-color: rgba(224, 69, 58, 0.5);
+}
+
+/* Fondo oscuro del teléfono con retícula de puntos y glow lima */
+.screen-bg {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(120% 55% at 85% -5%, rgba(198, 242, 50, 0.08), transparent 60%),
+    radial-gradient(90% 45% at 0% 0%, rgba(255, 255, 255, 0.05), transparent 55%),
+    radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1.4px);
+  background-size: auto, auto, 14px 14px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes goal50-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Tooltips globales del tema */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(2px);
+  background: #141c10;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 99999;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Tooltip que aparece debajo (barra superior) */
+[data-tipb] {
+  position: relative;
+}
+[data-tipb]::after {
+  content: attr(data-tipb);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-2px);
+  background: #141c10;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 99999;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+[data-tipb]:hover::after,
+[data-tipb]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tipr] {
+  position: relative;
+}
+[data-tipr]::after {
+  content: attr(data-tipr);
+  position: absolute;
+  left: calc(100% + 11px);
+  top: 50%;
+  transform: translate(2px, -50%);
+  background: #141c10;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 99999;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+[data-tipr]:hover::after,
+[data-tipr]:focus-visible::after {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* ────────────────────────────────────────────────────────────────────
+   Winbox · variante macOS
+   ──────────────────────────────────────────────────────────────────── */
+
+.goal50-win {
+  pointer-events: auto;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--g50-win-bg);
+  border: 1px solid var(--g50-glass-border);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: var(--g50-shadow);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+.goal50-win.max {
+  border-radius: 0;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.goal50-win .wb-header {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  line-height: 40px;
+  background: var(--g50-win-header);
+  border-bottom: 1px solid var(--g50-glass-border);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  color: var(--g50-on-glass);
+}
+.goal50-win .wb-drag {
+  order: 1;
+  flex: 1 1 auto;
+  height: auto;
+  padding-left: 12px;
+}
+.goal50-win .wb-title {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--g50-on-glass);
+}
+.goal50-win .wb-icon {
+  display: none;
+}
+
+/* Semáforos macOS a la izquierda */
+.goal50-win .wb-control {
+  order: 0;
+  float: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: auto;
+  padding-left: 14px;
+  text-align: left;
+}
+.goal50-win .wb-control * {
+  display: block;
+  width: 12px;
+  height: 12px;
+  max-width: none;
+  margin: 0;
+  border-radius: 999px;
+  background-image: none !important;
+  transition: filter 0.15s ease;
+}
+.goal50-win .wb-control *:hover {
+  filter: brightness(1.15);
+}
+.goal50-win .wb-close {
+  background: #ff5f57;
+}
+.goal50-win .wb-min {
+  background: #febc2e;
+}
+.goal50-win .wb-max {
+  background: #28c840;
+}
+.goal50-win .wb-full {
+  display: none !important;
+}
+
+.goal50-win .wb-body {
+  background: var(--g50-win-body);
+  touch-action: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* La barra de menú / dock / chat deben quedar por encima de las ventanas */
+.goal50-chrome {
+  pointer-events: auto;
+  z-index: 2147480000;
+}
+
+/* ── Diálogo de confirmación (Salir) ── */
+.goal50-dialog .wb-body {
+  background: var(--g50-win-bg);
+}
+.goal50-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  color: var(--g50-on-glass);
+}
+.goal50-dialog-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.goal50-dialog-text {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--g50-on-glass-dim);
+}
+.goal50-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+.goal50-btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid var(--g50-glass-border);
+  transition: filter 0.15s ease, background 0.15s ease;
+}
+.goal50-btn--ghost {
+  background: var(--g50-tile);
+  color: var(--g50-on-glass);
+}
+.goal50-btn--ghost:hover {
+  background: var(--g50-tile-hover);
+}
+.goal50-btn--danger {
+  background: #e0453a;
+  color: #fff;
+  border-color: transparent;
+}
+.goal50-btn--danger:hover {
+  filter: brightness(1.1);
+}
+
+/* Botones de edición de muebles (habitación) */
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.edit-btn--danger {
+  color: #ff8fab;
+  border-color: rgba(255, 143, 171, 0.4);
+}

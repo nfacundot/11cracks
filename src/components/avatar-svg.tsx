@@ -602,6 +602,17 @@ export function AvatarSvg({
         </g>
       )}
 
+      {accessory === "beanie" && (
+        <g>
+          <path
+            d="M33 15 Q33 0.5 50 0.5 Q67 0.5 67 15 Z"
+            fill={hairColor}
+          />
+          <rect x="31.5" y="12" width="37" height="6.5" rx="3" fill={hairColor} />
+          <rect x="31.5" y="12" width="37" height="2.4" rx="1.2" fill="rgba(255,255,255,0.22)" />
+        </g>
+      )}
+
       <circle cx="43" cy="18" r="3" fill="rgba(255,255,255,0.2)" />
     </svg>
   );

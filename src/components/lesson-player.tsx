@@ -868,6 +868,15 @@ const finalizeNative = useCallback(() => {
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={() => { void continueToNext(); }}
+              disabled={busy}
+              className="self-end rounded-xl border-2 border-zinc-200 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-zinc-500 transition hover:bg-zinc-50 active:scale-95 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              Saltar ⏭
+            </button>
+
             {micBlocked ? (
               <p className="rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-center text-sm font-semibold text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
                 {micError ?? "Este navegador no puede grabar audio."}

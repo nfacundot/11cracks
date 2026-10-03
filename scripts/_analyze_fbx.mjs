@@ -1,0 +1,13 @@
+﻿import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import * as THREE from "three";
+import fs from "node:fs";
+const buf = fs.readFileSync("public/models/polycity/Building_Clothing.fbx");
+const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+const g = new FBXLoader().parse(ab, "");
+g.updateMatrixWorld(true);
+const box = new THREE.Box3().setFromObject(g);
+const s = box.getSize(new THREE.Vector3());
+console.log("TRUE box size", s.x.toFixed(3), s.y.toFixed(3), s.z.toFixed(3));
+console.log("min", box.min.x.toFixed(3), box.min.y.toFixed(3), box.min.z.toFixed(3), "max", box.max.x.toFixed(3), box.max.y.toFixed(3), box.max.z.toFixed(3));
+let i=0;
+g.traverse((n)=>{ if(!n.isMesh) return; const b=new THREE.Box3().setFromObject(n); const sz=b.getSize(new THREE.Vector3()); console.log("mesh"+i, "size", sz.x.toFixed(2), sz.y.toFixed(2), sz.z.toFixed(2), "minZ", b.min.z.toFixed(2), "maxZ", b.max.z.toFixed(2)); i++; });

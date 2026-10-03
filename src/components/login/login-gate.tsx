@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { restoreSession } from "@/actions/auth";
 import { LoginForm } from "@/components/forms/login-form";
 import { RegisterForm } from "@/components/forms/register-form";
 import { snapshotStoredToken, clearStoredToken } from "@/lib/session-client";
 
 type SheetMode = "login" | "register" | null;
+
+const LoginStadium = dynamic(
+  () => import("@/components/login/login-stadium").then((mod) => mod.LoginStadium),
+  { ssr: false },
+);
 
 function CloseIcon() {
   return (
@@ -70,7 +76,9 @@ export function LoginGate() {
   return (
     <>
       <div className="login-gate">
-        <div className="login-gate__hero" role="presentation" />
+        <div className="login-gate__hero" role="presentation">
+          <LoginStadium />
+        </div>
         <div className="login-gate__scrim" role="presentation" />
 
         <div className="login-gate__window">
@@ -113,7 +121,7 @@ export function LoginGate() {
       />
 
       <div
-        className={`login-sheet ${open ? "is-open" : ""}`}
+        className={`login-sheet ${open ? "is-open" : ""} ${sheet === "register" ? "login-sheet--register" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-sheet-title"

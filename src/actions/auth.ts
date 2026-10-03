@@ -1,5 +1,6 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -13,6 +14,7 @@ import {
   homeForRole,
 } from "@/lib/auth";
 import { touchStreak } from "@/lib/streak";
+import { validateAvatarConfig } from "@/lib/avatar";
 
 export type AuthState = { error?: string; success?: string; userId?: string; userName?: string; home?: string } | undefined;
 
@@ -28,6 +30,10 @@ const registerSchema = z.object({
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres").max(72),
 });
 
+function generateTeamCode(): string {
+  return randomBytes(4).toString("hex").toUpperCase();
+}
+
 export async function register(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = registerSchema.safeParse({
     name: formData.get("name"),
@@ -42,6 +48,43 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
 
   const { name, username, email, password } = parsed.data;
 
+  const rawRole = String(formData.get("role") || "");
+  if (rawRole !== "player" && rawRole !== "coach") {
+    return { error: "Selecciona si eres jugador o entrenador" };
+  }
+  const role = rawRole === "coach" ? "ENTRENADOR" : "JUGADOR";
+
+  if (String(formData.get("consent") || "") !== "true") {
+    return { error: "Debes aceptar el consentimiento para continuar" };
+  }
+
+  let teamId: string | null = null;
+  let teamName = "";
+  let teamLogo: string | null = null;
+
+  if (role === "JUGADOR") {
+    const code = String(formData.get("teamCode") || "").trim().toUpperCase();
+    if (code.length < 4) {
+      return { error: "Escribe un código de equipo válido" };
+    }
+    const team = await prisma.team.findUnique({ where: { code } });
+    if (!team) {
+      return { error: "No encontramos un equipo con ese código" };
+    }
+    teamId = team.id;
+    teamName = team.name;
+  } else {
+    teamName = String(formData.get("teamName") || "").trim();
+    if (teamName.length < 2 || teamName.length > 40) {
+      return { error: "El nombre del equipo debe tener entre 2 y 40 caracteres" };
+    }
+    const logo = String(formData.get("logoUrl") || "").trim();
+    if (logo && !logo.startsWith("/uploads/")) {
+      return { error: "Logo de equipo inválido" };
+    }
+    teamLogo = logo || null;
+  }
+
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email: email.toLowerCase() }, { username }] },
   });
@@ -50,20 +93,59 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
     return { error: "El email o el usuario ya están registrados" };
   }
 
+  const rawAvatar = formData.get("avatarConfig");
+  let avatarConfig: ReturnType<typeof validateAvatarConfig> = null;
+  if (typeof rawAvatar === "string" && rawAvatar.length > 0) {
+    try {
+      avatarConfig = validateAvatarConfig(JSON.parse(rawAvatar));
+    } catch {
+      avatarConfig = null;
+    }
+  }
+
   const hashed = await hashPassword(password);
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      username,
-      email: email.toLowerCase(),
-      password: hashed,
-    },
+  let newTeamCode = "";
+  if (role === "ENTRENADOR") {
+    newTeamCode = generateTeamCode();
+    while (await prisma.team.findUnique({ where: { code: newTeamCode } })) {
+      newTeamCode = generateTeamCode();
+    }
+  }
+
+  const user = await prisma.$transaction(async (tx) => {
+    const created = await tx.user.create({
+      data: {
+        name,
+        username,
+        email: email.toLowerCase(),
+        password: hashed,
+        role,
+        avatarConfig: avatarConfig ?? undefined,
+        consentedAt: new Date(),
+      },
+    });
+
+    if (role === "ENTRENADOR") {
+      const team = await tx.team.create({
+        data: { name: teamName, code: newTeamCode, logoUrl: teamLogo },
+      });
+      await tx.teamMember.create({
+        data: { teamId: team.id, userId: created.id, role: "COACH" },
+      });
+    } else if (teamId) {
+      await tx.teamMember.create({
+        data: { teamId, userId: created.id, role: "PLAYER" },
+      });
+    }
+
+    return created;
   });
 
   await touchStreak(user.id);
+  await setSessionCookie(signToken({ id: user.id }));
 
-  return { success: "Cuenta creada", userId: user.id, userName: user.name };
+  redirect(homeForRole(role));
 }
 
 const loginSchema = z.object({

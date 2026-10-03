@@ -1,6 +1,14 @@
 export type PoseId = "standing" | "celebrate" | "jump" | "kick" | "dribble";
 
+export type AvatarGender = "male" | "female";
+
+export const AVATAR_GENDERS = [
+  { id: "male", label: "Hombre" },
+  { id: "female", label: "Mujer" },
+] as const;
+
 export type AvatarConfig = {
+  gender: AvatarGender;
   skin: string;
   hair: string;
   hairColor: string;
@@ -8,10 +16,15 @@ export type AvatarConfig = {
   mouth: string;
   pose: PoseId;
   jersey: string;
+  jerseyPattern: string;
+  hoodie: string;
+  hoodiePattern: string;
   shorts: string;
+  shortsPattern: string;
   socks: string;
   boots: string;
   number: number;
+  numberBack: boolean;
   shield: string;
   shieldUrl: string | null;
   accessory: string;
@@ -114,7 +127,18 @@ export const SHIELDS = [
 export const ACCESSORIES = [
   { id: "none", label: "Ninguno" },
   { id: "headband", label: "Cinta" },
-  { id: "cap", label: "Gorra" },
+  { id: "cap", label: "Cachucha" },
+  { id: "beanie", label: "Gorro" },
+] as const;
+
+export const HOODIE_NONE = "none";
+
+export const GARMENT_PATTERNS = [
+  { id: "none", label: "Lisa" },
+  { id: "vstripes", label: "Rayas" },
+  { id: "hstripes", label: "Aros" },
+  { id: "checkers", label: "Cuadros" },
+  { id: "diagonal", label: "Diagonal" },
 ] as const;
 
 export const BACKGROUNDS = [
@@ -129,6 +153,7 @@ export const BACKGROUNDS = [
 ] as const;
 
 export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
+  gender: "male",
   skin: "#f1c27d",
   hair: "short",
   hairColor: "#3b2f2f",
@@ -136,10 +161,15 @@ export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   mouth: "smile",
   pose: "standing",
   jersey: "#16a34a",
+  jerseyPattern: "none",
+  hoodie: "none",
+  hoodiePattern: "none",
   shorts: "#f8fafc",
+  shortsPattern: "none",
   socks: "#16a34a",
   boots: "#111827",
   number: 10,
+  numberBack: false,
   shield: "none",
   shieldUrl: null,
   accessory: "none",
@@ -153,6 +183,8 @@ const HAIR_COLOR_SET = new Set<string>(HAIR_COLORS);
 const KIT_SET = new Set<string>(KIT_COLORS);
 const BG_SET = new Set<string>(BACKGROUNDS);
 
+const GENDER_ID_SET = new Set(AVATAR_GENDERS.map((s) => s.id));
+const PATTERN_ID_SET = new Set(GARMENT_PATTERNS.map((s) => s.id));
 const HAIR_ID_SET = new Set(HAIR_STYLES.map((s) => s.id));
 const EYE_ID_SET = new Set(EYE_STYLES.map((s) => s.id));
 const MOUTH_ID_SET = new Set(MOUTH_STYLES.map((s) => s.id));
@@ -187,6 +219,7 @@ export function validateAvatarConfig(value: unknown): AvatarConfig | null {
       : null;
 
   return {
+    gender: inIds(c.gender, GENDER_ID_SET, d.gender) as AvatarGender,
     skin: inSet(c.skin, SKIN_SET, d.skin),
     hair: inIds(c.hair, HAIR_ID_SET, d.hair),
     hairColor: inSet(c.hairColor, HAIR_COLOR_SET, d.hairColor),
@@ -194,11 +227,16 @@ export function validateAvatarConfig(value: unknown): AvatarConfig | null {
     mouth: inIds(c.mouth, MOUTH_ID_SET, d.mouth),
     pose: inIds(c.pose, POSE_ID_SET, d.pose) as PoseId,
     jersey: inSet(c.jersey, KIT_SET, d.jersey),
+    jerseyPattern: inIds(c.jerseyPattern, PATTERN_ID_SET, d.jerseyPattern),
+    hoodie: c.hoodie === HOODIE_NONE ? HOODIE_NONE : inSet(c.hoodie, KIT_SET, d.hoodie),
+    hoodiePattern: inIds(c.hoodiePattern, PATTERN_ID_SET, d.hoodiePattern),
     shorts: inSet(c.shorts, KIT_SET, d.shorts),
+    shortsPattern: inIds(c.shortsPattern, PATTERN_ID_SET, d.shortsPattern),
     socks: inSet(c.socks, KIT_SET, d.socks),
     boots: inSet(c.boots, KIT_SET, d.boots),
     number:
       Number.isInteger(num) && num >= 1 && num <= 99 ? num : d.number,
+    numberBack: c.numberBack === true,
     shield: inIds(c.shield, SHIELD_ID_SET, d.shield),
     shieldUrl,
     accessory: inIds(c.accessory, ACC_ID_SET, d.accessory),

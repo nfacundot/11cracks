@@ -7,6 +7,7 @@ import {
   BarChartIcon,
   BoltIcon,
   BookIcon,
+  BuildingIcon,
   CoinIcon,
   EyeIcon,
   FlameIcon,
@@ -36,6 +37,8 @@ function groupsFor(base: string): Group[] {
           { href: `${base}/contenido`, label: "Contenido", short: "Contenido", icon: <BookIcon className="h-[18px] w-[18px]" /> },
           { href: `${base}/reportes`, label: "Reportes", short: "Reportes", icon: <BarChartIcon className="h-[18px] w-[18px]" /> },
           { href: `${base}/certificaciones`, label: "Certificaciones", short: "Certificados", icon: <TrophyIcon className="h-[18px] w-[18px]" /> },
+          { href: `${base}/trofeos`, label: "Trofeos", short: "Trofeos", icon: <TrophyIcon className="h-[18px] w-[18px]" /> },
+          { href: `${base}/patrocinadores`, label: "Patrocinadores", short: "Sponsors", icon: <BuildingIcon className="h-[18px] w-[18px]" /> },
         ],
       },
       {

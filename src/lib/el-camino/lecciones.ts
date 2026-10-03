@@ -16,6 +16,7 @@ export interface NodoLeccion {
   gameSlug?: string | null;
   gameLabel?: string | null;
   gameCategory?: GameCategory | null;
+  lessonType?: string | null;
   posX?: number;
   posY?: number;
 }

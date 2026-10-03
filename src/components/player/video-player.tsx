@@ -56,6 +56,8 @@ export function VideoPlayer({
     const attach = () => {
       if (!w.YT?.Player) return;
       player = new w.YT.Player(containerId, {
+        videoId: source.videoId,
+        playerVars: { rel: 0, playsinline: 1, modestbranding: 1 },
         events: {
           onStateChange: (event: { data: number }) => {
             if (event.data === 0) onEndedRef.current();
@@ -154,11 +156,14 @@ export function VideoPlayer({
     );
   }
 
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
-  const embedSrc =
-    source.provider === "youtube"
-      ? `${source.embedUrl}?enablejsapi=1&rel=0&playsinline=1${origin ? `&origin=${encodeURIComponent(origin)}` : ""}`
-      : `${source.embedUrl}?title=0&byline=0&portrait=0`;
+  // YouTube: se usa un contenedor gestionado por React y el API de YouTube crea
+  // el iframe dentro. Así al cerrar/abrir el video no queda un nodo reemplazado
+  // que rompa el desmontaje (y el video vuelve a aparecer).
+  if (source.provider === "youtube") {
+    return <div id={containerId} key={`yt-${source.videoId}`} className="player-videos-modal__video" />;
+  }
+
+  const embedSrc = `${source.embedUrl}?title=0&byline=0&portrait=0`;
 
   return (
     <iframe

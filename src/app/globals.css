@@ -6,6 +6,7 @@
 @import "./styles/login.css";
 @import "./styles/jugador-glass.css";
 @import "./styles/login-glass.css";
+@import "./styles/avatar-creator.css";
 @import "./styles/player-home.css";
 @import "./styles/dashboard-player.css";
 @import "./styles/player-home-glin.css";
@@ -23,6 +24,7 @@
 @import "./styles/admin-impact.css";
 @import "./styles/admin-audit.css";
 @import "./styles/admin-payments.css";
+@import "./styles/goal50.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

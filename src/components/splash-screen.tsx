@@ -12,7 +12,10 @@ export function SplashScreen({ onDone }: { onDone?: () => void }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const doneRef = useRef(onDone);
-  doneRef.current = onDone;
+
+  useEffect(() => {
+    doneRef.current = onDone;
+  }, [onDone]);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");

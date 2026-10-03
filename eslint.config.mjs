@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Prisma client autogenerado:
     "src/generated/**",
+    // Servidor Colyseus (proyecto independiente con su propio tooling):
+    "my-server/**",
   ]),
 ]);
 

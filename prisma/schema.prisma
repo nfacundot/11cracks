@@ -93,9 +93,14 @@ model User {
   xp           Int      @default(0)
   coins        Int      @default(0)
   trophies     Int      @default(0)
+  energy       Float    @default(100)
+  needs        Json     @default("{}")
+  inventory    Json     @default("[]")
+  calendarEvents Json   @default("[]")
   currentStreak Int     @default(0)
   bestStreak   Int      @default(0)
   lastActiveAt DateTime?
+  consentedAt  DateTime?
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -108,8 +113,92 @@ model User {
   pushSubscriptions PushSubscription[]
   streakDays       StreakDay[]
   indicators       Indicator[]
+  chatMessages     ChatMessage[]
+  rooms            Room[]
+  earnedTrophies   UserTrophy[]
+  sentMessages     DirectMessage[] @relation("SentMessages")
+  receivedMessages DirectMessage[] @relation("ReceivedMessages")
+  sentFriendRequests     Friendship[] @relation("FriendRequestsSent")
+  receivedFriendRequests Friendship[] @relation("FriendRequestsReceived")
 
   @@index([xp])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  requester   User             @relation("FriendRequestsSent", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User             @relation("FriendRequestsReceived", fields: [addresseeId], references: [id], onDelete: Cascade)
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+}
+
+model DirectMessage {
+  id          String   @id @default(cuid())
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId String
+  recipient   User     @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  body        String
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, read])
+}
+
+model Trophy {
+  id          String   @id @default(cuid())
+  name        String
+  subtitle    String   @default("")
+  description String   @default("")
+  icon        String   @default("🏆")
+  metric      String
+  target      Int      @default(1)
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  awards UserTrophy[]
+
+  @@index([active, order])
+}
+
+model UserTrophy {
+  id       String   @id @default(cuid())
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trophyId String
+  trophy   Trophy   @relation(fields: [trophyId], references: [id], onDelete: Cascade)
+  earnedAt DateTime @default(now())
+
+  @@unique([userId, trophyId])
+  @@index([userId])
+}
+
+model Sponsor {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String
+  slot      Int      @default(0)
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, order])
 }
 
 model Team {
@@ -1069,4 +1158,33 @@ model VideoProgress {
 
   @@unique([videoId, playerId])
   @@index([playerId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model Room {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  size       String
+  floorColor String
+  wallColor  String
+  avatarX    Float    @default(0)
+  avatarZ    Float    @default(0)
+  avatarRot  Float    @default(0)
+  furniture  Json     @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }

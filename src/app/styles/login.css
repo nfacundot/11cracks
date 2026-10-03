@@ -772,15 +772,16 @@ html[data-login-transition="leaving"] .login-page { animation: login-page-exit 5
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url(/img/back/backpc.png);
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 60% at 50% 112%, rgba(201, 162, 74, 0.14), transparent 72%),
+    linear-gradient(180deg, #070a10 0%, #05070a 55%, #030405 100%);
 }
 
-@media (max-width: 767px) {
-  .login-gate__hero {
-    background-image: url(/img/back/backmob.png);
-  }
+.login-gate__stadium {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .login-gate__scrim {

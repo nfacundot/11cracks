@@ -57,6 +57,7 @@ export const navigationByRole: Record<ShellRole, NavigationGroup[]> = {
       id: "player-team",
       label: "Tu mundo",
       items: [
+        { id: "world", label: "Mi Mundo", href: "/jugador/world", icon: "lineup" },
         { id: "lineup", label: "Alineación", href: "/jugador/alineacion", icon: "lineup" },
         { id: "streak", label: "Mi Racha", href: "/jugador/racha", icon: "impact" },
         { id: "pet", label: "Mi PET", href: "/jugador/pet", icon: "wallet" },
