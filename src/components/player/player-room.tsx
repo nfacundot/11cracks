@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
-import { LowpolyHuman } from "@/lib/avatar3d/lowpoly-human";
+import { FiguraAvatar } from "@/lib/avatar3d/avatares/figura";
 import { DEFAULT_AVATAR_CONFIG, type AvatarConfig } from "@/lib/avatar";
 import {
   FURNITURE_CATEGORIES,
@@ -464,7 +464,7 @@ export function PlayerRoom({ config, room }: { config: AvatarConfig | null; room
     scene.add(ring);
     selectionRingRef.current = ring;
 
-    const human = new LowpolyHuman({ config: config ?? DEFAULT_AVATAR_CONFIG, height: 1.8 });
+    const human = new FiguraAvatar({ config: config ?? DEFAULT_AVATAR_CONFIG, height: 1.8 });
     const hasSaved = room.avatarX !== 0 || room.avatarZ !== 0 || room.avatarRot !== 0;
     human.object3D.position.set(room.avatarX, 0, hasSaved ? room.avatarZ : halfD - 1.6);
     human.object3D.rotation.y = hasSaved ? room.avatarRot : Math.PI;

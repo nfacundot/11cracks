@@ -415,7 +415,7 @@ export function RegisterForm() {
       )}
 
       {phase === "avatar" && role && (
-        <div className="rw-phase">
+        <div className="rw-phase rw-phase--wide">
           <h4 className="rw-title">Tu avatar 3D</h4>
           <p className="rw-sub">
             {role === "player" ? "Paso 3 · " : "Paso 2 · "}
@@ -426,14 +426,11 @@ export function RegisterForm() {
             onChange={setAvatar}
             name={name || username}
             roomName={role === "coach" ? "coaches_lobby" : "players_lobby"}
+            onContinue={() => go("account")}
           />
-          <div className="rw-actions">
+          <div className="rw-actions rw-actions--single">
             <button type="button" className="login-submit login-submit--ghost" onClick={() => go("team")} onPointerEnter={hover}>
               <span>Atrás</span>
-            </button>
-            <button type="button" className="login-submit" onClick={() => go("account")} onPointerEnter={hover}>
-              <span>Continuar</span>
-              <ArrowIcon />
             </button>
           </div>
         </div>

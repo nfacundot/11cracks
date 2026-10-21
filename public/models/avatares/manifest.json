@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "base": "/models/avatares",
+  "actualizado": "2026-10-05",
+  "assets": [
+    {
+      "id": "av-fem",
+      "tipo": "cuerpo",
+      "genero": "femenino",
+      "nombre": "Calva",
+      "ocupa": [
+        "cuerpo"
+      ],
+      "archivo": "web/av_fem.glb",
+      "kb": 394,
+      "triangulos": 39916,
+      "animable": false
+    },
+    {
+      "id": "av-mal",
+      "tipo": "cuerpo",
+      "genero": "masculino",
+      "nombre": "Calvo",
+      "ocupa": [
+        "cuerpo"
+      ],
+      "archivo": "web/av_mal.glb",
+      "kb": 369,
+      "triangulos": 38210,
+      "animable": false
+    },
+    {
+      "id": "cab1",
+      "tipo": "cabello",
+      "genero": "todos",
+      "nombre": "Corto",
+      "ocupa": [
+        "cabello"
+      ],
+      "archivo": "web/cab1.glb",
+      "kb": 8868,
+      "triangulos": 1376094,
+      "animable": false
+    },
+    {
+      "id": "cab2",
+      "tipo": "cabello",
+      "genero": "todos",
+      "nombre": "Espigado",
+      "ocupa": [
+        "cabello"
+      ],
+      "archivo": "web/cab2.glb",
+      "kb": 9584,
+      "triangulos": 1218494,
+      "animable": false
+    }
+  ]
+}

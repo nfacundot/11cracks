@@ -7,6 +7,12 @@ const prisma = new PrismaClient({ adapter });
 
 type Opt = { text: string; imageUrl?: string; isCorrect: boolean };
 
+/**
+ * Crea/actualiza las lecciones de prueba (Preguntados / Contrarreloj / Ambas).
+ *
+ * Todo es upsert por contenido (prompt / texto de opcion): las preguntas y
+ * opciones ya cargadas se conservan en lugar de borrarse y recrearse.
+ */
 async function upsertLesson(args: {
   key: string;
   title: string;
@@ -23,62 +29,79 @@ async function upsertLesson(args: {
     select: { id: true },
   });
 
-  if (existing) {
-    await prisma.question.deleteMany({ where: { lessonId: existing.id } });
-    const lesson = await prisma.lesson.update({
-      where: { id: existing.id },
-      data: { type: args.type, optionMode: args.optionMode, timeSeconds: args.timeSeconds ?? null },
-    });
-    await prisma.question.createMany({
-      data: args.questions.map((q, qi) => ({
-        lessonId: lesson.id,
-        type: "MULTIPLE_CHOICE",
-        prompt: q.prompt,
-        explanation: q.explanation,
-        order: qi,
-      })),
-    });
-    await createOptions(lesson.id, args.questions);
-    console.log(`✔ Actualizada: ${args.title}`);
-    return;
-  }
-
-  const lesson = await prisma.lesson.create({
-    data: {
-      title: args.title,
-      emoji: args.emoji,
-      color: args.color,
-      type: args.type,
-      optionMode: args.optionMode,
-      timeSeconds: args.timeSeconds ?? null,
-      xpReward: args.xpReward,
-      order: 90,
-      questions: { create: [] },
-    },
-  });
-
-  await createOptions(lesson.id, args.questions);
-  console.log(`✔ Creada: ${args.title} (${lesson.id})`);
-}
-
-async function createOptions(lessonId: string, questions: { options: Opt[] }[]) {
-  const qs = await prisma.question.findMany({
-    where: { lessonId },
-    orderBy: { order: "asc" },
-    select: { id: true },
-  });
-  for (const [qi, q] of qs.entries()) {
-    const opts = questions[qi]?.options ?? [];
-    for (const [oi, o] of opts.entries()) {
-      await prisma.questionOption.create({
+  const lesson = existing
+    ? await prisma.lesson.update({
+        where: { id: existing.id },
         data: {
-          questionId: q.id,
-          text: o.text,
-          imageUrl: o.imageUrl ?? null,
-          isCorrect: o.isCorrect,
-          order: oi,
+          type: args.type,
+          optionMode: args.optionMode,
+          timeSeconds: args.timeSeconds ?? null,
+        },
+      })
+    : await prisma.lesson.create({
+        data: {
+          title: args.title,
+          emoji: args.emoji,
+          color: args.color,
+          type: args.type,
+          optionMode: args.optionMode,
+          timeSeconds: args.timeSeconds ?? null,
+          xpReward: args.xpReward,
+          order: 90,
+          questions: { create: [] },
         },
       });
+
+  for (const [qi, q] of args.questions.entries()) {
+    const existingQuestion = await prisma.question.findFirst({
+      where: { lessonId: lesson.id, prompt: q.prompt },
+      select: { id: true },
+    });
+
+    const question = existingQuestion
+      ? await prisma.question.update({
+          where: { id: existingQuestion.id },
+          data: {
+            type: "MULTIPLE_CHOICE",
+            explanation: q.explanation,
+            order: qi,
+          },
+        })
+      : await prisma.question.create({
+          data: {
+            lessonId: lesson.id,
+            type: "MULTIPLE_CHOICE",
+            prompt: q.prompt,
+            explanation: q.explanation,
+            order: qi,
+          },
+        });
+
+    await upsertOptions(question.id, q.options);
+  }
+
+  console.log(existing ? `✔ Actualizada: ${args.title}` : `✔ Creada: ${args.title} (${lesson.id})`);
+}
+
+async function upsertOptions(questionId: string, options: Opt[]) {
+  const existing = await prisma.questionOption.findMany({
+    where: { questionId },
+    select: { id: true, text: true },
+  });
+  const idByText = new Map(existing.map((option) => [option.text, option.id]));
+
+  for (const [oi, option] of options.entries()) {
+    const id = idByText.get(option.text);
+    const data = {
+      text: option.text,
+      imageUrl: option.imageUrl ?? null,
+      isCorrect: option.isCorrect,
+      order: oi,
+    };
+    if (id) {
+      await prisma.questionOption.update({ where: { id }, data });
+    } else {
+      await prisma.questionOption.create({ data: { questionId, ...data } });
     }
   }
 }
@@ -110,7 +133,7 @@ async function main() {
           { text: "Delantero", isCorrect: false },
           { text: "Portero", isCorrect: true },
           { text: "Defensa", isCorrect: false },
-          { text: "Centrocampista", isCorrect: false },
+          { text: "Mediocampista", isCorrect: false },
         ],
       },
     ],

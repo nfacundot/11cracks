@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType, type SVGProps } from "react";
 import * as THREE from "three";
-import { LowpolyHuman } from "@/lib/avatar3d/lowpoly-human";
+import { ArrowRight, Palette, Shirt, Sparkles } from "lucide-react";
+import { FiguraAvatar } from "@/lib/avatar3d/avatares/figura";
+import { cargarManifiesto, type AssetAvatar, type ManifiestoAvatar } from "@/lib/avatar3d/avatares/registro";
+import { AssetThumb } from "@/components/login/asset-thumb";
 import {
   ACCESSORIES,
   AVATAR_GENDERS,
   EYE_STYLES,
   GARMENT_PATTERNS,
   HAIR_COLORS,
-  HAIR_STYLES,
+  SIN_PELO,
   HOODIE_NONE,
   KIT_COLORS,
   MOUTH_STYLES,
@@ -18,8 +21,9 @@ import {
   type AvatarConfig,
 } from "@/lib/avatar";
 
-type TabId = "gender" | "hair" | "skin" | "eyes" | "kit" | "details";
+type SectionId = "look3d" | "position" | "style";
 type LobbyStatus = "connecting" | "online" | "offline";
+type SubTab = "genero" | "cabello" | "piel";
 
 type LobbyState = { avatarsJson?: string; count?: number };
 
@@ -35,14 +39,58 @@ type LobbyRoom = {
 const COLYSEUS_URL = process.env.NEXT_PUBLIC_COLYSEUS_URL ?? "ws://localhost:2567";
 const DEFAULT_ROOM = "players_lobby";
 
-const TABS: Array<{ id: TabId; label: string }> = [
-  { id: "gender", label: "Género" },
-  { id: "hair", label: "Pelo" },
-  { id: "skin", label: "Piel" },
-  { id: "eyes", label: "Ojos" },
-  { id: "kit", label: "Uniforme" },
-  { id: "details", label: "Detalles" },
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
+
+const SECTIONS: Array<{ id: SectionId; label: string; icon: IconType }> = [
+  { id: "look3d", label: "Apariencia", icon: Palette },
+  { id: "position", label: "Posición", icon: Shirt },
+  { id: "style", label: "Estilo", icon: Sparkles },
 ];
+
+const SUBTABS: Array<{ id: SubTab; label: string }> = [
+  { id: "genero", label: "Género" },
+  { id: "cabello", label: "Cabello" },
+  { id: "piel", label: "Piel" },
+];
+
+const SKIN_NAMES: Record<string, string> = {
+  "#ffe0bd": "Porcelana",
+  "#fbd5b5": "Marfil",
+  "#f1c27d": "Arena",
+  "#e8b878": "Trigo",
+  "#e0ac69": "Ámbar",
+  "#d59b5c": "Miel",
+  "#c68642": "Caramelo",
+  "#b0703c": "Canela",
+  "#8d5524": "Cacao",
+  "#7a4526": "Tostado",
+  "#5a3a22": "Ébano",
+  "#3b2f2f": "Noche",
+};
+
+function AssetCard({
+  asset,
+  manifiesto,
+  activo,
+  onSelect,
+}: {
+  asset: AssetAvatar;
+  manifiesto: ManifiestoAvatar | null;
+  activo: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`av3d-asset ${activo ? "is-active" : ""}`}
+      aria-pressed={activo}
+      onClick={onSelect}
+    >
+      <AssetThumb manifiesto={manifiesto} asset={asset} />
+      <span className="av3d-asset__name">{asset.nombre}</span>
+    </button>
+  );
+}
 
 function Swatch({
   color,
@@ -64,19 +112,30 @@ function Swatch({
   );
 }
 
-function PatternChips({ active, onSelect }: { active: string; onSelect: (id: string) => void }) {
+function PatternChips({
+  active,
+  onSelect,
+  label,
+}: {
+  active: string;
+  onSelect: (id: string) => void;
+  label: string;
+}) {
   return (
-    <div className="av3d__row">
-      {GARMENT_PATTERNS.map((pattern) => (
-        <button
-          key={pattern.id}
-          type="button"
-          className={`av3d-chip ${active === pattern.id ? "is-active" : ""}`}
-          onClick={() => onSelect(pattern.id)}
-        >
-          {pattern.label}
-        </button>
-      ))}
+    <div className="av3d__group">
+      <span className="av3d__label">{label}</span>
+      <div className="av3d__row">
+        {GARMENT_PATTERNS.map((pattern) => (
+          <button
+            key={pattern.id}
+            type="button"
+            className={`av3d-chip ${active === pattern.id ? "is-active" : ""}`}
+            onClick={() => onSelect(pattern.id)}
+          >
+            {pattern.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -86,15 +145,17 @@ export function AvatarCreator3D({
   onChange,
   name,
   roomName,
+  onContinue,
 }: {
   value: AvatarConfig;
   onChange: (config: AvatarConfig) => void;
   name?: string;
   roomName?: string;
+  onContinue?: () => void;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const localHumanRef = useRef<LowpolyHuman | null>(null);
+  const localHumanRef = useRef<FiguraAvatar | null>(null);
   const roomRef = useRef<LobbyRoom | null>(null);
   const sessionIdRef = useRef("");
   const valueRef = useRef(value);
@@ -103,19 +164,36 @@ export function AvatarCreator3D({
   const sendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draggingRef = useRef(false);
   const lastPointerXRef = useRef(0);
-  const spinRef = useRef(-0.5);
+const spinRef = useRef(-0.5);
 
-  const [tab, setTab] = useState<TabId>("gender");
+  const [section, setSection] = useState<SectionId>("look3d");
+  const [subtab, setSubtab] = useState<SubTab>("genero");
   const [status, setStatus] = useState<LobbyStatus>("connecting");
   const [count, setCount] = useState(1);
+  const [assets, setAssets] = useState<AssetAvatar[]>([]);
+  // El manifiesto entero, no solo la lista: las miniaturas necesitan `base` para
+  // resolver la ruta de cada asset.
+  const [manifiesto, setManifiesto] = useState<ManifiestoAvatar | null>(null);
+
+  useEffect(() => {
+    let vigente = true;
+    void cargarManifiesto().then((m) => {
+      if (!vigente) return;
+      setAssets(m.assets);
+      setManifiesto(m);
+    });
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   useEffect(() => {
     const stage = stageRef.current;
     const canvas = canvasRef.current;
     if (!stage || !canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -124,11 +202,22 @@ export function AvatarCreator3D({
     camera.position.set(0, 1.15, 3.5);
     camera.lookAt(0, 1.02, 0);
 
+    /** Encuadra al avatar para que siempre entre completo, en vertical o horizontal. */
+    const fitCamera = (aspect: number) => {
+      const vFov = (camera.fov * Math.PI) / 180;
+      const distHeight = 2.85 / 2 / Math.tan(vFov / 2);
+      const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+      const distWidth = 1.75 / 2 / Math.tan(hFov / 2);
+      const distance = Math.max(distHeight, distWidth);
+      camera.position.set(0, 1.16, distance);
+      camera.lookAt(0, 1.04, 0);
+    };
+
     scene.add(new THREE.HemisphereLight(0xffffff, 0x2a2f3a, 1.15));
     const key = new THREE.DirectionalLight(0xffffff, 2);
     key.position.set(2.4, 4.2, 3.2);
     key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.mapSize.set(768, 768);
     key.shadow.camera.left = -6;
     key.shadow.camera.right = 6;
     key.shadow.camera.top = 6;
@@ -169,7 +258,7 @@ export function AvatarCreator3D({
     const localPivot = new THREE.Group();
     scene.add(localPivot);
 
-    const local = new LowpolyHuman({ config: valueRef.current, height: 2 });
+    const local = new FiguraAvatar({ config: valueRef.current, height: 2 });
     localHumanRef.current = local;
     localPivot.add(local.object3D);
 
@@ -179,6 +268,7 @@ export function AvatarCreator3D({
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      fitCamera(camera.aspect);
     };
     const observer = new ResizeObserver(resize);
     observer.observe(stage);
@@ -287,6 +377,19 @@ export function AvatarCreator3D({
 
   const update = (patch: Partial<AvatarConfig>) => onChange({ ...value, ...patch });
 
+  const generoAsset = value.gender === "female" ? "femenino" : "masculino";
+  // Sin filtro de genero a proposito: la subpestana "Género" muestra los cuerpos de
+  // los dos sexos para poder cambiar. Si se filtrara por el genero actual, al elegir
+  // uno el otro desapareceria de la lista.
+  const cuerpos = assets.filter((a) => a.ocupa.includes("cuerpo"));
+  const cabellos = assets.filter(
+    (a) =>
+      a.ocupa.includes("cabello") &&
+      (a.genero === "todos" || a.genero === generoAsset),
+  );
+  // Los GLB traen el color horneado en la textura, asi que el tinte solo aplica al procedural.
+  const peloEsAsset = cabellos.some((a) => a.id === value.cabello);
+
   const statusLabel =
     status === "online"
       ? `Lobby · ${count}`
@@ -295,263 +398,356 @@ export function AvatarCreator3D({
         : "Modo local";
 
   return (
-    <div className="av3d">
-      <div className="av3d__stage" ref={stageRef}>
-        <canvas ref={canvasRef} className="av3d__canvas" />
-        <span className={`av3d__badge ${status === "online" ? "is-online" : ""}`}>
-          <i aria-hidden="true" />
-          {statusLabel}
-        </span>
-      </div>
+    <section className="av3d" aria-label="Estudio de avatar 3D">
+      <header className="av3d-head">
+        <p className="av3d-head__step">2 · Crear jugador</p>
+        <h3 className="av3d-head__title">
+          Personalización <span>de avatar</span>
+        </h3>
+      </header>
 
-      <div className="av3d__side">
-      <div className="av3d__tabs" role="tablist" aria-label="Personalización del avatar">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
-            className={`av3d-tab ${tab === item.id ? "is-active" : ""}`}
-            onClick={() => setTab(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="av3d__panels">
-      {tab === "gender" && (
-        <div className="av3d-gender">
-          {AVATAR_GENDERS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              className={value.gender === option.id ? "is-active" : ""}
-              onClick={() => update({ gender: option.id })}
-            >
-              <span className="av3d-gender__icon" aria-hidden="true">
-                {option.id === "male" ? "🧑" : "👩"}
-              </span>
-              {option.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {tab === "hair" && (
-        <div className="av3d__panel">
-          <span className="av3d__label">Peinado</span>
-          <div className="av3d__row">
-            {HAIR_STYLES.map((style) => (
-              <button
-                key={style.id}
-                type="button"
-                className={`av3d-chip ${value.hair === style.id ? "is-active" : ""}`}
-                onClick={() => update({ hair: style.id })}
-              >
-                {style.label}
-              </button>
-            ))}
-          </div>
-          <span className="av3d__label">Color de pelo</span>
-          <div className="av3d__row">
-            {HAIR_COLORS.map((color) => (
-              <Swatch
-                key={color}
-                color={color}
-                active={value.hairColor === color}
-                onSelect={() => update({ hairColor: color })}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {tab === "skin" && (
-        <div className="av3d__panel">
-          <span className="av3d__label">Tono de piel</span>
-          <div className="av3d__row">
-            {SKIN_TONES.map((color) => (
-              <Swatch
-                key={color}
-                color={color}
-                active={value.skin === color}
-                onSelect={() => update({ skin: color })}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {tab === "eyes" && (
-        <div className="av3d__panel">
-          <span className="av3d__label">Ojos</span>
-          <div className="av3d__row">
-            {EYE_STYLES.map((style) => (
-              <button
-                key={style.id}
-                type="button"
-                className={`av3d-chip ${value.eyes === style.id ? "is-active" : ""}`}
-                onClick={() => update({ eyes: style.id })}
-              >
-                {style.label}
-              </button>
-            ))}
-          </div>
-          <span className="av3d__label">Boca</span>
-          <div className="av3d__row">
-            {MOUTH_STYLES.map((style) => (
-              <button
-                key={style.id}
-                type="button"
-                className={`av3d-chip ${value.mouth === style.id ? "is-active" : ""}`}
-                onClick={() => update({ mouth: style.id })}
-              >
-                {style.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {tab === "kit" && (
-        <div className="av3d__panel">
-          <span className="av3d__label">Camisa</span>
-          <div className="av3d__row">
-            {KIT_COLORS.map((color) => (
-              <Swatch
-                key={`jersey-${color}`}
-                color={color}
-                active={value.jersey === color}
-                onSelect={() => update({ jersey: color })}
-              />
-            ))}
-          </div>
-          <PatternChips
-            active={value.jerseyPattern}
-            onSelect={(id) => update({ jerseyPattern: id })}
-          />
-
-          <span className="av3d__label">Sudadera</span>
-          <div className="av3d__row">
-            <button
-              type="button"
-              className={`av3d-chip ${value.hoodie === HOODIE_NONE ? "is-active" : ""}`}
-              onClick={() => update({ hoodie: HOODIE_NONE })}
-            >
-              Sin sudadera
-            </button>
-            {KIT_COLORS.map((color) => (
-              <Swatch
-                key={`hoodie-${color}`}
-                color={color}
-                active={value.hoodie === color}
-                onSelect={() => update({ hoodie: color })}
-              />
-            ))}
-          </div>
-          <PatternChips
-            active={value.hoodiePattern}
-            onSelect={(id) => update({ hoodiePattern: id })}
-          />
-
-          <span className="av3d__label">Pantalón</span>
-          <div className="av3d__row">
-            {KIT_COLORS.map((color) => (
-              <Swatch
-                key={`shorts-${color}`}
-                color={color}
-                active={value.shorts === color}
-                onSelect={() => update({ shorts: color })}
-              />
-            ))}
-          </div>
-          <PatternChips
-            active={value.shortsPattern}
-            onSelect={(id) => update({ shortsPattern: id })}
-          />
-
-          <span className="av3d__label">Tacos</span>
-          <div className="av3d__row">
-            {KIT_COLORS.map((color) => (
-              <Swatch
-                key={`boots-${color}`}
-                color={color}
-                active={value.boots === color}
-                onSelect={() => update({ boots: color })}
-              />
-            ))}
-          </div>
-
-          <span className="av3d__label">Número</span>
-          <div className="av3d__row av3d__row--number">
-            <input
-              type="number"
-              min={1}
-              max={99}
-              value={value.number}
-              className="av3d-number"
-              onChange={(e) => {
-                const next = Number(e.target.value);
-                if (Number.isInteger(next) && next >= 1 && next <= 99) {
-                  update({ number: next });
-                }
-              }}
-            />
-            <button
-              type="button"
-              className={`av3d-chip ${value.numberBack ? "is-active" : ""}`}
-              onClick={() => update({ numberBack: !value.numberBack })}
-            >
-              {value.numberBack ? "✓ " : ""}Número en la espalda
-            </button>
-          </div>
-        </div>
-      )}
-
-      {tab === "details" && (
-        <div className="av3d__panel">
-          <span className="av3d__label">Cabeza</span>
-          <div className="av3d__row">
-            {ACCESSORIES.map((item) => (
+      <div className="av3d-grid">
+        <nav className="av3d-nav" aria-label="Secciones del avatar">
+          <span className="av3d-nav__title">Secciones</span>
+          {SECTIONS.map((item) => {
+            const Icon = item.icon;
+            const active = section === item.id;
+            return (
               <button
                 key={item.id}
                 type="button"
-                className={`av3d-chip ${value.accessory === item.id ? "is-active" : ""}`}
-                onClick={() => update({ accessory: item.id })}
+                className={`av3d-nav__item ${active ? "is-active" : ""}`}
+                aria-current={active ? "step" : undefined}
+                onClick={() => setSection(item.id)}
               >
-                {item.label}
+                <span className="av3d-nav__icon" aria-hidden="true">
+                  <Icon width={16} height={16} />
+                </span>
+                <span className="av3d-nav__label">{item.label}</span>
               </button>
-            ))}
+            );
+          })}
+        </nav>
+
+        <div className="av3d-preview">
+          <div className="av3d__stage" ref={stageRef}>
+            <canvas ref={canvasRef} className="av3d__canvas" />
+            <span className={`av3d__badge ${status === "online" ? "is-online" : ""}`}>
+              <i aria-hidden="true" />
+              {statusLabel}
+            </span>
+            <span className="av3d__hint">Arrastra para girar</span>
           </div>
-          <span className="av3d__label">Escudo en la camiseta</span>
-          <div className="av3d__row">
-            {SHIELDS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`av3d-chip ${value.shield === item.id ? "is-active" : ""}`}
-                onClick={() =>
-                  update({
-                    shield: item.id,
-                    shieldUrl: item.id === "custom" ? value.shieldUrl : value.shieldUrl,
-                  })
-                }
-              >
-                {item.emoji} {item.label}
-              </button>
-            ))}
+          <div className="av3d-preview__foot">
+            <span className="av3d-preview__name">{name || "Tu crack"}</span>
+            <span className="av3d-preview__meta">
+              #{value.number} · {SKIN_NAMES[value.skin] ?? "Personalizado"}
+            </span>
           </div>
-          {value.shieldUrl ? (
-            <span className="av3d__note">El logo del equipo se muestra en la camiseta.</span>
+        </div>
+
+        <aside className="av3d-aside">
+          <div className="av3d__panels">
+            {section === "look3d" && (
+              <div className="av3d__panel">
+                <div className="av3d-subtabs" role="tablist" aria-label="Apariencia">
+                  {SUBTABS.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={subtab === item.id}
+                      className={`av3d-subtab ${subtab === item.id ? "is-active" : ""}`}
+                      onClick={() => setSubtab(item.id)}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+
+                {subtab === "genero" && (
+                  <>
+                    <span className="av3d__label">Género</span>
+                    {cuerpos.length > 0 ? (
+                      /* Un solo control: cada tarjeta ES un genero con su modelo, asi
+                         que la seccion "Modelo" deja de hacer falta por separado. */
+                      <div className="av3d-assets">
+                        {cuerpos.map((asset) => {
+                          const genero = asset.genero === "femenino" ? "female" : "male";
+                          const etiqueta =
+                            AVATAR_GENDERS.find((g) => g.id === genero)?.label ??
+                            (genero === "male" ? "Masculino" : "Femenino");
+                          return (
+                            <button
+                              key={asset.id}
+                              type="button"
+                              className={`av3d-asset ${value.gender === genero ? "is-active" : ""}`}
+                              aria-pressed={value.gender === genero}
+                              onClick={() =>
+                                update({ gender: genero, modelo: asset.id, cabello: null })
+                              }
+                            >
+                              <AssetThumb manifiesto={manifiesto} asset={asset} />
+                              <span className="av3d-asset__name">{etiqueta}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <span className="av3d__label">No hay modelos de cuerpo disponibles.</span>
+                    )}
+
+                    <span className="av3d__label">Número</span>
+                    <div className="av3d__row av3d__row--number">
+                      <input
+                        type="number"
+                        min={1}
+                        max={99}
+                        value={value.number}
+                        className="av3d-number"
+                        onChange={(e) => {
+                          const next = Number(e.target.value);
+                          if (Number.isInteger(next) && next >= 1 && next <= 99) {
+                            update({ number: next });
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className={`av3d-chip ${value.numberBack ? "is-active" : ""}`}
+                        onClick={() => update({ numberBack: !value.numberBack })}
+                      >
+                        {value.numberBack ? "✓ " : ""}Número en la espalda
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {subtab === "cabello" && (
+                  <>
+                    {cabellos.length > 0 ? (
+                      <div className="av3d-assets">
+                        {cabellos.map((asset) => (
+                          <AssetCard
+                            key={asset.id}
+                            asset={asset}
+                            manifiesto={manifiesto}
+                            activo={value.cabello === asset.id}
+                            onSelect={() => update({ cabello: asset.id })}
+                          />
+                        ))}
+                        <button
+                          type="button"
+                          className={`av3d-chip ${value.cabello === null ? "is-active" : ""}`}
+                          onClick={() => update({ hair: SIN_PELO.id, cabello: null })}
+                        >
+                          {SIN_PELO.label}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="av3d__label">No hay modelos de pelo disponibles.</span>
+                    )}
+
+                    <span className="av3d__label">Color de pelo</span>
+                    <div className={`av3d__row ${peloEsAsset ? "is-disabled" : ""}`}>
+                      {HAIR_COLORS.map((color) => (
+                        <Swatch
+                          key={color}
+                          color={color}
+                          active={value.hairColor === color}
+                          onSelect={() => update({ hairColor: color })}
+                        />
+                      ))}
+                    </div>
+                    {peloEsAsset && (
+                      <p className="av3d__hint">
+                        El pelo de estos modelos trae el color horneado en la textura, así que el
+                        tinte no se aplica.
+                      </p>
+                    )}
+                  </>
+                )}
+
+                {subtab === "piel" && (
+                  <>
+                    <span className="av3d__label">Tono de piel</span>
+                    <div className="av3d-piel">
+                      {SKIN_TONES.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          className={`av3d-piel__chip ${value.skin === color ? "is-active" : ""}`}
+                          aria-label={`Tono ${SKIN_NAMES[color] ?? color}`}
+                          aria-pressed={value.skin === color}
+                          onClick={() => update({ skin: color })}
+                        >
+                          <span
+                            className="av3d-piel__art"
+                            style={{ backgroundColor: color }}
+                            aria-hidden="true"
+                          />
+                          <span className="av3d-piel__name">
+                            {SKIN_NAMES[color] ?? color}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {section === "position" && (
+              <div className="av3d__panel">
+                <span className="av3d__label">Camisa</span>
+                <div className="av3d__row">
+                  {KIT_COLORS.map((color) => (
+                    <Swatch
+                      key={`jersey-${color}`}
+                      color={color}
+                      active={value.jersey === color}
+                      onSelect={() => update({ jersey: color })}
+                    />
+                  ))}
+                </div>
+                <PatternChips
+                  label="Patrón de la camisa"
+                  active={value.jerseyPattern}
+                  onSelect={(id) => update({ jerseyPattern: id })}
+                />
+
+                <span className="av3d__label">Sudadera</span>
+                <div className="av3d__row">
+                  <button
+                    type="button"
+                    className={`av3d-chip ${value.hoodie === HOODIE_NONE ? "is-active" : ""}`}
+                    onClick={() => update({ hoodie: HOODIE_NONE })}
+                  >
+                    Sin sudadera
+                  </button>
+                  {KIT_COLORS.map((color) => (
+                    <Swatch
+                      key={`hoodie-${color}`}
+                      color={color}
+                      active={value.hoodie === color}
+                      onSelect={() => update({ hoodie: color })}
+                    />
+                  ))}
+                </div>
+                <PatternChips
+                  label="Patrón de la sudadera"
+                  active={value.hoodiePattern}
+                  onSelect={(id) => update({ hoodiePattern: id })}
+                />
+
+                <span className="av3d__label">Pantalón</span>
+                <div className="av3d__row">
+                  {KIT_COLORS.map((color) => (
+                    <Swatch
+                      key={`shorts-${color}`}
+                      color={color}
+                      active={value.shorts === color}
+                      onSelect={() => update({ shorts: color })}
+                    />
+                  ))}
+                </div>
+                <PatternChips
+                  label="Patrón del pantalón"
+                  active={value.shortsPattern}
+                  onSelect={(id) => update({ shortsPattern: id })}
+                />
+
+                <span className="av3d__label">Tacos</span>
+                <div className="av3d__row">
+                  {KIT_COLORS.map((color) => (
+                    <Swatch
+                      key={`boots-${color}`}
+                      color={color}
+                      active={value.boots === color}
+                      onSelect={() => update({ boots: color })}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {section === "style" && (
+              <div className="av3d__panel">
+                <span className="av3d__label">Ojos</span>
+                <div className="av3d__row">
+                  {EYE_STYLES.map((style) => (
+                    <button
+                      key={style.id}
+                      type="button"
+                      className={`av3d-chip ${value.eyes === style.id ? "is-active" : ""}`}
+                      onClick={() => update({ eyes: style.id })}
+                    >
+                      {style.label}
+                    </button>
+                  ))}
+                </div>
+                <span className="av3d__label">Boca</span>
+                <div className="av3d__row">
+                  {MOUTH_STYLES.map((style) => (
+                    <button
+                      key={style.id}
+                      type="button"
+                      className={`av3d-chip ${value.mouth === style.id ? "is-active" : ""}`}
+                      onClick={() => update({ mouth: style.id })}
+                    >
+                      {style.label}
+                    </button>
+                  ))}
+                </div>
+
+                <span className="av3d__label">Cabeza</span>
+                <div className="av3d__row">
+                  {ACCESSORIES.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`av3d-chip ${value.accessory === item.id ? "is-active" : ""}`}
+                      onClick={() => update({ accessory: item.id })}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+
+                <span className="av3d__label">Escudo en la camiseta</span>
+                <div className="av3d__row">
+                  {SHIELDS.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={`av3d-chip ${value.shield === item.id ? "is-active" : ""}`}
+                      onClick={() => update({ shield: item.id })}
+                    >
+                      {item.emoji} {item.label}
+                    </button>
+                  ))}
+                </div>
+                {value.shieldUrl ? (
+                  <p className="av3d__note">El logo del equipo se muestra en la camiseta.</p>
+                ) : null}
+              </div>
+            )}
+          </div>
+
+          <div className="av3d-promo">
+            <span className="av3d-promo__line av3d-promo__line--solid">Crea</span>
+            <span className="av3d-promo__line av3d-promo__line--outline">tu historia</span>
+            <span className="av3d-promo__sub">Un crack mejor que tú</span>
+          </div>
+
+          {onContinue ? (
+            <button type="button" className="av3d-cta" onClick={onContinue}>
+              <span>Continuar</span>
+              <ArrowRight width={18} height={18} aria-hidden="true" />
+            </button>
           ) : null}
-        </div>
-      )}
-
-      <p className="av3d__note">Arrastra para girar · tu avatar se sincroniza con el lobby</p>
+        </aside>
       </div>
-      </div>
-    </div>
+    </section>
   );
 }

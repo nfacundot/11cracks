@@ -1,4 +1,6 @@
-﻿import { PrismaPg } from "@prisma/adapter-pg";
+﻿import "dotenv/config";
+
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 
@@ -116,9 +118,23 @@ const MATERIAS_TEMPLATE_ETAPA3: {
   },
 ];
 
+/**
+ * Posicion estable (determinista) dentro de un conjunto de n elementos.
+ *
+ * Antes se usaba Math.random(), lo que hacia que cada ejecucion del seed
+ * generase un conjunto de opciones distinto y obligase a recrearlas.
+ */
+function stableIndex(seed: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return hash % modulo;
+}
+
 function optionsFor(correct: string, distractors: string[]): QuestionSeed["options"] {
   const pool = [...distractors.filter((item) => item !== correct)];
-  const correctIndex = Math.floor(Math.random() * 4);
+  const correctIndex = stableIndex(correct, 4);
   const options: QuestionSeed["options"] = [{ text: correct, isCorrect: true }];
   for (let i = 0; i < 4; i++) {
     if (i === correctIndex) options[i] = { text: correct, isCorrect: true };
@@ -185,15 +201,129 @@ function juegosUnicos(): LessonSeed[] {
   ];
 }
 
+/**
+ * Sincroniza las preguntas de una leccion sin borrar las existentes.
+ *
+ * La identidad estable es el "prompt": si la pregunta ya existe se actualiza
+ * conservando su id (y por lo tanto sus AnswerRecord y LessonProgress
+ * asociados); si no existe, se crea. Las preguntas que ya no esten en la
+ * plantilla se conservan: este seed nunca borra historial de aprendizaje.
+ */
+async function syncQuestions(lessonId: string, questions: QuestionSeed[]) {
+  const existing = await prisma.question.findMany({
+    where: { lessonId },
+    select: { id: true, prompt: true },
+  });
+  const idByPrompt = new Map(existing.map((question) => [question.prompt, question.id]));
+
+  for (const [qi, q] of questions.entries()) {
+    const questionId = idByPrompt.get(q.prompt);
+    const question = questionId
+      ? await prisma.question.update({
+          where: { id: questionId },
+          data: { type: q.type, explanation: q.explanation, order: qi },
+        })
+      : await prisma.question.create({
+          data: {
+            lessonId,
+            type: q.type,
+            prompt: q.prompt,
+            explanation: q.explanation,
+            order: qi,
+          },
+        });
+    await syncOptions(question.id, q.options);
+  }
+}
+
+/** Igual que syncQuestions, pero para las opciones: la identidad es el texto. */
+async function syncOptions(questionId: string, options: QuestionSeed["options"]) {
+  const existing = await prisma.questionOption.findMany({
+    where: { questionId },
+    select: { id: true, text: true },
+  });
+  const idByText = new Map(existing.map((option) => [option.text, option.id]));
+
+  for (const [oi, option] of options.entries()) {
+    const data = { text: option.text, isCorrect: option.isCorrect ?? false, order: oi };
+    const optionId = idByText.get(option.text);
+    if (optionId) {
+      await prisma.questionOption.update({ where: { id: optionId }, data });
+    } else {
+      await prisma.questionOption.create({ data: { questionId, ...data } });
+    }
+  }
+
+  // Se retiran las opciones que ya no forman parte de la plantilla para que el
+  // seed sea idempotente. Solo se hace cuando la plantilla define opciones:
+  // una lista vacia significa "el seed no gestiona este contenido".
+  const labels = options.map((option) => option.text);
+  if (labels.length > 0) {
+    await prisma.questionOption.deleteMany({ where: { questionId, text: { notIn: labels } } });
+  }
+}
+
+/** Opciones de "Oído de Crack": la identidad estable es la etiqueta. */
+async function syncOidoOptions(
+  wordId: string,
+  options: { label: string; imageUrl: string; isCorrect: boolean }[],
+) {
+  const existing = await prisma.oidoCrackOption.findMany({
+    where: { wordId },
+    select: { id: true, label: true },
+  });
+  const idByLabel = new Map(existing.map((option) => [option.label, option.id]));
+
+  for (const [oi, option] of options.entries()) {
+    const data = { label: option.label, imageUrl: option.imageUrl, isCorrect: option.isCorrect, order: oi };
+    const optionId = idByLabel.get(option.label);
+    if (optionId) {
+      await prisma.oidoCrackOption.update({ where: { id: optionId }, data });
+    } else {
+      await prisma.oidoCrackOption.create({ data: { wordId, ...data } });
+    }
+  }
+
+  const labels = options.map((option) => option.label);
+  if (labels.length > 0) {
+    await prisma.oidoCrackOption.deleteMany({ where: { wordId, label: { notIn: labels } } });
+  }
+}
+
+/** Opciones de "Gol de Palabra": la identidad estable es la etiqueta. */
+async function syncGolOptions(wordId: string, options: { label: string; isCorrect: boolean }[]) {
+  const existing = await prisma.golPalabraOption.findMany({
+    where: { wordId },
+    select: { id: true, label: true },
+  });
+  const idByLabel = new Map(existing.map((option) => [option.label, option.id]));
+
+  for (const [oi, option] of options.entries()) {
+    const data = { label: option.label, isCorrect: option.isCorrect, order: oi };
+    const optionId = idByLabel.get(option.label);
+    if (optionId) {
+      await prisma.golPalabraOption.update({ where: { id: optionId }, data });
+    } else {
+      await prisma.golPalabraOption.create({ data: { wordId, ...data } });
+    }
+  }
+
+  const labels = options.map((option) => option.label);
+  if (labels.length > 0) {
+    await prisma.golPalabraOption.deleteMany({ where: { wordId, label: { notIn: labels } } });
+  }
+}
+
 async function main() {
   const oldStageLessons = await prisma.lesson.findMany({ where: { temaId: { startsWith: "stage-" } }, select: { id: true } });
   if (oldStageLessons.length > 0) {
     await prisma.lesson.deleteMany({ where: { id: { in: oldStageLessons.map((lesson) => lesson.id) } } });
   }
   await prisma.tema.deleteMany({ where: { id: { startsWith: "stage-" } } });
-  await prisma.tema.deleteMany({ where: { id: { startsWith: "demo-materia-" } } });
-  await prisma.etapaTema.deleteMany({ where: { temaId: { startsWith: "demo-materia-" } } });
-  await prisma.lesson.deleteMany({ where: { id: { startsWith: "demo-materia-" } } });
+
+  // Las materias "demo-materia-*" NO se borran: se hacen upsert más abajo.
+  // Borrarlas y recrearlas perdia la posicion ya ajustada en el mapa (posX/posY)
+  // y los vinculos etapa/materia registrados en la app.
   await prisma.lesson.deleteMany({
     where: {
       title: {
@@ -237,8 +367,8 @@ async function main() {
         color: materia.color,
         order: index + 1,
         xpReward: 60,
-        posX: materia.posX,
-        posY: materia.posY,
+        // posX/posY se omiten a proposito: en un upsert no se tocan, de modo que
+        // se respeta la posicion real de cada materia en el mapa.
       },
       create: {
         id: materiaId,
@@ -253,9 +383,10 @@ async function main() {
     });
     const etapaIndex = Math.min(2, Math.floor(index / 2));
     const etapaId = ETAPAS[etapaIndex].id;
+    // connect es aditivo: no desvincula la materia de otras etapas ya cargadas.
     await prisma.tema.update({
       where: { id: materiaId },
-      data: { clases: { set: [{ id: etapaId }] } },
+      data: { clases: { connect: [{ id: etapaId }] } },
     });
 
     await prisma.etapaTema.upsert({
@@ -281,22 +412,6 @@ async function main() {
         xpReward: leccion.xpReward,
         order: 100,
         temaId: preserveTemaId,
-        questions: {
-          deleteMany: {},
-          create: leccion.questions.map((q, qi) => ({
-            type: q.type,
-            prompt: q.prompt,
-            explanation: q.explanation,
-            order: qi,
-            options: {
-              create: q.options.map((o, oi) => ({
-                text: o.text,
-                isCorrect: o.isCorrect ?? false,
-                order: oi,
-              })),
-            },
-          })),
-        },
       },
       create: {
         id: leccion.id,
@@ -309,23 +424,11 @@ async function main() {
         xpReward: leccion.xpReward,
         order: 100,
         temaId: null,
-        questions: {
-          create: leccion.questions.map((q, qi) => ({
-            type: q.type,
-            prompt: q.prompt,
-            explanation: q.explanation,
-            order: qi,
-            options: {
-              create: q.options.map((o, oi) => ({
-                text: o.text,
-                isCorrect: o.isCorrect ?? false,
-                order: oi,
-              })),
-            },
-          })),
-        },
       },
     });
+    // Las preguntas se sincronizan aparte por "prompt": borrarlas y recrearlas
+    // arrastraba en cascada los AnswerRecord historicos de cada pregunta.
+    await syncQuestions(leccion.id, leccion.questions);
     console.log(`  ✔ Lección suelta: ${leccion.title} (${leccion.questions.length} preguntas)${preserveTemaId ? ` ·保留 temaId` : ""}`);
   }
 
@@ -342,12 +445,23 @@ async function main() {
     });
     if (leccionesSueltas.length > 0) {
       for (let i = 0; i < leccionesSueltas.length; i++) {
-        const materia = existingMaterias[i % existingMaterias.length];
+        const lessonId = leccionesSueltas[i].id;
+        // La leccion ya esta ubicada en el mapa via EtapaLesson: se respeta esa
+        // etapa y se elige una materia de la misma etapa. Solo si no hay vinculo
+        // se recurre al orden de materias.
+        const etapaLesson = await prisma.etapaLesson.findFirst({
+          where: { lessonId },
+          select: { claseId: true },
+        });
+        const materiaEnEtapa = etapaLesson
+          ? existingMaterias.find((materia) => materia.clases.some((clase) => clase.id === etapaLesson.claseId))
+          : undefined;
+        const materia = materiaEnEtapa ?? existingMaterias[i % existingMaterias.length];
         await prisma.lesson.update({
-          where: { id: leccionesSueltas[i].id },
+          where: { id: lessonId },
           data: { temaId: materia.id },
         });
-        console.log(`  ✔ Lección ${leccionesSueltas[i].id} asignada a materia ${materia.name}`);
+        console.log(`  ✔ Lección ${lessonId} asignada a materia ${materia.name}`);
       }
     }
   }
@@ -623,16 +737,7 @@ async function main() {
         order: index,
       },
     });
-    await prisma.oidoCrackOption.deleteMany({ where: { wordId: word.id } });
-    await prisma.oidoCrackOption.createMany({
-      data: item.options.map((option, oi) => ({
-        wordId: word.id,
-        label: option.label,
-        imageUrl: option.imageUrl,
-        isCorrect: option.isCorrect,
-        order: oi,
-      })),
-    });
+    await syncOidoOptions(word.id, item.options);
     console.log(`    ✔ Oído de Crack: ${item.word} (${item.language})`);
   }
 
@@ -762,15 +867,7 @@ async function main() {
         order: index,
       },
     });
-    await prisma.golPalabraOption.deleteMany({ where: { wordId: word.id } });
-    await prisma.golPalabraOption.createMany({
-      data: item.options.map((option, oi) => ({
-        wordId: word.id,
-        label: option.label,
-        isCorrect: option.isCorrect,
-        order: oi,
-      })),
-    });
+    await syncGolOptions(word.id, item.options);
     console.log(`    ✔ Gol de Palabra: ${item.word} (${item.language})`);
   }
 

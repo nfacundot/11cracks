@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { LowpolyHuman } from "@/lib/avatar3d/lowpoly-human";
+import { FiguraAvatar } from "@/lib/avatar3d/avatares/figura";
 import type { AvatarConfig } from "@/lib/avatar";
 
 /**
@@ -12,7 +12,7 @@ import type { AvatarConfig } from "@/lib/avatar";
 export function AvatarViewer({ config, className }: { config: AvatarConfig; className?: string }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const humanRef = useRef<LowpolyHuman | null>(null);
+  const humanRef = useRef<FiguraAvatar | null>(null);
   const configRef = useRef(config);
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
@@ -66,7 +66,7 @@ export function AvatarViewer({ config, className }: { config: AvatarConfig; clas
 
     const pivot = new THREE.Group();
     scene.add(pivot);
-    const human = new LowpolyHuman({ config: configRef.current, height: 2 });
+    const human = new FiguraAvatar({ config: configRef.current, height: 2 });
     humanRef.current = human;
     pivot.add(human.object3D);
 

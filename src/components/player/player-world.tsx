@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
-import { LowpolyHuman } from "@/lib/avatar3d/lowpoly-human";
+import { FiguraAvatar } from "@/lib/avatar3d/avatares/figura";
 import { DEFAULT_AVATAR_CONFIG, parseAvatarConfig, type AvatarConfig } from "@/lib/avatar";
 import { PlayerContextMenu, type WorldPlayerInfo } from "./player-context-menu";
 
@@ -34,7 +34,7 @@ type RemoteEntry = {
   rot: number;
 };
 type RemotePlayer = {
-  human: LowpolyHuman;
+  human: FiguraAvatar;
   data: WorldPlayerInfo;
   target: THREE.Vector3;
   rotTarget: number;
@@ -1231,7 +1231,7 @@ export function PlayerWorld({ config, self }: { config: AvatarConfig | null; sel
         let player = remotePlayers.get(entry.sessionId);
         if (!player) {
           try {
-            const human = new LowpolyHuman({ config: parseConfig(entry.config), height: 1.8 });
+            const human = new FiguraAvatar({ config: parseConfig(entry.config), height: 1.8 });
             human.object3D.position.set(ex, 0, ez);
             human.object3D.rotation.y = erot;
             scene.add(human.object3D);
@@ -1351,14 +1351,14 @@ export function PlayerWorld({ config, self }: { config: AvatarConfig | null; sel
     const spawnX = (Math.random() - 0.5) * 6;
     const spawnZ = 52 + (Math.random() - 0.5) * 6;
 
-    const human = new LowpolyHuman({ config: config ?? DEFAULT_AVATAR_CONFIG, height: 1.8 });
+    const human = new FiguraAvatar({ config: config ?? DEFAULT_AVATAR_CONFIG, height: 1.8 });
     human.object3D.position.set(spawnX, 0, spawnZ);
     human.object3D.rotation.y = Math.PI;
     scene.add(human.object3D);
 
     // Presencia en tiempo real: conecta al lobby del mundo.
     // Si el servidor no está disponible, cae a jugadores demo del servidor web.
-    const addRemote = (id: string, other: LowpolyHuman, data: WorldPlayerInfo, x: number, z: number, rot: number) => {
+    const addRemote = (id: string, other: FiguraAvatar, data: WorldPlayerInfo, x: number, z: number, rot: number) => {
       other.object3D.position.set(x, 0, z);
       other.object3D.rotation.y = rot;
       other.object3D.userData.player = true;
@@ -1390,7 +1390,7 @@ export function PlayerWorld({ config, self }: { config: AvatarConfig | null; sel
           const spot = spots[index % spots.length] ?? [0, 28];
           addRemote(
             `static-${player.id}`,
-            new LowpolyHuman({ config: player.avatarConfig ?? DEFAULT_AVATAR_CONFIG, height: 1.8 }),
+            new FiguraAvatar({ config: player.avatarConfig ?? DEFAULT_AVATAR_CONFIG, height: 1.8 }),
             { id: player.id, name: player.name, username: player.username, teamName: player.teamName, teamLogoUrl: player.teamLogoUrl },
             spot[0],
             spot[1],

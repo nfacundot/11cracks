@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Avatar } from "@/components/avatar";
@@ -11,7 +11,7 @@ import { setAvatarConfig } from "@/actions/user";
 import {
   DEFAULT_AVATAR_CONFIG,
   SKIN_TONES,
-  HAIR_STYLES,
+  SIN_PELO,
   HAIR_COLORS,
   EYE_STYLES,
   MOUTH_STYLES,
@@ -23,6 +23,11 @@ import {
   BACKGROUNDS,
   type AvatarConfig,
 } from "@/lib/avatar";
+import {
+  cargarManifiesto,
+  listarPorSlot,
+  type AssetAvatar,
+} from "@/lib/avatar3d/avatares/registro";
 
 function Swatch({
   color,
@@ -96,6 +101,25 @@ export function AvatarEditor({
   const [error, setError] = useState("");
   const shieldInputRef = useRef<HTMLInputElement>(null);
   const [uploadingShield, setUploadingShield] = useState(false);
+  const [cabellos, setCabellos] = useState<AssetAvatar[]>([]);
+
+  // Los modelos de pelo GLB salen del manifiesto, igual que en el creador 3D.
+  useEffect(() => {
+    let vigente = true;
+    void cargarManifiesto().then((manifiesto) => {
+      if (!vigente) return;
+      const genero = (draft.gender === "female" ? "femenino" : "masculino") as
+        | "femenino"
+        | "masculino";
+      setCabellos(listarPorSlot(manifiesto, "cabello", genero));
+    });
+    return () => {
+      vigente = false;
+    };
+  }, [draft.gender]);
+
+  // Los GLB traen el color horneado en la textura: el tinte no los afecta.
+  const peloEsAsset = cabellos.some((a) => a.id === draft.cabello);
 
   const openEditor = () => {
     setDraft(config ?? DEFAULT_AVATAR_CONFIG);
@@ -374,17 +398,32 @@ export function AvatarEditor({
 
             <div>
               <SectionTitle>Pelo</SectionTitle>
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                {HAIR_STYLES.map((s) => (
+
+              {cabellos.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {cabellos.map((asset) => (
+                    <Chip
+                      key={asset.id}
+                      label={asset.nombre}
+                      selected={draft.cabello === asset.id}
+                      onClick={() => setDraft((d) => ({ ...d, cabello: asset.id }))}
+                    />
+                  ))}
                   <Chip
-                    key={s.id}
-                    label={s.label}
-                    selected={draft.hair === s.id}
-                    onClick={() => setDraft((d) => ({ ...d, hair: s.id }))}
+                    label={SIN_PELO.label}
+                    selected={draft.cabello === null}
+                    onClick={() => setDraft((d) => ({ ...d, hair: SIN_PELO.id, cabello: null }))}
                   />
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2">
+                </div>
+              ) : (
+                <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                  No hay modelos de pelo disponibles.
+                </p>
+              )}
+
+              <div
+                className={`mt-2 flex flex-wrap gap-2 ${peloEsAsset ? "pointer-events-none opacity-40" : ""}`}
+              >
                 {HAIR_COLORS.map((c) => (
                   <Swatch
                     key={c}
@@ -394,6 +433,12 @@ export function AvatarEditor({
                   />
                 ))}
               </div>
+              {peloEsAsset && (
+                <p className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">
+                  Los modelos 3D traen el color horneado en la textura, así que el tinte no se
+                  aplica.
+                </p>
+              )}
             </div>
 
             <div>

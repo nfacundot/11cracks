@@ -1,0 +1,24 @@
+{
+  "_comentario": "Metadatos manuales por asset. La clave es el nombre del archivo original (sin .glb). 'ocupa' define que slots reemplaza. Los cuerpos son personajes calvos; el pelo se ancla a la cabeza detectada del cuerpo, asi que cab1/cab2 se publican ya recortados a la region de la cabeza y en el mismo espacio de anclaje (origen al centro, 1 = radioX de la cabeza). Como ese espacio se normaliza contra el ancla del cuerpo, el pelo sirve para cualquier genero: 'genero' es 'todos'.",
+
+  "av_mal": {
+    "nombre": "Calvo",
+    "ocupa": ["cuerpo"],
+    "genero": "masculino"
+  },
+  "av_fem": {
+    "nombre": "Calva",
+    "ocupa": ["cuerpo"],
+    "genero": "femenino"
+  },
+  "cab1": {
+    "nombre": "Corto",
+    "ocupa": ["cabello"],
+    "genero": "todos"
+  },
+  "cab2": {
+    "nombre": "Espigado",
+    "ocupa": ["cabello"],
+    "genero": "todos"
+  }
+}

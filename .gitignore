@@ -42,3 +42,9 @@ opencode.json
 next-env.d.ts
 
 /src/generated/prisma
+
+# originales 3D pesados (exports de Meshy). La version optimizada vive en
+# public/models/avatares/web y es lo unico que se sirve.
+/assets-3d/avatares/_inbox/
+/assets-3d/avatares/**/*.glb
+/public/models/avatares/_inbox/

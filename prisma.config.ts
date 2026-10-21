@@ -7,7 +7,9 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
+    // Seed completo: contenido base + reglas de dominio + jugadores de demo.
+    // `prisma db seed` (y `prisma migrate reset`) dejan la base lista para usar.
+    seed: "tsx prisma/seed.ts && tsx prisma/seed-domain.ts && tsx scripts/seed-players.ts",
   },
   datasource: {
     url: process.env["DATABASE_URL"],

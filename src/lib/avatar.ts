@@ -29,14 +29,27 @@ export type AvatarConfig = {
   shieldUrl: string | null;
   accessory: string;
   background: string;
+  /** Id del asset GLB que ocupa el slot "cuerpo" (ver public/models/avatares/manifest.json). */
+  modelo: string | null;
+  /**
+   * Id del asset GLB que ocupa el slot "cabello". Si es null se dibuja el pelo
+   * procedural de `hair`. Los GLB traen el color horneado en la textura, asi que
+   * `hairColor` no los tiñe.
+   */
+  cabello: string | null;
 };
 
 export const SKIN_TONES = [
   "#ffe0bd",
+  "#fbd5b5",
   "#f1c27d",
+  "#e8b878",
   "#e0ac69",
+  "#d59b5c",
   "#c68642",
+  "#b0703c",
   "#8d5524",
+  "#7a4526",
   "#5a3a22",
   "#3b2f2f",
 ] as const;
@@ -103,6 +116,14 @@ export const KIT_COLORS = [
   "#64748b",
   "#84cc16",
 ] as const;
+
+/**
+ * Unico estado de pelo sin asset. Los cuerpos GLB son calvos, asi que el pelo
+ * visible viene siempre de un asset (cab1/cab2) y los peinados procedurales
+ * quedaron obsoletos: siguen en HAIR_STYLES solo para validar configs ya
+ * guardados, pero la UI ya no los ofrece.
+ */
+export const SIN_PELO = { id: "none", label: "Sin pelo" } as const;
 
 export const UNIFORM_PRESETS = [
   { id: "clasico", label: "Clásico", jersey: "#16a34a", shorts: "#f8fafc", socks: "#16a34a" },
@@ -174,6 +195,8 @@ export const DEFAULT_AVATAR_CONFIG: AvatarConfig = {
   shieldUrl: null,
   accessory: "none",
   background: "#111827",
+  modelo: null,
+  cabello: null,
 };
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -191,6 +214,13 @@ const MOUTH_ID_SET = new Set(MOUTH_STYLES.map((s) => s.id));
 const POSE_ID_SET = new Set(POSE_STYLES.map((s) => s.id));
 const SHIELD_ID_SET = new Set(SHIELDS.map((s) => s.id));
 const ACC_ID_SET = new Set(ACCESSORIES.map((s) => s.id));
+const ASSET_ID_RE = /^[a-z0-9-]{1,64}$/;
+
+/** Los ids de asset validan contra el manifiesto en tiempo de carga, aqui solo el formato. */
+function idAsset(value: unknown): string | null {
+  const s = typeof value === "string" ? value : "";
+  return ASSET_ID_RE.test(s) ? s : null;
+}
 
 function inSet(value: unknown, set: Set<string>, fallback: string): string {
   const s = String(value ?? "");
@@ -241,5 +271,7 @@ export function validateAvatarConfig(value: unknown): AvatarConfig | null {
     shieldUrl,
     accessory: inIds(c.accessory, ACC_ID_SET, d.accessory),
     background: inSet(c.background, BG_SET, d.background),
+    modelo: idAsset(c.modelo),
+    cabello: idAsset(c.cabello),
   };
 }
